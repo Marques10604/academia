@@ -5,6 +5,7 @@ import { EXERCISES } from '../data/exercises.js';
 import { nextTemplate, exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
+import { sessionsThisWeek, WEEKLY_GOAL } from '../domain/week.js';
 import { startWorkout } from '../actions/workout.js';
 import { dayText } from './datefmt.js';
 import { phaseLabel, effortText, loadText, restText, reasonText } from './reasons.js';
@@ -28,6 +29,16 @@ function exerciseRow(item, plan) {
       isTime ? null : h('strong', { 'data-role': 'load' }, loadText(plan.load, exercise)),
       h('span', { class: 'muted small', 'data-role': 'effort' }, effortText(plan.phase, exercise)),
       reason ? h('span', { class: 'muted small', 'data-role': 'reason' }, reason) : null));
+}
+
+// "Esta semana ●●○ 2 de 3": filled dots for finished workouts this week; above the goal all dots stay filled.
+function weekCard(done) {
+  const dots = Array.from({ length: WEEKLY_GOAL }, (_, i) => (
+    h('span', { class: i < done ? 'dot on' : 'dot', 'aria-hidden': 'true' }, i < done ? '●' : '○')));
+  return h('div', { class: 'card week-card', 'data-role': 'week', 'data-count': String(done) },
+    h('span', { class: 'muted' }, 'Esta semana'),
+    h('span', { class: 'dots' }, dots),
+    h('strong', null, `${done} de ${WEEKLY_GOAL}`));
 }
 
 // Where this workout sits in the first-month plan (counted in workouts, not dates).
@@ -73,6 +84,7 @@ export async function renderToday() {
       h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
     h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
+    weekCard(sessionsThisWeek(sessions, today)),
     h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
     h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
     h('ul', { class: 'list' }, rows),

@@ -20,6 +20,7 @@ const ASSETS = [
   './src/domain/progression.js',
   './src/domain/records.js',
   './src/domain/timer.js',
+  './src/domain/week.js',
   './src/platform/device.js',
   './src/ui/datefmt.js',
   './src/ui/dom.js',
