@@ -9,6 +9,11 @@ import { PLAN_LINES, DEFAULT_PROFILE, NAME_MAX, cleanName } from '../domain/prof
 
 const p = (text) => h('p', { class: 'small' }, text);
 
+// The two guides live in the repository; the app only links to them on github.com (opens in the browser).
+const KIT_URL = 'https://github.com/Marques10604/academia/blob/main/KIT-SOCORRO-IA.md';
+const MANUAL_URL = 'https://github.com/Marques10604/academia/blob/main/MANUAL.md';
+const external = (props, text) => h('a', { class: 'btn', ...props, target: '_blank', rel: 'noopener noreferrer' }, text);
+
 // Plain-language explanation of the program (source: .planning/research/TRAINING-SCIENCE.md).
 function planCard() {
   return h('details', { class: 'card collapsible', 'data-role': 'plan' },
@@ -79,13 +84,20 @@ export async function renderSettings() {
       h('h2', null, 'Backup'),
       h('p', { class: 'small' }, backupAgeText(backup)),
       h('button', { class: 'btn', 'data-action': 'open-backup', onclick: () => { location.hash = '#/backup'; } }, 'Backup e restauração')),
-    // Ajuda: placeholder, plan 04-02 fills it
+    h('div', { class: 'card stack', 'data-role': 'first-day-link' },
+      h('h2', null, 'Primeiro dia na academia'),
+      h('button', { class: 'btn', 'data-action': 'first-day', onclick: () => { location.hash = '#/primeiro-dia'; } }, 'Checklist do 1º dia na academia')),
     h('div', { class: 'card stack', 'data-role': 'help' },
-      h('h2', null, 'Ajuda'),
-      h('p', { class: 'muted small' }, 'Em breve: como instalar o app, fazer backup e tirar dúvidas.')),
+      h('h2', null, 'Precisa de ajuda?'),
+      h('p', { class: 'small' }, 'Se algo quebrar ou você quiser mudar o app, o kit de socorro ensina a pedir ajuda a uma IA grátis (ChatGPT, Gemini) e a publicar a correção. O manual explica, passo a passo, como publicar uma mudança, desfazer e restaurar um backup. Os dois abrem no navegador e precisam de internet.'),
+      external({ 'data-action': 'help-kit', href: KIT_URL }, 'Abrir kit de socorro'),
+      external({ class: 'btn btn-ghost', 'data-action': 'manual', href: MANUAL_URL }, 'Manual de manutenção')),
     planCard(),
     h('div', { class: 'card stack', 'data-role': 'about' },
       h('h2', null, 'Sobre'),
+      h('div', { class: 'brand' },
+        h('img', { class: 'brand-logo', src: './icons/icon.svg', alt: '', width: '56', height: '56' }),
+        h('strong', { class: 'subtitle' }, 'Progride')),
       h('p', null, `Versão do app: ${APP_VERSION}`),
       h('p', null, `Armazenamento protegido: ${persisted ? 'sim' : 'não'}`),
       h('p', { class: 'muted small' }, 'Não limpe os dados do Chrome para este site: seus treinos ficam só neste celular.'),
