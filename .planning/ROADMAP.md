@@ -56,7 +56,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User starts the workout with one tap and logs each set in 1–2 taps with load and reps pre-filled and adjustable with +/−, sees the previous session's result ("anterior: 20 kg × 10"), can mark "leve / no ponto / pesado" on the last set, can undo the last set; the rest timer starts by itself, vibrates or beeps at the end and stays correct after the screen turns off or the app is switched; the screen stays awake during the workout.
   5. Closing, reloading or returning from YouTube mid-workout resumes exactly where the user stopped; finishing shows a summary (duration, sets, loads) and celebrates a personal record when beaten (ignoring warm-up and calibration); in the first 2 sessions of each exercise the app guides ramp sets and asks "quantas repetições ainda sobravam?", afterwards it suggests the next load by double progression with a one-line explanation, lowers the load after repeated failure or stagnation, suggests 90% / 80% after 10+ / 28+ days away, and lets the user change the per-exercise increment and override any suggestion.
 
-**Plans**: 5/6 plans executed
+**Plans**: 6/6 plans executed
 Plans:
 
 - [x] 01-01-PLAN.md — Tracer: Today (Treino A) → one-tap start → write-through set logging (queued, double-tap safe) → reload resumes; exercise navigation; zero-dependency E2E runner (wave 1)
@@ -64,7 +64,7 @@ Plans:
 - [x] 01-03-PLAN.md — Finish → summary → A/B rotation, onboarding + medical notice (comma decimals), Settings (version, storage), SW registration, publish 0.1.0 (wave 2)
 - [x] 01-04-PLAN.md — pt-BR library for the 15 exercises + YouTube search, Today prescription (sets × reps, rest, phase, effort) and tested double-progression suggestions with reasons (wave 3)
 - [x] 01-05-PLAN.md — Live logger: +/− steppers, typed loads, "anterior", leve/no ponto/pesado, undo, warm-up, rest timer + wake lock, summary with PRs (wave 3, parallel)
-- [ ] 01-06-PLAN.md — Calibration ramp ("quantas sobravam?"), per-exercise increments, publish 0.2.0, consolidated real-phone check (wave 4)
+- [x] 01-06-PLAN.md — Calibration ramp ("quantas sobravam?"), per-exercise increments, publish 0.2.0, consolidated real-phone check (wave 4)
 
 **UI hint**: yes
 
@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Today's Workout (Core Value) | 5/6 | In Progress|  |
+| 1. Today's Workout (Core Value) | 6/6 | In Progress|  |
 | 2. Backup, History & Check-in | 0/TBD | Not started | - |
 | 3. Food, Goals, Photos & AI | 0/TBD | Not started | - |
 | 4. Identity, Publish & Handoff | 0/TBD | Not started | - |

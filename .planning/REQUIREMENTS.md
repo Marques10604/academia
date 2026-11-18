@@ -38,12 +38,12 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Progressão de Carga (CARGA)
 
-- [ ] **CARGA-01**: Nas 2 primeiras sessões de cada exercício (calibração), o app guia a descoberta da carga inicial com séries de rampa e a pergunta "quantas repetições ainda sobravam?"
+- [x] **CARGA-01**: Nas 2 primeiras sessões de cada exercício (calibração), o app guia a descoberta da carga inicial com séries de rampa e a pergunta "quantas repetições ainda sobravam?"
 - [x] **CARGA-02**: Depois da calibração, o app aplica dupla progressão: quando todas as séries chegam ao topo da faixa (ex: 3×12 numa faixa 8–12), sugere subir a carga no próximo treino
 - [x] **CARGA-03**: App mostra uma linha explicando a sugestão (ex: "Você fez 3×12 — suba para 22 kg")
 - [x] **CARGA-04**: Se o usuário falhar a faixa mínima em 2 sessões seguidas ou estagnar 3 sessões, o app reduz a carga automaticamente
 - [x] **CARGA-05**: Após 10+ dias sem treinar, o app sugere retomar com 90% da carga (80% após 28+ dias)
-- [ ] **CARGA-06**: Usuário pode ajustar o incremento de cada exercício (ex: +1 pino, +2 kg, próximo halter) e sobrescrever a carga sugerida a qualquer momento
+- [x] **CARGA-06**: Usuário pode ajustar o incremento de cada exercício (ex: +1 pino, +2 kg, próximo halter) e sobrescrever a carga sugerida a qualquer momento
 
 ### Progresso (EVOL)
 
@@ -156,12 +156,12 @@ Adiado. Rastreado, fora do roadmap atual.
 | TREINO-07 | Phase 1 | Complete |
 | TREINO-08 | Phase 1 | Complete |
 | TREINO-09 | Phase 1 | Complete |
-| CARGA-01 | Phase 1 | Pending |
+| CARGA-01 | Phase 1 | Complete |
 | CARGA-02 | Phase 1 | Complete |
 | CARGA-03 | Phase 1 | Complete |
 | CARGA-04 | Phase 1 | Complete |
 | CARGA-05 | Phase 1 | Complete |
-| CARGA-06 | Phase 1 | Pending |
+| CARGA-06 | Phase 1 | Complete |
 | EVOL-01 | Phase 2 | Pending |
 | EVOL-02 | Phase 2 | Pending |
 | EVOL-03 | Phase 1 | Complete |
