@@ -54,3 +54,42 @@ test('overdueSeconds counts whole seconds past the end time', () => {
   assert.equal(overdueSeconds(10000, 9000), 0);
   assert.equal(overdueSeconds(null, 9000), 0);
 });
+
+import { beats, detectPRs } from '../src/domain/records.js';
+
+test('beats compares load first, then reps', () => {
+  assert.equal(beats({ load: 30, reps: 8 }, { load: 25, reps: 12 }), true);
+  assert.equal(beats({ load: 25, reps: 13 }, { load: 25, reps: 12 }), true);
+  assert.equal(beats({ load: 25, reps: 12 }, { load: 25, reps: 12 }), false);
+});
+
+const sess = (startedAt, exerciseId, sets) => ({
+  id: 's' + startedAt, startedAt, localDate: '2026-12-0' + startedAt,
+  entries: [{ exerciseId, sets: sets.map(([load, reps, kind = 'work']) => ({ load, reps, kind, at: startedAt })) }],
+});
+
+test('detectPRs gives no PR while an exercise has fewer than 2 prior sessions', () => {
+  const none = detectPRs([], sess(3, 'leg', [[30, 12]]));
+  assert.deepEqual(none, []);
+  const one = detectPRs([sess(1, 'leg', [[20, 12]])], sess(3, 'leg', [[30, 12]]));
+  assert.deepEqual(one, []);
+});
+
+test('detectPRs reports a beaten best after 2 prior sessions', () => {
+  const prior = [sess(2, 'leg', [[20, 12], [20, 11]]), sess(1, 'leg', [[20, 12]])];
+  const prs = detectPRs(prior, sess(3, 'leg', [[30, 12], [25, 12]]));
+  assert.deepEqual(prs, [{ exerciseId: 'leg', load: 30, reps: 12, prevLoad: 20, prevReps: 12 }]);
+});
+
+test('detectPRs ignores warm-up and ramp sets on the current session', () => {
+  const prior = [sess(2, 'leg', [[20, 12]]), sess(1, 'leg', [[20, 12]])];
+  const cur = sess(3, 'leg', [[100, 8, 'warmup'], [100, 5, 'ramp'], [20, 12]]);
+  assert.deepEqual(detectPRs(prior, cur), []);
+});
+
+test('detectPRs ignores warm-up sets in the prior sessions too', () => {
+  const prior = [sess(2, 'leg', [[100, 8, 'warmup'], [20, 12]]), sess(1, 'leg', [[20, 12]])];
+  const prs = detectPRs(prior, sess(3, 'leg', [[25, 10]]));
+  assert.equal(prs.length, 1);
+  assert.equal(prs[0].prevLoad, 20);
+});
