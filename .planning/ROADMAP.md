@@ -109,12 +109,12 @@ Plans:
   4. Every 4 weeks the app reminds the user to take front/side/back photos into a phone-gallery album (no photos stored in the app).
   5. User taps "Gerar relatório para IA" and gets a copyable text summary (loads, frequency, average weight, sleep/energy, protein) with a ready question, to paste into any free AI.
 
-**Plans**: 1/3 plans executed (sequential)
+**Plans**: 2/3 plans executed (sequential)
 
 Plans:
 
 - [x] 03-01-PLAN.md — Tracer: protein without a scale (Today "Proteína hoje" line → #/proteina home-portion buttons per meal, target 1,7 g/kg editable, 7-day average with days ≥ floor), stored in dailyLogs; backup validation + round trip (wave 1)
-- [ ] 03-02-PLAN.md — Goals and cues: weekly goal setting + streak with 1 grace week, "Faz N dias" on Today, weight goal with healthy pace on Corpo, carbohydrate nudge, 4-week photo reminder to the "Progride" album (wave 2)
+- [x] 03-02-PLAN.md — Goals and cues: weekly goal setting + streak with 1 grace week, "Faz N dias" on Today, weight goal with healthy pace on Corpo, carbohydrate nudge, 4-week photo reminder to the "Progride" album (wave 2)
 - [ ] 03-03-PLAN.md — "Gerar relatório para IA" (copy/share), morning-alarm guide + daily .ics, rescue-kit file map, release 0.5.0 published (wave 3)
 
 **UI hint**: yes
@@ -149,5 +149,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Today's Workout (Core Value) | 6/6 | In Progress|  |
 | 2. Backup, History & Check-in | 3/3 | In Progress|  |
-| 3. Food, Goals, Photos & AI | 1/3 | In Progress|  |
+| 3. Food, Goals, Photos & AI | 2/3 | In Progress|  |
 | 4. Identity, Publish & Handoff | 2/2 | In Progress|  |
