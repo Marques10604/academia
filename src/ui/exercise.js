@@ -45,6 +45,8 @@ export async function renderExercise(hash) {
       h('div', { class: 'card' },
         h('h2', null, 'Erros comuns'),
         h('ul', { 'data-role': 'mistakes' }, exercise.mistakes.map((m) => h('li', null, m)))),
+      h('p', { class: 'small', 'data-role': 'alternative' },
+        h('strong', null, 'Não tem essa máquina ou está ocupada? Use: '), exercise.alternative),
       h('a', {
         class: 'btn btn-big btn-primary',
         'data-action': 'youtube',

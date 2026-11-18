@@ -39,6 +39,7 @@ test('every exercise has pt-BR teaching content', () => {
     assert.ok(ex.mistakes.every((s) => typeof s === 'string' && s.trim()), `${ex.id}: mistakes vazios`);
     assert.ok(ex.muscles.primary.length >= 1, `${ex.id}: músculo principal`);
     assert.ok(ex.setup.trim().length > 0, `${ex.id}: setup`);
+    assert.ok(typeof ex.alternative === 'string' && ex.alternative.trim().length > 0, `${ex.id}: alternative`);
     assert.ok(ex.youtubeQuery.trim().length > 0, `${ex.id}: youtubeQuery`);
   }
 });
