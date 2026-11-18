@@ -267,9 +267,9 @@ input.stepper-value,
 }
 
 .notice {
-  background: var(--surface);
-  border-left: 4px solid var(--warn);
-  border-radius: 0 var(--radius) var(--radius) 0;
+  background: color-mix(in srgb, var(--warn) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  border-radius: var(--radius);
   padding: 14px;
 }
 
