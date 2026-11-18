@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { brDate, brShort } from '../src/domain/dates.js';
 import {
-  BACKUP_STORES, buildBackup, parseBackup, backupSummary, prepareRestore, backupFileName,
+  BACKUP_STORES, BACKUP_NUDGE_WORKOUTS, buildBackup, parseBackup, backupSummary, prepareRestore, backupFileName, backupStatus,
 } from '../src/domain/backup.js';
 
 const NOW = Date.UTC(2026, 10, 18, 12);
@@ -182,4 +182,28 @@ test('backupSummary adds the check-in count only when there are check-ins', () =
   assert.equal(backupSummary(mk(2)), '1 treino, em 17/11/2026 · 2 check-ins · salvo em 18/11/2026');
   assert.equal(backupSummary(mk(1)), '1 treino, em 17/11/2026 · 1 check-in · salvo em 18/11/2026');
   assert.equal(backupSummary(mk(0)), '1 treino, em 17/11/2026 · salvo em 18/11/2026');
+});
+
+test('BACKUP_NUDGE_WORKOUTS is 3', () => {
+  assert.equal(BACKUP_NUDGE_WORKOUTS, 3);
+});
+
+test('backupStatus counts workouts saved since the last backup', () => {
+  const at = (day, hh) => Date.parse(`2026-11-${day}T${hh}:00:00`);
+  const s = (id, day) => ({ id, startedAt: at(day, '10'), endedAt: at(day, '11') });
+  const two = [s('1', '10'), s('2', '12')];
+  const three = [...two, s('3', '14')];
+  assert.deepEqual(backupStatus({ lastBackupAt: null, sessions: two, today: '2026-11-18' }), { daysAgo: null, since: 2, due: false });
+  assert.equal(backupStatus({ lastBackupAt: null, sessions: three, today: '2026-11-18' }).due, true);
+  // backup between the end of session 2 and session 3: only session 3 is newer
+  const mid = backupStatus({ lastBackupAt: at('13', '09'), sessions: three, today: '2026-11-18' });
+  assert.equal(mid.since, 1);
+  assert.equal(mid.due, false);
+  assert.equal(mid.daysAgo, 5);
+  assert.equal(backupStatus({ lastBackupAt: at('18', '08'), sessions: three, today: '2026-11-18' }).daysAgo, 0);
+  assert.equal(backupStatus({ lastBackupAt: at('17', '08'), sessions: three, today: '2026-11-18' }).daysAgo, 1);
+  // a session without endedAt counts by its startedAt
+  const open = { id: 'x', startedAt: at('15', '10') };
+  assert.equal(backupStatus({ lastBackupAt: at('14', '12'), sessions: [open], today: '2026-11-18' }).since, 1);
+  assert.equal(backupStatus({ lastBackupAt: at('15', '12'), sessions: [open], today: '2026-11-18' }).since, 0);
 });

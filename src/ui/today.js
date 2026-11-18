@@ -1,5 +1,5 @@
 import { h } from './dom.js';
-import { listSessions, getActive } from '../data/db.js';
+import { listSessions, getActive, getSetting } from '../data/db.js';
 import { loadPrefs } from '../data/prefs.js';
 import { PROGRAM, ROTATION, workoutItems } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
@@ -9,6 +9,8 @@ import { localDate } from '../domain/dates.js';
 import { unitFor, incrementFor, historyOpts, noteOf } from '../domain/units.js';
 import { sessionsThisWeek, WEEKLY_GOAL } from '../domain/week.js';
 import { startWorkout } from '../actions/workout.js';
+import { backupStatus } from '../domain/backup.js';
+import { backupAgeText } from './backup.js';
 import { dayText } from './datefmt.js';
 import { phaseLabel, effortText, loadText, restText, reasonText } from './reasons.js';
 
@@ -76,6 +78,8 @@ export async function renderToday() {
     return exerciseRow(item, plan, noteOf(pref));
   });
 
+  const backup = backupStatus({ lastBackupAt: await getSetting('lastBackupAt', null), sessions, today });
+
   const onStart = (short) => async (e) => {
     e.currentTarget.disabled = true;
     await startWorkout(templateId, Date.now(), short);
@@ -91,6 +95,11 @@ export async function renderToday() {
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
     h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
     weekCard(sessionsThisWeek(sessions, today)),
+    backup.due
+      ? h('div', { class: 'notice stack', 'data-role': 'backup-nudge' },
+        h('p', null, `Você tem ${backup.since} treinos sem backup. Salve uma cópia para não perder seus dados.`),
+        h('button', { class: 'btn btn-primary', 'data-action': 'backup-now', onclick: () => { location.hash = '#/backup'; } }, 'Fazer backup agora'))
+      : h('p', { class: 'muted small', 'data-role': 'backup-status' }, backupAgeText(backup)),
     h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
     h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
     h('ul', { class: 'list' }, rows),

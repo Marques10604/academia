@@ -104,8 +104,16 @@ export default async function (page) {
   assert.equal(before.exercisePrefs.length, 3);
   assert.equal(before.dailyLogs.length, 2);
 
-  await page.goto('#/backup');
-  await page.waitFor("!!document.querySelector('[data-action=export-download]')");
+  // 3 workouts and no backup yet: Today reminds, and the button leads to the backup screen.
+  await page.goto('#/hoje');
+  await page.reload(); // same hash as before the seeding: re-render with the new data
+  await page.waitFor("!!document.querySelector('[data-role=backup-nudge]')");
+  assert.ok((await page.eval("document.querySelector('[data-role=backup-nudge]').innerText")).includes('3 treinos'));
+  assert.equal(await page.eval("!!document.querySelector('[data-role=backup-status]')"), false);
+  await page.click('[data-action=backup-now]');
+  await page.waitFor("!!document.querySelector('[data-screen=backup]')");
+  assert.equal(await page.eval("document.querySelector('[data-role=backup-last]').innerText"), 'Nenhum backup ainda');
+  assert.equal(await page.eval("!!document.querySelector('[data-action=export-download]')"), true, 'baixar sempre existe');
   await page.eval(`(() => {
     window.__blobs = []; window.__downloads = [];
     const create = URL.createObjectURL.bind(URL);
@@ -127,6 +135,15 @@ export default async function (page) {
   assert.match(await page.eval('window.__downloads[0]'), /^academia-backup-\d{4}-\d{2}-\d{2}\.json$/);
   await page.waitFor(`(async () => typeof ((await (${DB}).get('settings', 'lastBackupAt')) || {}).value === 'number')()`);
   const beforeWithStamp = await page.eval(SNAPSHOT); // includes lastBackupAt written by the export
+  await page.waitFor("document.querySelector('[data-role=backup-last]').innerText === 'Último backup: hoje'");
+  await page.goto('#/hoje');
+  await page.waitFor("!!document.querySelector('[data-role=backup-status]')");
+  assert.equal(await page.eval("document.querySelector('[data-role=backup-status]').innerText"), 'Último backup: hoje');
+  assert.equal(await page.eval("!!document.querySelector('[data-role=backup-nudge]')"), false);
+  await page.goto('#/config');
+  await page.waitFor("!!document.querySelector('[data-role=backup]')");
+  assert.ok((await page.eval("document.querySelector('[data-role=backup]').innerText")).includes('Último backup: hoje'));
+  assert.equal(await page.eval("!!document.querySelector('[data-action=open-backup]')"), true);
 
   // Wipe: leaving the app closes its connection, then the database is deleted.
   await page.goto('manifest.webmanifest');
@@ -158,6 +175,8 @@ export default async function (page) {
   assert.deepEqual(stripped(after.settings), stripped(before.settings));
   assert.equal(after.settings.find((r) => r.key === 'lastBackupAt').value, Date.parse(doc.exportedAt));
   assert.ok(beforeWithStamp.settings.some((r) => r.key === 'lastBackupAt'));
+  // lastBackupAt = exportedAt is after every session: no reminder after the restore
+  assert.equal(await page.eval("!!document.querySelector('[data-role=backup-nudge]')"), false);
 
   // ---- Part C: refusals change nothing.
   const refuse = async (text, expected) => {

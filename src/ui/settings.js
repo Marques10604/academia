@@ -1,5 +1,8 @@
 import { h } from './dom.js';
-import { getSetting, isPersisted } from '../data/db.js';
+import { getSetting, isPersisted, listSessions } from '../data/db.js';
+import { backupStatus } from '../domain/backup.js';
+import { localDate } from '../domain/dates.js';
+import { backupAgeText } from './backup.js';
 import { formatNumber } from '../domain/numbers.js';
 import { APP_VERSION } from '../version.js';
 import { PROGRAM } from '../data/program.js';
@@ -25,6 +28,11 @@ function planCard() {
 export async function renderSettings() {
   const persisted = await isPersisted();
   const profile = await getSetting('profile', null);
+  const backup = backupStatus({
+    lastBackupAt: await getSetting('lastBackupAt', null),
+    sessions: await listSessions(),
+    today: localDate(Date.now()),
+  });
   return h('div', { class: 'screen', 'data-screen': 'config' },
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Configurações')),
     h('div', { class: 'card' },
@@ -32,6 +40,10 @@ export async function renderSettings() {
       h('p', null, `Armazenamento protegido: ${persisted ? 'sim' : 'não'}`),
       h('p', { class: 'muted small' }, 'Não limpe os dados do Chrome para este site: seus treinos ficam só neste celular.'),
       profile ? h('p', null, `Peso: ${formatNumber(profile.weightKg)} kg · Altura: ${formatNumber(profile.heightCm)} cm`) : null),
+    h('div', { class: 'card stack', 'data-role': 'backup' },
+      h('strong', null, 'Backup'),
+      h('p', { class: 'small' }, backupAgeText(backup)),
+      h('button', { class: 'btn', 'data-action': 'open-backup', onclick: () => { location.hash = '#/backup'; } }, 'Backup e restauração')),
     planCard(),
     h('div', { class: 'notice' }, 'Este app não é aconselhamento médico.'),
     h('div', { class: 'bottom-bar' },

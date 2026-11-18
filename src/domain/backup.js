@@ -2,7 +2,11 @@
 //
 // EVERY IndexedDB store except 'active' (the in-progress draft) must be listed in BACKUP_STORES,
 // or it is silently left out of the backup. The 08-backup E2E compares this list with the real database.
-import { localDate, brDate } from './dates.js';
+import { localDate, brDate, daysBetween } from './dates.js';
+
+// Remind after this many workouts without a backup: about one week at the weekly goal of 3.
+// A trigger based on the data at risk, not calendar nagging (PITFALLS 2).
+export const BACKUP_NUDGE_WORKOUTS = 3;
 
 export const BACKUP_APP = 'academia';
 export const BACKUP_FORMAT = 1; // version of the envelope, not of the database
@@ -129,6 +133,15 @@ export function prepareRestore(doc, now) {
   out.settings = out.settings.filter((r) => r.key !== 'lastBackupAt');
   out.settings.push({ key: 'lastBackupAt', value: Number.isFinite(exported) ? exported : now });
   return out;
+}
+
+// since = saved workouts (complete or not, both are data) newer than the last backup;
+// daysAgo = whole local days since that backup (null when there is none).
+export function backupStatus({ lastBackupAt, sessions, today }) {
+  const since = sessions.filter((s) => lastBackupAt === null || lastBackupAt === undefined
+    || (s.endedAt ?? s.startedAt) > lastBackupAt).length;
+  const daysAgo = Number.isFinite(lastBackupAt) ? daysBetween(localDate(lastBackupAt), today) : null;
+  return { daysAgo, since, due: since >= BACKUP_NUDGE_WORKOUTS };
 }
 
 export function backupFileName(today, ext) {
