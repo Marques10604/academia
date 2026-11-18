@@ -159,6 +159,7 @@ export async function renderWorkout() {
           h('button', {
             class: 'btn', 'data-action': 'log-warmup', 'data-idx': String(i),
             onclick: async () => {
+              unlockAudio(); // needs the tap gesture so the end-of-rest beep can play later
               await logWarmup(0, w.load, w.reps, Date.now());
               await rerender();
             },
