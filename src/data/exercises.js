@@ -10,6 +10,7 @@ const ex = (id, name, type, equipment, startLoadKg, incrementKg, noFailure, cali
       primary: Object.freeze(content.primary),
       secondary: Object.freeze(content.secondary),
     }),
+    selectorized: content.selectorized === true, // pin-loaded machine/cable: may show "placa N" instead of kg
     setup: content.setup,
     alternative: content.alternative,
     steps: Object.freeze(content.steps),
@@ -53,6 +54,7 @@ const LIST = [
     ],
   }),
   ex('lat_pulldown', 'Puxada frontal', 'reps', 'polia', 20, 5, false, true, 'puxada frontal polia execução correta iniciante', {
+    selectorized: true,
     primary: ['dorsais (costas)'],
     secondary: ['bíceps', 'meio das costas'],
     alternative: 'Puxada com triângulo ou pegada neutra, ou barra assistida (máquina).',
@@ -70,6 +72,7 @@ const LIST = [
     ],
   }),
   ex('lying_leg_curl', 'Mesa flexora', 'reps', 'maquina', 10, 5, false, true, 'mesa flexora como fazer execução correta', {
+    selectorized: true,
     primary: ['posteriores de coxa'],
     secondary: ['panturrilha'],
     alternative: 'Cadeira flexora (sentado).',
@@ -119,6 +122,7 @@ const LIST = [
     ],
   }),
   ex('standing_calf_raise', 'Panturrilha em pé', 'reps', 'maquina', 20, 5, false, true, 'panturrilha em pé máquina execução correta', {
+    selectorized: true,
     primary: ['panturrilhas'],
     secondary: ['sóleo (músculo profundo da panturrilha)'],
     alternative: 'Panturrilha no leg press.',
@@ -186,6 +190,7 @@ const LIST = [
     ],
   }),
   ex('seated_cable_row', 'Remada baixa', 'reps', 'polia', 20, 5, false, true, 'remada baixa polia execução correta iniciante', {
+    selectorized: true,
     primary: ['costas (dorsais e meio das costas)'],
     secondary: ['bíceps'],
     alternative: 'Remada na máquina com apoio no peito ou remada curvada apoiada no banco inclinado.',
@@ -219,6 +224,7 @@ const LIST = [
     ],
   }),
   ex('pec_deck', 'Voador', 'reps', 'maquina', 15, 5, false, true, 'voador peck deck execução correta', {
+    selectorized: true,
     primary: ['peitoral'],
     secondary: ['ombro (parte da frente)'],
     alternative: 'Crucifixo com halteres (leve).',
@@ -235,6 +241,7 @@ const LIST = [
     ],
   }),
   ex('cable_triceps_pushdown', 'Tríceps na polia', 'reps', 'polia', 10, 2.5, false, true, 'tríceps na polia corda execução correta', {
+    selectorized: true,
     primary: ['tríceps'],
     secondary: [],
     alternative: 'Tríceps testa com halteres ou tríceps na máquina.',

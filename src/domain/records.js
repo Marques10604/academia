@@ -15,7 +15,8 @@ export function detectPRs(prevSessionsDesc, session) {
   for (const entry of session.entries || []) {
     const work = (entry.sets || []).filter((s) => s.kind === 'work');
     if (work.length === 0) continue;
-    const prior = exerciseHistory(prevSessionsDesc, entry.exerciseId);
+    // Loads in another unit (kg vs placa) are not comparable, so they never count as a previous best.
+    const prior = exerciseHistory(prevSessionsDesc, entry.exerciseId, { unit: entry.unit ?? 'kg' });
     if (prior.length < 2) continue;
     const prevBest = topSet(prior.flatMap((p) => p.sets));
     const cur = topSet(work);

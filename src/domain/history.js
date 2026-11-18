@@ -11,12 +11,16 @@ export function nextTemplate(sessionsDesc, rotation = ['A', 'B']) {
 }
 
 // Most recent first; only sessions with at least one 'work' set of this exercise.
-export function exerciseHistory(sessionsDesc, exerciseId) {
+// opts.unit: only entries logged in that load unit ('kg' | 'placa'; entries without a unit are kg).
+// opts.since: only sessions that started at or after this time (a unit change restarts the history).
+export function exerciseHistory(sessionsDesc, exerciseId, opts = {}) {
   const out = [];
   const sorted = [...sessionsDesc].sort((a, b) => b.startedAt - a.startedAt);
   for (const s of sorted) {
+    if (opts.since && s.startedAt < opts.since) continue;
     const entry = (s.entries || []).find((e) => e.exerciseId === exerciseId);
     if (!entry) continue;
+    if (opts.unit && (entry.unit ?? 'kg') !== opts.unit) continue;
     const sets = (entry.sets || []).filter((x) => x.kind === 'work');
     if (sets.length === 0) continue;
     out.push({ localDate: s.localDate, startedAt: s.startedAt, sets, feel: entry.feel ?? null });

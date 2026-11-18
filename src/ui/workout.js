@@ -7,6 +7,8 @@ import {
   adjustLoad, setLoad, adjustReps, setFeel, undoLastSet, logWarmup, skipRest, logRampSet, answerRamp,
 } from '../actions/workout.js';
 import { exerciseHistory } from '../domain/history.js';
+import { getPref } from '../data/prefs.js';
+import { loadLabel } from '../domain/units.js';
 import { warmupSets } from '../domain/draft.js';
 import { formatNumber as fmt, parseDecimal } from '../domain/numbers.js';
 import { restRemainingMs, formatClock, overdueSeconds } from '../domain/timer.js';
@@ -40,19 +42,19 @@ document.addEventListener('visibilitychange', () => {
 
 const workSets = (entry) => entry.sets.filter((s) => s.kind === 'work');
 
-function previousLine(entry, ex, prev) {
+function previousLine(entry, ex, prev, unit) {
   if (!prev) return 'primeira vez neste exercício';
   const set = prev.sets[workSets(entry).length] ?? prev.sets[prev.sets.length - 1];
-  return ex.type === 'time' ? `anterior: ${fmt(set.reps)} s` : `anterior: ${fmt(set.load)} kg × ${set.reps}`;
+  return ex.type === 'time' ? `anterior: ${fmt(set.reps)} s` : `anterior: ${loadLabel(set.load, unit)} × ${set.reps}`;
 }
 
-function setRowText(entry, ex, s, workNumber, rampNumber) {
-  if (s.kind === 'warmup') return `Aquecimento: ${fmt(s.load)} kg × ${s.reps}`;
+function setRowText(entry, ex, s, workNumber, rampNumber, unit) {
+  if (s.kind === 'warmup') return `Aquecimento: ${loadLabel(s.load, unit)} × ${s.reps}`;
   if (s.kind === 'ramp') {
     const left = s.rir === undefined ? '' : ` · sobravam ${s.rir >= 4 ? '4+' : s.rir}`;
-    return `Rampa ${rampNumber}: ${fmt(s.load)} kg × ${s.reps}${left}`;
+    return `Rampa ${rampNumber}: ${loadLabel(s.load, unit)} × ${s.reps}${left}`;
   }
-  return ex.type === 'time' ? `${workNumber}ª série: ${fmt(s.reps)} s` : `${workNumber}ª série: ${fmt(s.load)} kg × ${s.reps}`;
+  return ex.type === 'time' ? `${workNumber}ª série: ${fmt(s.reps)} s` : `${workNumber}ª série: ${loadLabel(s.load, unit)} × ${s.reps}`;
 }
 
 export async function renderWorkout() {
@@ -70,7 +72,9 @@ export async function renderWorkout() {
   const total = draft.entries.length;
   const done = workSets(entry).length;
   const hasAnySet = draft.entries.some((e) => e.sets.length > 0);
-  const prev = exerciseHistory(await listSessions(), entry.exerciseId)[0];
+  const unit = entry.unit ?? 'kg'; // drafts from 0.2.0 have no unit
+  const pref = await getPref(entry.exerciseId);
+  const prev = exerciseHistory(await listSessions(), entry.exerciseId, { unit, since: pref?.unitChangedAt ?? 0 })[0];
 
   // The set goes to the entry shown on screen (index captured at render time).
   const onRamp = async () => {
@@ -117,8 +121,8 @@ export async function renderWorkout() {
   // Load and reps update their own nodes: no screen re-render, so a field that was just
   // typed in (and blurred by tapping + or -) is never replaced under the user's finger.
   const loadInput = isTime ? null : h('input', {
-    name: 'load', type: 'text', inputmode: 'decimal', class: 'stepper-value',
-    value: fmt(entry.load), 'aria-label': 'Carga em kg',
+    name: 'load', type: 'text', inputmode: unit === 'placa' ? 'numeric' : 'decimal', class: 'stepper-value',
+    value: fmt(entry.load), 'aria-label': unit === 'placa' ? 'Número da placa' : 'Carga em kg',
     onchange: async (e) => {
       const input = e.currentTarget;
       const value = parseDecimal(input.value);
@@ -151,7 +155,7 @@ export async function renderWorkout() {
       h('p', null, 'Aquecimento: 5 min leves na bicicleta ou esteira + mobilidade (balance as pernas, gire os braços, 10 agachamentos sem peso).'),
       warmupSets(entry.load, entry.incrementKg ?? ex.incrementKg).map((w, i) => (i < warmups ? null
         : h('div', { class: 'set-row' },
-          h('span', null, `Aquecimento ${i + 1}: ${fmt(w.load)} kg × ${w.reps}`),
+          h('span', null, `Aquecimento ${i + 1}: ${loadLabel(w.load, unit)} × ${w.reps}`),
           h('button', {
             class: 'btn', 'data-action': 'log-warmup', 'data-idx': String(i),
             onclick: async () => {
@@ -175,7 +179,7 @@ export async function renderWorkout() {
     if (s.kind === 'work') workNumber += 1;
     if (s.kind === 'ramp') rampNumber += 1;
     return h('li', { class: `set-row${s.kind === 'work' ? '' : ' ' + s.kind}`, 'data-set-kind': s.kind },
-      setRowText(entry, ex, s, workNumber, rampNumber));
+      setRowText(entry, ex, s, workNumber, rampNumber, unit));
   });
 
   // Calibration (CARGA-01): ramp sets of ~10 reps; after each the user says how many reps were left.
@@ -197,7 +201,7 @@ export async function renderWorkout() {
     : null;
   const rampEndedBanner = !entry.calibrating && ramps.length > 0 && done === 0
     ? h('div', { class: 'banner', 'data-role': 'ramp-result' },
-      'Sua carga de trabalho: ' + loadText(entry.load, ex) + '. Agora faça as séries valendo.')
+      'Sua carga de trabalho: ' + loadText(entry.load, ex, unit) + '. Agora faça as séries valendo.')
     : null;
 
   const planned = entry.plannedSets;
@@ -240,13 +244,13 @@ export async function renderWorkout() {
         h('button', { class: 'btn btn-icon', 'data-action': 'load-minus', 'aria-label': 'Menos carga', onclick: onLoadStep(-1) }, '−'),
         loadInput,
         h('button', { class: 'btn btn-icon', 'data-action': 'load-plus', 'aria-label': 'Mais carga', onclick: onLoadStep(1) }, '+')),
-      isTime ? null : h('p', { class: 'muted small' }, loadText(1, ex).replace(/^1 /, '')),
+      isTime ? null : h('p', { class: 'muted small' }, unit === 'placa' ? 'placa (número da máquina)' : loadText(1, ex).replace(/^1 /, '')),
       h('div', { class: 'stepper' },
         h('button', { class: 'btn btn-icon', 'data-action': 'reps-minus', 'aria-label': 'Menos repetições', onclick: onRepsStep(-1) }, '−'),
         repsSpan,
         h('button', { class: 'btn btn-icon', 'data-action': 'reps-plus', 'aria-label': 'Mais repetições', onclick: onRepsStep(1) }, '+')),
       h('p', { class: 'muted small' }, isTime ? 'segundos' : 'repetições'),
-      h('p', { class: 'muted', 'data-role': 'previous' }, previousLine(entry, ex, prev)),
+      h('p', { class: 'muted', 'data-role': 'previous' }, previousLine(entry, ex, prev, unit)),
       h('ul', { class: 'list' }, setRows),
       done >= planned
         ? h('div', null,

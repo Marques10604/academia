@@ -1,6 +1,7 @@
 // Serialized write-through workout actions. IndexedDB is the only source of truth:
 // nothing here keeps a draft copy in memory between calls.
-import { getActive, putActive, listSessions, getAll, del, finishActive, SCHEMA_VERSION } from '../data/db.js';
+import { getActive, putActive, listSessions, del, finishActive, SCHEMA_VERSION } from '../data/db.js';
+import { loadPrefs } from '../data/prefs.js';
 import { workoutItems } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import { exerciseHistory } from '../domain/history.js';
@@ -8,6 +9,7 @@ import { planExercise } from '../domain/plan.js';
 import { calibrationStep } from '../domain/progression.js';
 import { localDate } from '../domain/dates.js';
 import { undoLast, isComplete } from '../domain/draft.js';
+import { unitFor, incrementFor, historyOpts } from '../domain/units.js';
 
 let chain = Promise.resolve();
 
@@ -32,16 +34,17 @@ export function mutate(fn) {
 export function startWorkout(templateId, now, short = false) {
   return queue(async () => {
     const sessions = await listSessions();
-    const prefs = await getAll('exercisePrefs');
-    const incrementById = new Map(prefs.map((p) => [p.exerciseId, p.incrementKg]));
+    const prefs = await loadPrefs();
     const today = localDate(now);
     const entries = workoutItems(templateId, short).map((item) => {
       const exercise = EXERCISES[item.exerciseId];
+      const pref = prefs.get(item.exerciseId);
       const plan = planExercise({
         item,
         exercise,
-        history: exerciseHistory(sessions, item.exerciseId),
-        incrementKg: incrementById.get(item.exerciseId),
+        history: exerciseHistory(sessions, item.exerciseId, historyOpts(exercise, pref)),
+        incrementKg: incrementFor(exercise, pref),
+        unit: unitFor(exercise, pref),
         today,
       });
       return {
@@ -53,6 +56,7 @@ export function startWorkout(templateId, now, short = false) {
         load: plan.load,
         reps: plan.targetReps,
         incrementKg: plan.incrementKg,
+        unit: plan.unit, // 'kg' | 'placa'; drafts and sessions from 0.2.0 have none (= kg)
         type: exercise.type,
         feel: null,
         phase: plan.phase,
@@ -101,6 +105,7 @@ export function logRampSet(entryIdx, now) {
 
 const clean = (v) => Math.round(v * 100) / 100;
 const FEELS = ['leve', 'ponto', 'pesado'];
+const isPlaca = (entry) => entry.unit === 'placa';
 const incrementOf = (entry) => entry.incrementKg ?? EXERCISES[entry.exerciseId]?.incrementKg ?? 1;
 
 // Load changes apply to every remaining set of that exercise in this workout (CARGA-06).
@@ -108,7 +113,7 @@ export function adjustLoad(entryIdx, direction) {
   return mutate((draft) => {
     const entry = draft.entries[entryIdx];
     if (!entry) return draft;
-    entry.load = Math.max(0, clean(entry.load + (direction < 0 ? -1 : 1) * incrementOf(entry)));
+    entry.load = Math.max(isPlaca(entry) ? 1 : 0, clean(entry.load + (direction < 0 ? -1 : 1) * incrementOf(entry)));
     return draft;
   });
 }
@@ -117,7 +122,7 @@ export function setLoad(entryIdx, value) {
   return mutate((draft) => {
     const entry = draft.entries[entryIdx];
     if (!entry || !Number.isFinite(value) || value < 0) return draft;
-    entry.load = clean(value);
+    entry.load = isPlaca(entry) ? Math.max(1, Math.round(value)) : clean(value); // a placa is a whole number
     return draft;
   });
 }

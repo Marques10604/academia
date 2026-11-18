@@ -6,18 +6,20 @@ import { nextTemplate } from '../domain/history.js';
 import { detectPRs } from '../domain/records.js';
 import { dayText } from './datefmt.js';
 import { formatNumber as fmt } from '../domain/numbers.js';
+import { loadLabel } from '../domain/units.js';
 
 // "30 kg × 12, 12, 11" when every set shares the load, else "30 kg × 12, 27,5 kg × 10"; time: "30 s, 35 s".
-function setsText(ex, sets) {
+// unit 'placa': "placa 6 × 12, 12, 11".
+function setsText(ex, sets, unit) {
   if (ex.type === 'time') return sets.map((s) => `${fmt(s.reps)} s`).join(', ');
   const sameLoad = sets.every((s) => s.load === sets[0].load);
-  if (sameLoad) return `${fmt(sets[0].load)} kg × ${sets.map((s) => s.reps).join(', ')}`;
-  return sets.map((s) => `${fmt(s.load)} kg × ${s.reps}`).join(', ');
+  if (sameLoad) return `${loadLabel(sets[0].load, unit)} × ${sets.map((s) => s.reps).join(', ')}`;
+  return sets.map((s) => `${loadLabel(s.load, unit)} × ${s.reps}`).join(', ');
 }
 
-function prText(ex, pr) {
+function prText(ex, pr, unit) {
   if (ex.type === 'time') return `${ex.name}: ${fmt(pr.reps)} s (antes: ${fmt(pr.prevReps)} s)`;
-  return `${ex.name}: ${fmt(pr.load)} kg × ${pr.reps} (antes: ${fmt(pr.prevLoad)} kg × ${pr.prevReps})`;
+  return `${ex.name}: ${loadLabel(pr.load, unit)} × ${pr.reps} (antes: ${loadLabel(pr.prevLoad, unit)} × ${pr.prevReps})`;
 }
 
 export async function renderSummary(hash) {
@@ -32,9 +34,10 @@ export async function renderSummary(hash) {
   const next = PROGRAM[nextTemplate(sessions, ROTATION)];
   const minutes = Math.max(0, Math.round((session.endedAt - session.startedAt) / 60000));
   const rows = session.entries
-    .map((e) => ({ ex: EXERCISES[e.exerciseId], sets: e.sets.filter((s) => s.kind === 'work') }))
+    .map((e) => ({ ex: EXERCISES[e.exerciseId], unit: e.unit ?? 'kg', sets: e.sets.filter((s) => s.kind === 'work') }))
     .filter((r) => r.sets.length > 0);
   const totalSets = rows.reduce((sum, r) => sum + r.sets.length, 0);
+  const unitOf = (exerciseId) => session.entries.find((e) => e.exerciseId === exerciseId)?.unit ?? 'kg';
   const prs = detectPRs(sessions.filter((s) => s.id !== session.id), session);
 
   return h('div', { class: 'screen', 'data-screen': 'resumo' },
@@ -47,9 +50,9 @@ export async function renderSummary(hash) {
     prs.length === 0 ? null : h('div', { class: 'card' },
       prs.map((pr) => h('p', { 'data-role': 'pr' },
         h('span', { class: 'badge badge-pr' }, 'Recorde!'),
-        ' ' + prText(EXERCISES[pr.exerciseId], pr)))),
+        ' ' + prText(EXERCISES[pr.exerciseId], pr, unitOf(pr.exerciseId))))),
     h('div', { class: 'card', 'data-role': 'loads' },
-      rows.map((r) => h('p', null, `${r.ex.name}: ${setsText(r.ex, r.sets)}`))),
+      rows.map((r) => h('p', null, `${r.ex.name}: ${setsText(r.ex, r.sets, r.unit)}`))),
     h('p', { class: 'muted' }, `Próximo treino: ${next.name}`),
     h('div', { class: 'bottom-bar' },
       h('button', {

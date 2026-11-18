@@ -3,8 +3,11 @@ import { h } from './dom.js';
 import { EXERCISES, youtubeUrl } from '../data/exercises.js';
 import { PROGRAM } from '../data/program.js';
 import { restText } from './reasons.js';
-import { get, put } from '../data/db.js';
+import { listSessions } from '../data/db.js';
+import { getPref, savePref } from '../data/prefs.js';
+import { exerciseHistory } from '../domain/history.js';
 import { formatNumber } from '../domain/numbers.js';
+import { unitFor, historyOpts } from '../domain/units.js';
 import { rerender } from '../app.js';
 
 function prescriptions(exercise) {
@@ -21,7 +24,32 @@ function prescriptions(exercise) {
 // Fixed lists only (no free text): the stored value is always one of these numbers.
 const INCREMENTS = { reps: [1, 2, 2.5, 5, 10], time: [5, 10] };
 
-function incrementCard(exercise, current) {
+// "kg" or "placa" (only pin-loaded machines/cables). Changing it restarts that exercise's calibration.
+function unitCard(exercise, pref) {
+  const current = unitFor(exercise, pref);
+  const choose = (next) => async () => {
+    if (next === current) return;
+    const hasHistory = exerciseHistory(await listSessions(), exercise.id, historyOpts(exercise, pref)).length > 0;
+    if (hasHistory && !window.confirm('Trocar a unidade recomeça a calibração deste exercício')) return;
+    await savePref(exercise.id, { unit: next, unitChangedAt: Date.now() });
+    await rerender();
+  };
+  return h('div', { class: 'card', 'data-role': 'unit' },
+    h('h2', null, 'Unidade da carga'),
+    h('div', { class: 'chips' },
+      ['kg', 'placa'].map((u) => h('button', {
+        class: `chip${u === current ? ' selected' : ''}`, 'data-unit': u, onclick: choose(u),
+      }, u))),
+    h('p', { class: 'muted small' }, "Use 'placa' se a máquina mostra só números (1, 2, 3…) e não kg."));
+}
+
+function incrementCard(exercise, current, unitName) {
+  if (unitName === 'placa') {
+    return h('div', { class: 'card', 'data-role': 'increment' },
+      h('h2', null, 'Incremento de carga'),
+      h('p', null, 'Em placa, o salto é sempre 1 placa.'),
+      h('p', { class: 'muted small' }, 'A carga sugerida é só uma sugestão: no treino você pode trocar com − e + a qualquer momento.'));
+  }
   const unit = exercise.type === 'time' ? ' s' : ' kg';
   const values = [...INCREMENTS[exercise.type === 'time' ? 'time' : 'reps']];
   if (!values.includes(current)) values.push(current);
@@ -33,7 +61,7 @@ function incrementCard(exercise, current) {
       values.map((v) => h('button', {
         class: `chip${v === current ? ' selected' : ''}`, 'data-increment': String(v),
         onclick: async () => {
-          await put('exercisePrefs', { exerciseId: exercise.id, incrementKg: v });
+          await savePref(exercise.id, { incrementKg: v });
           await rerender();
         },
       }, formatNumber(v) + unit))),
@@ -52,7 +80,8 @@ export async function renderExercise(hash) {
       h('a', { class: 'btn btn-primary', href: '#/hoje' }, 'Voltar para Hoje'));
   }
 
-  const pref = await get('exercisePrefs', exercise.id);
+  const pref = await getPref(exercise.id);
+  const unitName = unitFor(exercise, pref);
   const increment = pref?.incrementKg ?? exercise.incrementKg;
   const { primary, secondary } = exercise.muscles;
   const muscles = 'Músculos: ' + primary.join(', ') + (secondary.length ? ' · também: ' + secondary.join(', ') : '');
@@ -72,7 +101,8 @@ export async function renderExercise(hash) {
       h('div', { class: 'card' },
         h('h2', null, 'Erros comuns'),
         h('ul', { 'data-role': 'mistakes' }, exercise.mistakes.map((m) => h('li', null, m)))),
-      incrementCard(exercise, increment),
+      exercise.selectorized ? unitCard(exercise, pref) : null,
+      incrementCard(exercise, increment, unitName),
       h('p', { class: 'small', 'data-role': 'alternative' },
         h('strong', null, 'Não tem essa máquina ou está ocupada? Use: '), exercise.alternative),
       h('a', {

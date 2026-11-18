@@ -1,6 +1,7 @@
 // pt-BR texts for the prescription shown on Today and the exercise screen.
 // Formatting only: every decision is made in src/domain/progression.js.
 import { formatNumber } from '../domain/numbers.js';
+import { loadLabel } from '../domain/units.js';
 
 const PHASES = { calibracao: 'Calibração', adaptacao: 'Adaptação', base: 'Base' };
 
@@ -18,10 +19,10 @@ export function effortText(phase, exercise) {
     : 'Última série: deixe sobrar 1–2 repetições';
 }
 
-// 22 -> "22 kg"; dumbbells say "cada halter"; load 0 on a bodyweight exercise says so.
-export function loadText(load, exercise) {
+// 22 -> "22 kg"; dumbbells say "cada halter"; load 0 on a bodyweight exercise says so; unit 'placa' -> "placa 6".
+export function loadText(load, exercise, unit = 'kg') {
   if (load === 0 && exercise.equipment === 'peso-corporal') return 'peso do corpo';
-  return formatNumber(load) + ' kg' + (exercise.equipment === 'halter' ? ' cada halter' : '');
+  return loadLabel(load, unit) + (exercise.equipment === 'halter' ? ' cada halter' : '');
 }
 
 // 90 -> "descanso 1:30"
@@ -32,9 +33,9 @@ export function restText(sec) {
 }
 
 // One line explaining the suggestion. Unknown codes give ''.
-export function reasonText(code, params, exercise) {
+export function reasonText(code, params, exercise, unit = 'kg') {
   const p = params || {};
-  const load = p.load === undefined ? '' : loadText(p.load, exercise);
+  const load = p.load === undefined ? '' : loadText(p.load, exercise, unit);
   switch (code) {
     case 'increase': return `Você fez ${p.sets}×${p.reps} — suba para ${load}`;
     case 'boost': return `Você fez ${p.sets}×${p.reps} e estava leve — suba para ${load}`;
