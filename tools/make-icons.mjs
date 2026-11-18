@@ -34,15 +34,15 @@ function chunk(type, data) {
 const BG = [0x00, 0x00, 0x00];
 const FG = [0x22, 0xc5, 0x5e];
 
-// Arte numa caixa unitaria [0,1]x[0,1]: halter horizontal na parte de baixo e seta para cima saindo do meio da barra.
+// Arte numa caixa unitaria [0,1]x[0,1]: halter com anilhas arredondadas embaixo e um chevron de progresso (^) em cima.
+// rect: [x0, y0, x1, y1, raio do canto]; poly: lista de pontos (preenchimento par-impar).
 const ARTWORK = [
-  { rect: [0.08, 0.70, 0.92, 0.80] }, // barra
-  { rect: [0.16, 0.56, 0.28, 0.94] }, // anilha esquerda
-  { rect: [0.72, 0.56, 0.84, 0.94] }, // anilha direita
-  { rect: [0.06, 0.63, 0.16, 0.87] }, // ponta esquerda
-  { rect: [0.84, 0.63, 0.94, 0.87] }, // ponta direita
-  { rect: [0.43, 0.30, 0.57, 0.70] }, // haste da seta
-  { tri: [[0.50, 0.04], [0.22, 0.36], [0.78, 0.36]] }, // ponta da seta
+  { rect: [0.14, 0.695, 0.86, 0.765, 0.03] }, // barra
+  { rect: [0.21, 0.56, 0.31, 0.90, 0.04] }, // anilha interna esquerda
+  { rect: [0.69, 0.56, 0.79, 0.90, 0.04] }, // anilha interna direita
+  { rect: [0.10, 0.62, 0.20, 0.84, 0.035] }, // anilha externa esquerda
+  { rect: [0.80, 0.62, 0.90, 0.84, 0.035] }, // anilha externa direita
+  { poly: [[0.17, 0.40], [0.50, 0.07], [0.83, 0.40], [0.73, 0.50], [0.50, 0.27], [0.27, 0.50]] }, // chevron ^ com pontas em diagonal
 ];
 
 // Onde a caixa da arte fica dentro do icone: [offset, lado] em fracoes do lado do icone.
@@ -54,21 +54,28 @@ function place(kind, [x, y]) {
   return [offset + x * side, offset + y * side];
 }
 
-function inTriangle(px, py, [a, b, c]) {
-  const sign = (p, q, r) => (p[0] - r[0]) * (q[1] - r[1]) - (q[0] - r[0]) * (p[1] - r[1]);
-  const p = [px, py];
-  const d1 = sign(p, a, b);
-  const d2 = sign(p, b, c);
-  const d3 = sign(p, c, a);
-  const neg = d1 < 0 || d2 < 0 || d3 < 0;
-  const pos = d1 > 0 || d2 > 0 || d3 > 0;
-  return !(neg && pos);
+function inPoly(px, py, pts) {
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const [xi, yi] = pts[i];
+    const [xj, yj] = pts[j];
+    if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+function inRoundRect(px, py, [x0, y0, x1, y1, r]) {
+  if (px < x0 || px >= x1 || py < y0 || py >= y1) return false;
+  const cx = Math.min(Math.max(px, x0 + r), x1 - r);
+  const cy = Math.min(Math.max(py, y0 + r), y1 - r);
+  return (px - cx) ** 2 + (py - cy) ** 2 <= r * r;
 }
 
 function shapesFor(kind) {
+  const side = PLACEMENT[kind][1];
   return ARTWORK.map((s) => (s.rect
-    ? { rect: [...place(kind, [s.rect[0], s.rect[1]]), ...place(kind, [s.rect[2], s.rect[3]])] }
-    : { tri: s.tri.map((p) => place(kind, p)) }));
+    ? { rect: [...place(kind, [s.rect[0], s.rect[1]]), ...place(kind, [s.rect[2], s.rect[3]]), s.rect[4] * side] }
+    : { poly: s.poly.map((p) => place(kind, p)) }));
 }
 
 const SS = 4; // 4x4 amostras por pixel
@@ -84,9 +91,7 @@ export function renderIcon(size, kind) {
         for (let sx = 0; sx < SS; sx++) {
           const fx = (x + (sx + 0.5) / SS) / size;
           const fy = (y + (sy + 0.5) / SS) / size;
-          const on = shapes.some((s) => (s.rect
-            ? fx >= s.rect[0] && fx < s.rect[2] && fy >= s.rect[1] && fy < s.rect[3]
-            : inTriangle(fx, fy, s.tri)));
+          const on = shapes.some((s) => (s.rect ? inRoundRect(fx, fy, s.rect) : inPoly(fx, fy, s.poly)));
           if (on) hit++;
         }
       }
@@ -124,8 +129,8 @@ export function encodePng(size, rgba) {
 export function iconSvg() {
   const n = (v) => String(Math.round(v * 10000) / 100);
   const parts = shapesFor('any').map((s) => (s.rect
-    ? `<rect x="${n(s.rect[0])}" y="${n(s.rect[1])}" width="${n(s.rect[2] - s.rect[0])}" height="${n(s.rect[3] - s.rect[1])}" fill="#22c55e"/>`
-    : `<polygon points="${s.tri.map((p) => `${n(p[0])},${n(p[1])}`).join(' ')}" fill="#22c55e"/>`));
+    ? `<rect x="${n(s.rect[0])}" y="${n(s.rect[1])}" width="${n(s.rect[2] - s.rect[0])}" height="${n(s.rect[3] - s.rect[1])}" rx="${n(s.rect[4])}" fill="#22c55e"/>`
+    : `<polygon points="${s.poly.map((p) => `${n(p[0])},${n(p[1])}`).join(' ')}" fill="#22c55e"/>`));
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\n<rect width="100" height="100" rx="20" fill="#000000"/>\n${parts.join('\n')}\n</svg>\n`;
 }
 
