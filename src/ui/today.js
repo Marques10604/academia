@@ -1,22 +1,54 @@
 import { h } from './dom.js';
-import { listSessions, getActive } from '../data/db.js';
+import { listSessions, getActive, getAll } from '../data/db.js';
 import { PROGRAM, ROTATION } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
-import { nextTemplate } from '../domain/history.js';
+import { nextTemplate, exerciseHistory } from '../domain/history.js';
+import { planExercise } from '../domain/plan.js';
+import { localDate } from '../domain/dates.js';
 import { startWorkout } from '../actions/workout.js';
+import { phaseLabel, effortText, loadText, restText, reasonText } from './reasons.js';
 
-function planned(item) {
-  const ex = EXERCISES[item.exerciseId];
+function plannedText(item, plan, exercise) {
   const range = `${item.repMin}–${item.repMax}`;
-  return ex.type === 'time' ? `${item.sets} × ${range} s` : `${item.sets} × ${range}`;
+  const unit = exercise.type === 'time' ? ' s' : '';
+  return `${plan.sets} × ${range}${unit} · ${restText(item.restSec)}`;
+}
+
+function exerciseRow(item, plan) {
+  const exercise = EXERCISES[item.exerciseId];
+  const isTime = exercise.type === 'time';
+  const reason = reasonText(plan.reasonCode, plan.reasonParams, exercise);
+  return h('li', { class: 'list-item', 'data-exercise': item.exerciseId },
+    h('div', { class: 'stack', style: { gap: '4px', flex: '1' } },
+      h('div', { class: 'row', style: { justifyContent: 'space-between' } },
+        h('a', { href: '#/exercicio/' + item.exerciseId }, exercise.name),
+        h('span', { class: 'badge badge-' + plan.phase, 'data-role': 'phase' }, phaseLabel(plan.phase))),
+      h('span', { class: 'muted small', 'data-role': 'prescription' }, plannedText(item, plan, exercise)),
+      isTime ? null : h('strong', { 'data-role': 'load' }, loadText(plan.load, exercise)),
+      h('span', { class: 'muted small', 'data-role': 'effort' }, effortText(plan.phase, exercise)),
+      reason ? h('span', { class: 'muted small', 'data-role': 'reason' }, reason) : null));
 }
 
 export async function renderToday() {
   const draft = await getActive();
   const sessions = await listSessions();
+  const prefs = await getAll('exercisePrefs');
+  const incrementById = new Map(prefs.map((p) => [p.exerciseId, p.incrementKg]));
   // With an open workout, Today shows that workout instead of the rotation's next one.
   const templateId = draft ? draft.templateId : nextTemplate(sessions, ROTATION);
   const tpl = PROGRAM[templateId];
+  const today = localDate(Date.now()); // the clock is read here in the UI layer, never in src/domain
+
+  const rows = tpl.items.map((item) => {
+    const plan = planExercise({
+      item,
+      exercise: EXERCISES[item.exerciseId],
+      history: exerciseHistory(sessions, item.exerciseId),
+      incrementKg: incrementById.get(item.exerciseId),
+      today,
+    });
+    return exerciseRow(item, plan);
+  });
 
   const onStart = async (e) => {
     e.currentTarget.disabled = true;
@@ -31,11 +63,7 @@ export async function renderToday() {
     h('div', { class: 'topbar' },
       h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
-    h('ul', { class: 'list' },
-      tpl.items.map((item) =>
-        h('li', { class: 'list-item row', 'data-exercise': item.exerciseId },
-          h('a', { href: '#/exercicio/' + item.exerciseId }, EXERCISES[item.exerciseId].name),
-          h('span', { class: 'muted small' }, planned(item))))),
+    h('ul', { class: 'list' }, rows),
     h('div', { class: 'bottom-bar' },
       draft
         ? h('button', { class: 'btn btn-big btn-primary', 'data-action': 'resume', onclick: onResume }, 'Continuar treino')
