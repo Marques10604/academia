@@ -1,20 +1,29 @@
 // Boot, hash router, rerender(). Add a route by adding an entry to ROUTES.
-import { openDb, getActive } from './data/db.js';
+import { openDb, getActive, getSetting } from './data/db.js';
 import { mount } from './ui/dom.js';
 import { renderToday } from './ui/today.js';
 import { renderWorkout } from './ui/workout.js';
 import { renderSummary } from './ui/summary.js';
+import { renderOnboarding } from './ui/onboarding.js';
+import { renderSettings } from './ui/settings.js';
 
 const ROUTES = {
   '#/hoje': renderToday,
   '#/treino': renderWorkout,
   '#/resumo': renderSummary,
+  '#/inicio': renderOnboarding,
+  '#/config': renderSettings,
 };
 
 const root = () => document.getElementById('app');
 
 async function render() {
   const hash = location.hash;
+  // First open always goes through the medical notice + weight/height screen.
+  if (hash !== '#/inicio' && (await getSetting('onboardingDone', false)) !== true) {
+    location.hash = '#/inicio';
+    return; // hashchange re-enters render()
+  }
   // Exact match first; routes with a parameter ('#/resumo/<id>') match by prefix.
   const key = ROUTES[hash] ? hash : Object.keys(ROUTES).find((k) => hash.startsWith(k + '/'));
   if (!key) {

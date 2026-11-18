@@ -8,8 +8,19 @@ const draftSetCount = `(async () => {
 })()`;
 
 export default async function (page) {
+  // onboarding: medical notice, then weight with a comma decimal
   await page.goto('');
+  await page.waitFor("!!document.querySelector('[data-screen=inicio]')");
+  assert.ok((await page.text()).includes('não é aconselhamento médico'), 'aviso médico no primeiro acesso');
+  await page.type('input[name=weight]', '72,5');
+  await page.type('input[name=height]', '175');
+  await page.click('[data-action=accept-onboarding]');
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
+  const weightKg = await page.eval(`(async () => {
+    const db = await import(new URL('src/data/db.js', location.href).href);
+    return (await db.getSetting('profile')).weightKg;
+  })()`);
+  assert.equal(weightKg, 72.5, '72,5 deve virar 72.5 kg');
   const text = await page.text();
   assert.ok(text.includes('Treino A'), 'Today deve mostrar Treino A');
   assert.ok(text.includes('Leg press 45°'), 'Today deve listar Leg press 45°');
@@ -61,4 +72,12 @@ export default async function (page) {
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
   const today = await page.text();
   assert.ok(today.includes('Treino B') && today.includes('Iniciar treino'), 'Hoje deve oferecer Treino B');
+
+  // (e) Settings: version, storage status, profile
+  await page.click('[data-action=settings]');
+  await page.waitFor("!!document.querySelector('[data-screen=config]')");
+  const cfg = await page.text();
+  assert.ok(cfg.includes('Versão do app: 0.1.0'), 'config mostra a versão');
+  assert.ok(cfg.includes('Armazenamento protegido'), 'config mostra o armazenamento');
+  assert.ok(cfg.includes('72,5'), 'config mostra o peso');
 }

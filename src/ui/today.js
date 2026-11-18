@@ -28,7 +28,9 @@ export async function renderToday() {
   };
 
   return h('div', { class: 'screen', 'data-screen': 'hoje' },
-    h('div', { class: 'topbar' }, h('h1', { class: 'title' }, `Hoje: ${tpl.name}`)),
+    h('div', { class: 'topbar' },
+      h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
+      h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
     h('ul', { class: 'list' },
       tpl.items.map((item) =>
         h('li', { class: 'list-item row', 'data-exercise': item.exerciseId },
