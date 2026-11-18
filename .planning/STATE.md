@@ -1,18 +1,18 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 2
-current_phase_name: Backup, History & Check-in
+current_phase: 4
+current_phase_name: Identity, Publish & Handoff
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-11-18T20:02:30.628Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-11-18T20:50:30.657Z"
 last_activity: 2026-11-18
-last_activity_desc: Phase 1 execution started
-state_head: bea1cb255cf459d6002a62ea3297d07285163a31
+last_activity_desc: Completed 04-01 (Progride identity, first-day checklist, Today dashboard, reset-all)
+state_head: d7f9b52ccf84f5002073f9a908dff7c77fe17306
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
   percent: 0
 ---
 
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-18)
 
 **Core value:** In the gym, open the app and know exactly which workout to do today, how to do each exercise and with what weight, log each set in seconds, and have the next load suggested automatically, offline.
-**Current focus:** Phase 2 — Backup, History & Check-in (all 3 plans done, 0.3.0 live; phone checks pending)
+**Current focus:** Phase 4 — Identity, Publish & Handoff (04-01 done on branch gsd/phase-04-identity-publish-handoff; 04-02 publishes 0.4.0; Phases 1-2 live as 0.3.0, phone checks pending)
 
 **Hard deadline:** whole app finished in 5 days, target finish 2026-11-23 (started 2026-11-18). First gym session is in December 2026. Keep every implementation as simple as works for one person.
 
 ## Current Position
 
-Phase: 2 (Backup, History & Check-in) — EXECUTING
-Plan: 3 of 3 complete (phase 2 plans done; verification and UAT pending)
-Status: Phase 2 plans complete (0.3.0 published)
-Last activity: 2026-11-18 — Completed 02-03 (check-in, 7-day average, waist, 0.3.0 published)
+Phase: 4 (Identity, Publish & Handoff) — EXECUTING
+Plan: 1 of 2 complete (04-02: version 0.4.0, publish, maintenance guide, rescue kit)
+Status: 04-01 complete, not published (Phase 2 plans complete, 0.3.0 live)
+Last activity: 2026-11-18 — Completed 04-01 (Progride identity, first-day checklist, Today dashboard, Apagar tudo)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -69,6 +69,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P01 | 1h | 3 tasks | 11 files |
 | Phase 02 P02 | 45 min | 2 tasks | 14 files |
 | Phase 02 P03 | 40min | 3 tasks | 9 files |
+| Phase 04 P01 | 35min | 4 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - [Phase 02]: Backup envelope {app, format, schemaVersion, appVersion, exportedAt, counts, stores}; share as text/plain .txt; restore in one transaction; lastBackupAt = exportedAt after restore
 - [Phase 02]: 02-02: chart plots best set per workout (time for plank, reps when loads are 0, load in most recent unit); older workouts compute records against earlier workouts only
 - [Phase 02]: 02-03: only body weight from the scale is recorded; saving the waist rebuilds only the waist card so an unsaved check-in is never lost
+- [Phase 04]: Rebrand to Progride touches user-visible text only; manifest id/start_url/scope, DB_NAME, BACKUP_APP stay 'academia'
+- [Phase 04]: Settings has 'Apagar tudo e começar do zero' (db.clearAll, two confirms) for the pre-December test install
 
 ### Pending Todos
 
@@ -115,6 +118,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T20:02:29.753Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-11-18T20:50:30.463Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None

@@ -85,11 +85,11 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Identidade e Manutenção (LANC)
 
-- [ ] **LANC-01**: App tem nome e logo/ícone próprios na tela inicial do Android
+- [x] **LANC-01**: App tem nome e logo/ícone próprios na tela inicial do Android
 - [ ] **LANC-02**: App fica hospedado gratuitamente (GitHub Pages) numa URL definitiva
 - [ ] **LANC-03**: Existe um guia em pt-BR de como manter o app sem IA (publicar, adicionar exercício, restaurar backup)
 - [ ] **LANC-04**: "Kit de socorro com IA grátis": um texto pronto para colar no ChatGPT/Gemini explicando o projeto + passo a passo para aplicar e publicar uma correção
-- [ ] **LANC-05**: Checklist do 1º dia na academia (pedir ao professor, conferir máquinas que não existem, ver se a carga é em kg ou placa, anotar regulagens)
+- [x] **LANC-05**: Checklist do 1º dia na academia (pedir ao professor, conferir máquinas que não existem, ver se a carga é em kg ou placa, anotar regulagens)
 
 ## v2 Requirements
 
@@ -182,11 +182,11 @@ Adiado. Rastreado, fora do roadmap atual.
 | BKP-01 | Phase 2 | Complete |
 | BKP-02 | Phase 2 | Complete |
 | BKP-03 | Phase 2 | Complete |
-| LANC-01 | Phase 4 | Pending |
+| LANC-01 | Phase 4 | Complete |
 | LANC-02 | Phase 4 | Pending |
 | LANC-03 | Phase 4 | Pending |
 | LANC-04 | Phase 4 | Pending |
-| LANC-05 | Phase 4 | Pending |
+| LANC-05 | Phase 4 | Complete |
 
 **Coverage:**
 
