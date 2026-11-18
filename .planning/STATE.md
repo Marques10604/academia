@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Today's Workout (Core Value)
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-11-18T15:44:07.515Z"
+stopped_at: Completed 01-05-PLAN.md
+last_updated: "2026-11-18T15:57:24.030Z"
 last_activity: 2026-11-18
 last_activity_desc: Phase 1 execution started
-state_head: 5d18a809a93956d586a13d451d0c90f4ea14e2fb
+state_head: 4057935b26ffb92454a044c49838b124b350137e
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-11-18)
 ## Current Position
 
 Phase: 1 (Today's Workout (Core Value)) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-11-18 — Phase 1 execution started
 
@@ -64,6 +64,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 1 P02 | 15min | 3 tasks | 11 files |
 | Phase 01 P03 | 30min | 3 tasks | 11 files |
 | Phase 01 P04 | 25min | 2 tasks | 11 files |
+| Phase 01 P05 | 12 min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 1]: stamp-sw normalizes CRLF so --check is stable on Windows; sw.js ASSETS generated from tree
 - [Phase 01]: 01-03: workout counts as complete at >=70% exercises with a work set; Pages enabled from main root; version 0.1.0 published
 - [Phase 01]: 01-04: YouTube button uses a search URL; layoff/stall deloads never return the same load; calibration/adaptation plan min(2, sets) sets
+- [Phase 01]: 01-05: Typed load and +/- taps update the input in place (no re-render) and run in order through the action queue
+- [Phase 01]: 01-05: Rest timer is restEndsAt minus now, stored in the draft; alert guaranteed only while visible, one alert on return to an overdue timer
 
 ### Pending Todos
 
@@ -104,6 +107,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T15:44:07.430Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-11-18T15:57:23.913Z
+Stopped at: Completed 01-05-PLAN.md
 Resume file: None

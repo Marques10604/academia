@@ -22,19 +22,19 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 - [x] **PROG-03**: Cada exercício tem nome de academia brasileira, passo a passo de execução em pt-BR, erros comuns, músculos trabalhados e ajuste do aparelho
 - [x] **PROG-04**: Cada exercício tem botão que abre busca do YouTube em português para ver a demonstração
 - [x] **PROG-05**: Cada exercício mostra séries × repetições alvo, descanso e esforço esperado ("quantas repetições devem sobrar") conforme a fase (calibração / adaptação / base)
-- [ ] **PROG-06**: Aquecimento guiado: app sugere 5 min leves + séries de aquecimento no primeiro exercício, marcadas como aquecimento (não contam para recorde)
+- [x] **PROG-06**: Aquecimento guiado: app sugere 5 min leves + séries de aquecimento no primeiro exercício, marcadas como aquecimento (não contam para recorde)
 
 ### Treino ao Vivo (TREINO)
 
 - [x] **TREINO-01**: Usuário inicia o treino do dia com um toque
-- [ ] **TREINO-02**: Usuário registra uma série em 1–2 toques, com carga e repetições pré-preenchidas pela sugestão e ajustáveis por botões +/−
-- [ ] **TREINO-03**: Ao registrar, o app mostra o que foi feito na sessão anterior desse exercício (ex: "anterior: 20 kg × 10")
-- [ ] **TREINO-04**: Usuário informa "quanto sobrou" (leve / no ponto / pesado) na última série
+- [x] **TREINO-02**: Usuário registra uma série em 1–2 toques, com carga e repetições pré-preenchidas pela sugestão e ajustáveis por botões +/−
+- [x] **TREINO-03**: Ao registrar, o app mostra o que foi feito na sessão anterior desse exercício (ex: "anterior: 20 kg × 10")
+- [x] **TREINO-04**: Usuário informa "quanto sobrou" (leve / no ponto / pesado) na última série
 - [ ] **TREINO-05**: Timer de descanso inicia sozinho após cada série, vibra/toca ao terminar e continua correto se a tela apagar ou o app for trocado
 - [ ] **TREINO-06**: Tela não apaga durante o treino (wake lock)
 - [x] **TREINO-07**: Treino em andamento é salvo a cada série — se o app fechar, recarregar ou o usuário voltar do YouTube, ele retoma de onde parou
-- [ ] **TREINO-08**: Usuário pode desfazer a última série registrada
-- [ ] **TREINO-09**: Usuário finaliza o treino e vê um resumo (duração, séries, cargas, recordes)
+- [x] **TREINO-08**: Usuário pode desfazer a última série registrada
+- [x] **TREINO-09**: Usuário finaliza o treino e vê um resumo (duração, séries, cargas, recordes)
 
 ### Progressão de Carga (CARGA)
 
@@ -49,7 +49,7 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 - [ ] **EVOL-01**: Usuário vê o histórico de cada exercício (datas, cargas, repetições)
 - [ ] **EVOL-02**: Usuário vê gráfico da evolução de carga por exercício
-- [ ] **EVOL-03**: App detecta e comemora recorde pessoal (PR), ignorando aquecimento e calibração
+- [x] **EVOL-03**: App detecta e comemora recorde pessoal (PR), ignorando aquecimento e calibração
 - [ ] **EVOL-04**: Usuário vê histórico de treinos realizados (lista por data)
 
 ### Corpo e Check-in (CORPO)
@@ -146,16 +146,16 @@ Adiado. Rastreado, fora do roadmap atual.
 | PROG-03 | Phase 1 | Complete |
 | PROG-04 | Phase 1 | Complete |
 | PROG-05 | Phase 1 | Complete |
-| PROG-06 | Phase 1 | Pending |
+| PROG-06 | Phase 1 | Complete |
 | TREINO-01 | Phase 1 | Complete |
-| TREINO-02 | Phase 1 | Pending |
-| TREINO-03 | Phase 1 | Pending |
-| TREINO-04 | Phase 1 | Pending |
+| TREINO-02 | Phase 1 | Complete |
+| TREINO-03 | Phase 1 | Complete |
+| TREINO-04 | Phase 1 | Complete |
 | TREINO-05 | Phase 1 | Pending |
 | TREINO-06 | Phase 1 | Pending |
 | TREINO-07 | Phase 1 | Complete |
-| TREINO-08 | Phase 1 | Pending |
-| TREINO-09 | Phase 1 | Pending |
+| TREINO-08 | Phase 1 | Complete |
+| TREINO-09 | Phase 1 | Complete |
 | CARGA-01 | Phase 1 | Pending |
 | CARGA-02 | Phase 1 | Complete |
 | CARGA-03 | Phase 1 | Complete |
@@ -164,7 +164,7 @@ Adiado. Rastreado, fora do roadmap atual.
 | CARGA-06 | Phase 1 | Pending |
 | EVOL-01 | Phase 2 | Pending |
 | EVOL-02 | Phase 2 | Pending |
-| EVOL-03 | Phase 1 | Pending |
+| EVOL-03 | Phase 1 | Complete |
 | EVOL-04 | Phase 2 | Pending |
 | CORPO-01 | Phase 2 | Pending |
 | CORPO-02 | Phase 2 | Pending |
