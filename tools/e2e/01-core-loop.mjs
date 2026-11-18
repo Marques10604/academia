@@ -80,4 +80,7 @@ export default async function (page) {
   assert.ok(cfg.includes('Versão do app: 0.1.0'), 'config mostra a versão');
   assert.ok(cfg.includes('Armazenamento protegido'), 'config mostra o armazenamento');
   assert.ok(cfg.includes('72,5'), 'config mostra o peso');
+
+  // (f) the service worker is registered and active (precache finished)
+  await page.waitFor('(async () => { const r = await navigator.serviceWorker.ready; return !!r.active; })()', 8000);
 }

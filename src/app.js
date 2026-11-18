@@ -48,6 +48,12 @@ async function boot() {
   }
   window.addEventListener('hashchange', render);
   await render();
+  // A failed registration must never break the workout. The worker never takes over an open app.
+  if ('serviceWorker' in navigator) {
+    try {
+      await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
+    } catch { /* offline support is a bonus */ }
+  }
 }
 
 boot();
