@@ -1,18 +1,18 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 1
-current_phase_name: Today's Workout (Core Value)
+current_phase: 2
+current_phase_name: Backup, History & Check-in
 status: verifying
-stopped_at: Completed 01-06-PLAN.md
-last_updated: "2026-11-18T16:17:17.404Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-11-18T17:24:05.836Z"
 last_activity: 2026-11-18
 last_activity_desc: Phase 1 execution started
-state_head: 27276aa9621b43460efddd8a131f62f27b4165ce
+state_head: 675b425ed1a006968cde98a2626f132dab367c03
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 9
+  completed_plans: 7
   percent: 0
 ---
 
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-18)
 
 **Core value:** In the gym, open the app and know exactly which workout to do today, how to do each exercise and with what weight, log each set in seconds, and have the next load suggested automatically, offline.
-**Current focus:** Phase 1 — Today's Workout (Core Value)
+**Current focus:** Phase 2 — Backup, History & Check-in (02-01 done; next 02-02)
 
 **Hard deadline:** whole app finished in 5 days, target finish 2026-11-23 (started 2026-11-18). First gym session is in December 2026. Keep every implementation as simple as works for one person.
 
 ## Current Position
 
-Phase: 1 (Today's Workout (Core Value)) — EXECUTING
-Plan: 6 of 6
-Status: Phase complete — ready for verification
-Last activity: 2026-11-18 — Phase 1 execution started
+Phase: 2 (Backup, History & Check-in) — EXECUTING
+Plan: 1 of 3 complete (next: 02-02)
+Status: Executing Phase 2
+Last activity: 2026-11-18 — Completed 02-01 (backup and restore)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -66,6 +66,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P04 | 25min | 2 tasks | 11 files |
 | Phase 01 P05 | 12 min | 3 tasks | 11 files |
 | Phase 1 P06 | 20 min | 2 tasks | 8 files |
+| Phase 02 P01 | 1h | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,7 @@ Recent decisions affecting current work:
 - [Phase 01]: 01-05: Typed load and +/- taps update the input in place (no re-render) and run in order through the action queue
 - [Phase 01]: 01-05: Rest timer is restEndsAt minus now, stored in the draft; alert guaranteed only while visible, one alert on return to an overdue timer
 - [Phase 1]: 01-06: Ramp sets are kind 'ramp' and logSet ends calibration; increment chips come from fixed lists and apply to the next workout started
+- [Phase 02]: Backup envelope {app, format, schemaVersion, appVersion, exportedAt, counts, stores}; share as text/plain .txt; restore in one transaction; lastBackupAt = exportedAt after restore
 
 ### Pending Todos
 
@@ -109,6 +111,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T16:17:17.312Z
-Stopped at: Completed 01-06-PLAN.md
+Last session: 2026-11-18T17:24:05.691Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

@@ -79,9 +79,9 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Backup (BKP)
 
-- [ ] **BKP-01**: Usuário exporta todos os dados (sem fotos) num arquivo de backup versionado e pode enviá-lo pelo compartilhamento do Android (Drive, WhatsApp) ou baixar
-- [ ] **BKP-02**: Usuário importa um backup, vê prévia do que será restaurado e confirma
-- [ ] **BKP-03**: App mostra "último backup há N dias" e lembra de fazer backup após vários treinos sem backup
+- [x] **BKP-01**: Usuário exporta todos os dados (sem fotos) num arquivo de backup versionado e pode enviá-lo pelo compartilhamento do Android (Drive, WhatsApp) ou baixar
+- [x] **BKP-02**: Usuário importa um backup, vê prévia do que será restaurado e confirma
+- [x] **BKP-03**: App mostra "último backup há N dias" e lembra de fazer backup após vários treinos sem backup
 
 ### Identidade e Manutenção (LANC)
 
@@ -179,9 +179,9 @@ Adiado. Rastreado, fora do roadmap atual.
 | META-04 | Phase 3 | Pending |
 | META-05 | Phase 3 | Pending |
 | IA-01 | Phase 3 | Pending |
-| BKP-01 | Phase 2 | Pending |
-| BKP-02 | Phase 2 | Pending |
-| BKP-03 | Phase 2 | Pending |
+| BKP-01 | Phase 2 | Complete |
+| BKP-02 | Phase 2 | Complete |
+| BKP-03 | Phase 2 | Complete |
 | LANC-01 | Phase 4 | Pending |
 | LANC-02 | Phase 4 | Pending |
 | LANC-03 | Phase 4 | Pending |
