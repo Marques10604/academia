@@ -49,3 +49,25 @@ test('manifest: install identity and icons', () => {
 test('.nojekyll exists', () => {
   assert.ok(existsSync(join(ROOT, '.nojekyll')));
 });
+
+test('service worker: versioned precache, cache-first, no takeover', () => {
+  const sw = read('sw.js');
+  const ver = read('src/version.js').match(/APP_VERSION\s*=\s*'([^']+)'/)[1];
+  assert.equal(sw.split('\n')[0], `const VERSION = '${ver}';`);
+  assert.ok(sw.includes('// ASSETS-START') && sw.includes('// ASSETS-END'));
+  for (const ev of ['install', 'activate', 'fetch']) {
+    assert.ok(sw.includes(`addEventListener('${ev}'`), `sem listener ${ev}`);
+  }
+  assert.ok(!sw.includes('skipWaiting'), 'sw.js nao pode forcar ativacao');
+  assert.ok(!sw.includes('clients.claim'), 'sw.js nao pode tomar clientes');
+  const block = sw.split('// ASSETS-START')[1].split('// ASSETS-END')[0];
+  const assets = [...block.matchAll(/'([^']+)'/g)].map((x) => x[1]);
+  assert.ok(assets.includes('./styles.css') && assets.includes('./manifest.webmanifest'));
+  for (const a of assets) {
+    const rel = a === './' ? 'index.html' : a.replace(/^\.\//, '');
+    assert.ok(existsSync(join(ROOT, rel)), `asset listado nao existe: ${a}`);
+  }
+  for (const bad of ['tools/', 'test/', '.planning', '.claude', 'package.json']) {
+    assert.ok(!assets.some((a) => a.includes(bad)), `nao pode precachear ${bad}`);
+  }
+});
