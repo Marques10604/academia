@@ -25,8 +25,15 @@ export function loadLabel(load, unit) {
   return unit === 'placa' ? `placa ${formatNumber(load)}` : `${formatNumber(load)} kg`;
 }
 
-// Free text typed by the user: no CR, trimmed, at most 120 chars.
+// "Minha regulagem" note: free text typed by the user. No CR, trimmed, at most 3 lines and 120 chars.
+// Always shown through text nodes (see h() in src/ui/dom.js), never parsed as markup.
 export const NOTE_MAX = 120;
+export const NOTE_LINES = 3;
 export function cleanNote(text) {
-  return String(text ?? '').replace(/\r/g, '').trim().slice(0, NOTE_MAX).trim();
+  const lines = String(text ?? '').replace(/\r/g, '').trim().split('\n').slice(0, NOTE_LINES);
+  return lines.join('\n').slice(0, NOTE_MAX).trim();
+}
+
+export function noteOf(pref) {
+  return cleanNote(pref?.note);
 }

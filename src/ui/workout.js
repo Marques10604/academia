@@ -8,7 +8,7 @@ import {
 } from '../actions/workout.js';
 import { exerciseHistory } from '../domain/history.js';
 import { getPref } from '../data/prefs.js';
-import { loadLabel } from '../domain/units.js';
+import { loadLabel, noteOf } from '../domain/units.js';
 import { warmupSets } from '../domain/draft.js';
 import { formatNumber as fmt, parseDecimal } from '../domain/numbers.js';
 import { restRemainingMs, formatClock, overdueSeconds } from '../domain/timer.js';
@@ -234,6 +234,7 @@ export async function renderWorkout() {
     h('div', { class: 'card current' },
       h('h2', { class: 'title' },
         h('a', { href: '#/exercicio/' + entry.exerciseId }, ex.name)),
+      noteOf(pref) ? h('p', { class: 'small setup-note', 'data-role': 'setup-note' }, h('strong', null, 'Minha regulagem: '), noteOf(pref)) : null,
       entry.phase ? h('p', null, h('span', { class: `badge badge-${entry.phase}`, 'data-role': 'phase' }, phaseLabel(entry.phase))) : null, // drafts from 0.1.0 have no phase
       entry.phase ? h('p', { class: 'muted small', 'data-role': 'effort' }, effortText(entry.phase, ex)) : null,
       h('p', { class: 'muted' }, `${planned} × ${entry.repMin}–${entry.repMax}${isTime ? ' s' : ''}`),

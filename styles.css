@@ -284,7 +284,8 @@ input.stepper-value,
   font-size: 0.9rem;
 }
 
-input {
+input,
+textarea {
   font-size: 18px;
   font-family: inherit;
   min-height: 48px;
@@ -293,6 +294,19 @@ input {
   border: 1px solid var(--surface-2);
   border-radius: 10px;
   padding: 0 12px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 84px;
+  padding: 10px 12px;
+  resize: none;
+  line-height: 1.35;
+}
+
+.setup-note {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
 .set-row {

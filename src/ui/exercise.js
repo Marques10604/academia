@@ -7,7 +7,7 @@ import { listSessions } from '../data/db.js';
 import { getPref, savePref } from '../data/prefs.js';
 import { exerciseHistory } from '../domain/history.js';
 import { formatNumber } from '../domain/numbers.js';
-import { unitFor, historyOpts } from '../domain/units.js';
+import { unitFor, historyOpts, noteOf, cleanNote, NOTE_MAX, NOTE_LINES } from '../domain/units.js';
 import { rerender } from '../app.js';
 
 function prescriptions(exercise) {
@@ -41,6 +41,25 @@ function unitCard(exercise, pref) {
         class: `chip${u === current ? ' selected' : ''}`, 'data-unit': u, onclick: choose(u),
       }, u))),
     h('p', { class: 'muted small' }, "Use 'placa' se a máquina mostra só números (1, 2, 3…) e não kg."));
+}
+
+// "Minha regulagem": the user's own machine setup (seat hole, pad position...). Saved when the field loses focus.
+function noteCard(exercise, pref) {
+  const field = h('textarea', {
+    name: 'note', rows: String(NOTE_LINES), maxlength: String(NOTE_MAX),
+    placeholder: 'ex: banco no furo 4, almofada no 2', 'aria-label': 'Minha regulagem',
+    value: noteOf(pref),
+    onchange: async (e) => {
+      const el = e.currentTarget;
+      const note = cleanNote(el.value);
+      el.value = note;
+      await savePref(exercise.id, { note });
+    },
+  });
+  return h('div', { class: 'card', 'data-role': 'note' },
+    h('h2', null, 'Minha regulagem'),
+    field,
+    h('p', { class: 'muted small' }, 'Aparece no treino e na tela Hoje, para você não esquecer o ajuste do aparelho.'));
 }
 
 function incrementCard(exercise, current, unitName) {
@@ -101,6 +120,7 @@ export async function renderExercise(hash) {
       h('div', { class: 'card' },
         h('h2', null, 'Erros comuns'),
         h('ul', { 'data-role': 'mistakes' }, exercise.mistakes.map((m) => h('li', null, m)))),
+      noteCard(exercise, pref),
       exercise.selectorized ? unitCard(exercise, pref) : null,
       incrementCard(exercise, increment, unitName),
       h('p', { class: 'small', 'data-role': 'alternative' },

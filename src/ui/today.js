@@ -6,7 +6,7 @@ import { EXERCISES } from '../data/exercises.js';
 import { nextTemplate, exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
-import { unitFor, incrementFor, historyOpts } from '../domain/units.js';
+import { unitFor, incrementFor, historyOpts, noteOf } from '../domain/units.js';
 import { sessionsThisWeek, WEEKLY_GOAL } from '../domain/week.js';
 import { startWorkout } from '../actions/workout.js';
 import { dayText } from './datefmt.js';
@@ -18,7 +18,7 @@ function plannedText(item, plan, exercise) {
   return `${plan.sets} × ${range}${unit} · ${restText(item.restSec)}`;
 }
 
-function exerciseRow(item, plan) {
+function exerciseRow(item, plan, note) {
   const exercise = EXERCISES[item.exerciseId];
   const isTime = exercise.type === 'time';
   const reason = reasonText(plan.reasonCode, plan.reasonParams, exercise, plan.unit);
@@ -30,7 +30,9 @@ function exerciseRow(item, plan) {
       h('span', { class: 'muted small', 'data-role': 'prescription' }, plannedText(item, plan, exercise)),
       isTime ? null : h('strong', { 'data-role': 'load' }, loadText(plan.load, exercise, plan.unit)),
       h('span', { class: 'muted small', 'data-role': 'effort' }, effortText(plan.phase, exercise)),
-      reason ? h('span', { class: 'muted small', 'data-role': 'reason' }, reason) : null));
+      reason ? h('span', { class: 'muted small', 'data-role': 'reason' }, reason) : null,
+      // user text: h() only ever adds it as a text node
+      note ? h('span', { class: 'small setup-note', 'data-role': 'setup-note' }, 'Minha regulagem: ', note) : null));
 }
 
 // "Esta semana ●●○ 2 de 3": filled dots for finished workouts this week; above the goal all dots stay filled.
@@ -71,7 +73,7 @@ export async function renderToday() {
       unit: unitFor(exercise, pref),
       today,
     });
-    return exerciseRow(item, plan);
+    return exerciseRow(item, plan, noteOf(pref));
   });
 
   const onStart = (short) => async (e) => {
