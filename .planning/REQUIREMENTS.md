@@ -61,9 +61,9 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Alimentação (ALIM)
 
-- [ ] **ALIM-01**: Meta diária de proteína calculada pelo peso (1,7 g/kg ≈ 120 g para 70 kg), editável
-- [ ] **ALIM-02**: Usuário marca proteína por refeição com atalhos de porções brasileiras (ovo, frango, carne, feijão, leite, whey…) que somam gramas
-- [ ] **ALIM-03**: Usuário vê o total do dia e a média semanal (dias ≥ 112 g), em cores neutras, sem contagem de calorias
+- [x] **ALIM-01**: Meta diária de proteína calculada pelo peso (1,7 g/kg ≈ 120 g para 70 kg), editável
+- [x] **ALIM-02**: Usuário marca proteína por refeição com atalhos de porções brasileiras (ovo, frango, carne, feijão, leite, whey…) que somam gramas
+- [x] **ALIM-03**: Usuário vê o total do dia e a média semanal (dias ≥ 112 g), em cores neutras, sem contagem de calorias
 - [ ] **ALIM-04**: Se o peso médio não subir em 2 semanas, o app sugere acrescentar 1 porção de carboidrato por dia
 
 ### Metas e Lembretes (META)
@@ -170,9 +170,9 @@ Adiado. Rastreado, fora do roadmap atual.
 | CORPO-02 | Phase 2 | Complete |
 | CORPO-03 | Phase 3 | Pending |
 | CORPO-05 | Phase 2 | Complete |
-| ALIM-01 | Phase 3 | Pending |
-| ALIM-02 | Phase 3 | Pending |
-| ALIM-03 | Phase 3 | Pending |
+| ALIM-01 | Phase 3 | Complete |
+| ALIM-02 | Phase 3 | Complete |
+| ALIM-03 | Phase 3 | Complete |
 | ALIM-04 | Phase 3 | Pending |
 | META-01 | Phase 3 | Pending |
 | META-02 | Phase 3 | Pending |

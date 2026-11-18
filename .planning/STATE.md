@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 4
 current_phase_name: Identity, Publish & Handoff
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-11-18T22:41:03.097Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-11-18T23:33:33.099Z"
 last_activity: 2026-11-18
 last_activity_desc: Completed 04-01 (Progride identity, first-day checklist, Today dashboard, reset-all)
-state_head: 2de5e3c762053b73579078eed7497443f633020f
+state_head: 1b7100befa9a7a9b3e0b5f84de43e2dd1d73cbf6
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 14
+  completed_plans: 12
   percent: 0
 ---
 
@@ -71,6 +71,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P03 | 40min | 3 tasks | 9 files |
 | Phase 04 P01 | 35min | 4 tasks | 18 files |
 | Phase 04 P02 | 45min | 3 tasks | 9 files |
+| Phase 03 P01 | 35min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,7 @@ Recent decisions affecting current work:
 - [Phase 04]: Rebrand to Progride touches user-visible text only; manifest id/start_url/scope, DB_NAME, BACKUP_APP stay 'academia'
 - [Phase 04]: Settings has 'Apagar tudo e começar do zero' (db.clearAll, two confirms) for the pre-December test install
 - [Phase 04]: 04-02: guides follow the current card/tab UI; docs test checks plain and backticked paths plus quoted UI labels; sw.js precache uses cache 'reload'
+- [Phase 03]: 03-01: protein stored as a field of the dailyLogs row (no schema change); target in setting proteinTargetG; floor = target x 112/120; backup validates protein entries (g < 1000)
 
 ### Pending Todos
 
@@ -120,6 +122,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T22:41:02.395Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-11-18T23:33:32.926Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
