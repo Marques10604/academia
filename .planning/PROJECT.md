@@ -81,6 +81,8 @@ Se todo o resto falhar, isso precisa funcionar: treino do dia + registro de sér
 | IA sem servidor: relatório copiável + Gemini direto do celular | Usuário quer análise por IA; servidor reconsiderado e rejeitado (celular + backup) | — Pending |
 | Lembrete via alarme do Relógio/.ics, não push | Notification Triggers abandonado pelo Chrome | — Pending |
 | Construção em MVP vertical | Treino usável primeiro, resto em fatias | — Pending |
+| URL definitiva: https://marques10604.github.io/academia/ (repo público Marques10604/academia) | IndexedDB pertence à origem; nunca renomear conta/repo | ✓ Decidido |
+| Prazo: 5 dias (fim em 2026-11-23), versão enxuta sem blindagem | Uso só pessoal; proteções extras depois se precisar | — Pending |
 
 ## Evolution
 
