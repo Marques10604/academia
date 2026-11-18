@@ -6,6 +6,7 @@ import { EXERCISES } from '../data/exercises.js';
 import { exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
+import { undoLast } from '../domain/draft.js';
 
 let chain = Promise.resolve();
 
@@ -50,6 +51,8 @@ export function startWorkout(templateId, now) {
         restSec: plan.restSec,
         load: plan.load,
         reps: plan.targetReps,
+        incrementKg: plan.incrementKg,
+        type: exercise.type,
         feel: null,
         sets: [],
       };
@@ -73,6 +76,62 @@ export function logSet(entryIdx, now) {
     const entry = draft.entries[entryIdx];
     if (!entry) return draft;
     entry.sets.push({ load: entry.load, reps: entry.reps, kind: 'work', at: now });
+    return draft;
+  });
+}
+
+const clean = (v) => Math.round(v * 100) / 100;
+const FEELS = ['leve', 'ponto', 'pesado'];
+const incrementOf = (entry) => entry.incrementKg ?? EXERCISES[entry.exerciseId]?.incrementKg ?? 1;
+
+// Load changes apply to every remaining set of that exercise in this workout (CARGA-06).
+export function adjustLoad(entryIdx, direction) {
+  return mutate((draft) => {
+    const entry = draft.entries[entryIdx];
+    if (!entry) return draft;
+    entry.load = Math.max(0, clean(entry.load + (direction < 0 ? -1 : 1) * incrementOf(entry)));
+    return draft;
+  });
+}
+
+export function setLoad(entryIdx, value) {
+  return mutate((draft) => {
+    const entry = draft.entries[entryIdx];
+    if (!entry || !Number.isFinite(value) || value < 0) return draft;
+    entry.load = clean(value);
+    return draft;
+  });
+}
+
+export function adjustReps(entryIdx, direction) {
+  return mutate((draft) => {
+    const entry = draft.entries[entryIdx];
+    if (!entry) return draft;
+    const step = entry.type === 'time' ? 5 : 1;
+    entry.reps = Math.max(1, entry.reps + (direction < 0 ? -1 : 1) * step);
+    return draft;
+  });
+}
+
+export function setFeel(entryIdx, feel) {
+  return mutate((draft) => {
+    const entry = draft.entries[entryIdx];
+    if (!entry || !FEELS.includes(feel)) return draft;
+    entry.feel = feel;
+    return draft;
+  });
+}
+
+export function undoLastSet() {
+  return mutate((draft) => undoLast(draft));
+}
+
+// Warm-up sets are saved with kind 'warmup' so they never count for records or progression.
+export function logWarmup(entryIdx, load, reps, now) {
+  return mutate((draft) => {
+    const entry = draft.entries[entryIdx];
+    if (!entry) return draft;
+    entry.sets.push({ load, reps, kind: 'warmup', at: now });
     return draft;
   });
 }
