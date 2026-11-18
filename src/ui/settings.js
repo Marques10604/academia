@@ -1,5 +1,5 @@
 import { h } from './dom.js';
-import { getSetting, isPersisted, listSessions } from '../data/db.js';
+import { getSetting, isPersisted, listSessions, clearAll } from '../data/db.js';
 import { backupStatus } from '../domain/backup.js';
 import { localDate } from '../domain/dates.js';
 import { backupAgeText } from './backup.js';
@@ -25,6 +25,24 @@ function planCard() {
     p('Entre treinos: pelo menos 1 dia livre se der (ex: seg/qua/sex). Mesmos exercícios por 8 a 12 semanas. Ficou 10+ dias parado: volte com 90% da carga; 4+ semanas: 80% (o app faz sozinho).'));
 }
 
+// Two confirmations, then every store is cleared and the app goes back to the first-install screen.
+// (Cancel on the first one leaves room to make a backup, right above on this screen.)
+async function onResetAll(e) {
+  const button = e.currentTarget;
+  const first = confirm('Isso apaga todos os treinos, check-ins, cargas e configurações deste celular. Não dá para desfazer. Quer fazer um backup antes?\n\nToque em Cancelar para voltar e fazer o backup, ou em OK para continuar.');
+  if (!first) return;
+  if (!confirm('Apagar tudo agora?')) return;
+  button.disabled = true;
+  try {
+    await clearAll();
+  } catch {
+    button.disabled = false;
+    alert('Não foi possível apagar. Seus dados continuam no celular.');
+    return;
+  }
+  location.hash = '#/inicio'; // no onboardingDone any more: the app behaves like a first install
+}
+
 export async function renderSettings() {
   const persisted = await isPersisted();
   const profile = await getSetting('profile', null);
@@ -44,6 +62,9 @@ export async function renderSettings() {
       h('strong', null, 'Backup'),
       h('p', { class: 'small' }, backupAgeText(backup)),
       h('button', { class: 'btn', 'data-action': 'open-backup', onclick: () => { location.hash = '#/backup'; } }, 'Backup e restauração')),
+    h('div', { class: 'card stack', 'data-role': 'reset' },
+      h('p', { class: 'muted small' }, 'Vai testar o app antes de começar? Depois de testar, apague tudo para começar o treino de verdade com o app limpo.'),
+      h('button', { class: 'btn btn-danger', 'data-action': 'reset-all', onclick: onResetAll }, 'Apagar tudo e começar do zero')),
     planCard(),
     h('div', { class: 'notice' }, 'Este app não é aconselhamento médico.'),
     h('div', { class: 'bottom-bar' },

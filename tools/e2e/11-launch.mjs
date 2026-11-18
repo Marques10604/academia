@@ -1,4 +1,4 @@
-// Launch: first-gym-day checklist (shown until the first completed workout, ticks saved in settings and backed up).
+// Launch: identity, Today dashboard, first-gym-day checklist, and "Apagar tudo e começar do zero".
 import assert from 'node:assert/strict';
 
 const DB = "await import(new URL('src/data/db.js', location.href).href)";
@@ -107,4 +107,57 @@ export default async function (page) {
   await page.goto('#/primeiro-dia');
   await page.waitFor(has('[data-screen=primeiro-dia]'));
   assert.ok((await page.eval(textOf('[data-role=first-day-progress]'))).includes('1 de 6 feitos'));
+
+  // --- "Apagar tudo e começar do zero": two confirmations, every store (draft included) cleared, back to onboarding ---
+  await page.goto('#/hoje');
+  await page.waitFor(has('[data-action=start]'));
+  await page.click('[data-action=start]'); // leaves an open workout draft behind
+  await page.waitFor(has('[data-screen=treino]'));
+  await page.goto('#/config');
+  await page.waitFor(has('[data-action=reset-all]'));
+  const counts = `(async () => {
+    const db = ${DB};
+    const conn = await db.openDb();
+    const out = {};
+    for (const name of conn.objectStoreNames) out[name] = (await db.getAll(name)).length;
+    return out;
+  })()`;
+  await page.eval(`(async () => { await (${DB}).put('exercisePrefs', { exerciseId: 'leg_press_45', incrementKg: 2.5, note: 'banco no furo 4' }); return true; })()`);
+  const before = await page.eval(counts);
+  for (const name of ['settings', 'sessions', 'exercisePrefs', 'dailyLogs', 'active']) {
+    assert.ok(before[name] > 0, 'dados semeados em ' + name);
+  }
+  // Replaces window.confirm: answers the questions in order and records the texts.
+  const answers = (list) => page.eval(`(() => {
+    window.__asked = [];
+    const a = ${JSON.stringify(list)};
+    window.confirm = (m) => { window.__asked.push(m); return a.shift() === true; };
+    return true;
+  })()`);
+
+  // Cancel on the first question: nothing changes.
+  await answers([false]);
+  await page.click('[data-action=reset-all]');
+  assert.deepEqual(await page.eval(counts), before, 'cancelar na 1a pergunta nao apaga nada');
+  // Cancel on the second question: nothing changes.
+  await answers([true, false]);
+  await page.click('[data-action=reset-all]');
+  assert.equal(await page.eval('window.__asked.length'), 2, 'duas perguntas');
+  assert.deepEqual(await page.eval(counts), before, 'cancelar na 2a pergunta nao apaga nada');
+  // Both confirmed: wiped, and the app shows the first-install screen.
+  await answers([true, true]);
+  await page.click('[data-action=reset-all]');
+  await page.waitFor(has('[data-screen=inicio]'));
+  const asked = await page.eval('window.__asked');
+  assert.ok(asked[0].includes('Quer fazer um backup antes?'), 'texto da 1a pergunta');
+  assert.equal(asked[1], 'Apagar tudo agora?');
+  const after = await page.eval(counts);
+  for (const [name, n] of Object.entries(after)) assert.equal(n, 0, 'store vazio: ' + name);
+  assert.equal(Object.keys(after).length, Object.keys(before).length, 'mesmos stores');
+  assert.ok((await page.text()).includes('Bem-vindo ao Progride'));
+  // It works as a first install again: onboarding, then Today with the first-day card.
+  await page.type('input[name=weight]', '71');
+  await page.type('input[name=height]', '176');
+  await page.click('[data-action=accept-onboarding]');
+  await page.waitFor(has('[data-screen=hoje]') + ' && ' + has('[data-role=first-day]'));
 }

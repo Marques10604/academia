@@ -159,6 +159,21 @@ export async function replaceStores(stores) {
   });
 }
 
+// "Apagar tudo e começar do zero": clear EVERY object store (including the open-workout draft) in ONE
+// readwrite transaction, so it is all-or-nothing. Lists the stores from the real database, so a store
+// added in a later schema version is wiped too. The database itself and its schema stay in place.
+export async function clearAll() {
+  const db = await openDb();
+  const names = Array.from(db.objectStoreNames);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(names, 'readwrite');
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+    for (const name of names) tx.objectStore(name).clear();
+  });
+}
+
 export async function requestPersist() {
   if (navigator.storage && navigator.storage.persist) return navigator.storage.persist();
   return false;
