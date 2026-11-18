@@ -52,21 +52,29 @@ export async function main() {
     await browser.send('Runtime.enable');
     await browser.send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 2, mobile: true });
     const page = makePage(browser.send, url);
+    const capture = (params) => Promise.race([
+      browser.send('Page.captureScreenshot', { format: 'png', ...params }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('captura demorou demais')), 20000)),
+    ]);
     const shot = async (name, { full = false } = {}) => {
       await new Promise((r) => setTimeout(r, 300)); // let fonts/layout settle
-      const save = async (file) => {
-        const { data } = await browser.send('Page.captureScreenshot', { format: 'png' });
+      const save = async (file, params = {}) => {
+        const { data } = await capture(params);
         fs.writeFileSync(path.join(OUT, file), Buffer.from(data, 'base64'));
         console.log('salvo', path.join(OUT, file));
       };
       await save(`${name}.png`);
       if (full) {
-        // same screen, tall viewport: the whole page in one image
-        const height = await page.eval('Math.ceil(document.documentElement.scrollHeight)');
-        await browser.send('Emulation.setDeviceMetricsOverride', { width: W, height: Math.max(H, height), deviceScaleFactor: 2, mobile: true });
-        await new Promise((r) => setTimeout(r, 300));
-        await save(`${name}-completo.png`);
-        await browser.send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 2, mobile: true });
+        // long screen: more viewport-sized shots, scrolling down by almost one screen each time (name-2.png, name-3.png...)
+        const total = await page.eval('Math.ceil(document.documentElement.scrollHeight)');
+        let y = 0;
+        for (let n = 2; y + H < total && n <= 8; n++) {
+          y = Math.min(y + H - 140, total - H);
+          await page.eval(`window.scrollTo(0, ${y}); true`);
+          await new Promise((r) => setTimeout(r, 250));
+          await save(`${name}-${n}.png`);
+        }
+        await page.eval('window.scrollTo(0, 0); true');
       }
     };
     const screen = (name) => page.waitFor(`!!document.querySelector('[data-screen=${name}]')`);

@@ -58,7 +58,8 @@ function checkinCard(row, today) {
       h('label', null, 'Energia'),
       ratingChips('data-energy', energy, (v) => { energy = v; }),
       h('span', { class: 'muted small' }, '1 = sem energia · 5 = muita energia')),
-    error);
+    error,
+    h('button', { class: 'btn btn-primary', 'data-action': 'save-checkin', onclick: save }, 'Salvar check-in'));
   return { node, save };
 }
 
@@ -133,7 +134,5 @@ export async function renderBody() {
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Corpo')),
     checkin.node,
     weightCard(days, today),
-    waistCard(days, today),
-    h('div', { class: 'bottom-bar' },
-      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'save-checkin', onclick: checkin.save }, 'Salvar check-in')));
+    waistCard(days, today));
 }

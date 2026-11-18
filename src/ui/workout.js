@@ -151,7 +151,7 @@ export async function renderWorkout() {
   // Warm-up guidance on the very first exercise, before any work set (PROG-06).
   const warmups = entry.sets.filter((s) => s.kind === 'warmup').length;
   const warmupCard = idx === 0 && done === 0
-    ? h('div', { class: 'card', 'data-role': 'warmup' },
+    ? h('div', { class: 'card stack', 'data-role': 'warmup' },
       h('p', null, 'Aquecimento: 5 min leves na bicicleta ou esteira + mobilidade (balance as pernas, gire os braços, 10 agachamentos sem peso).'),
       warmupSets(entry.load, entry.incrementKg ?? ex.incrementKg).map((w, i) => (i < warmups ? null
         : h('div', { class: 'set-row' },
@@ -187,7 +187,7 @@ export async function renderWorkout() {
   const ramps = entry.sets.filter((s) => s.kind === 'ramp');
   const awaitingRir = ramps.length > 0 && ramps[ramps.length - 1].rir === undefined;
   const calibrationCard = entry.calibrating
-    ? h('div', { class: 'card', 'data-role': 'calibration' },
+    ? h('div', { class: 'stack', 'data-role': 'calibration' },
       h('span', { class: 'badge badge-calibracao' }, 'Calibração'),
       h('p', null, 'Descubra sua carga: faça 10 repetições com boa forma, sem pressa.'),
       awaitingRir
@@ -209,10 +209,9 @@ export async function renderWorkout() {
   const header = done < planned ? `Série ${done + 1} de ${planned}` : `Séries planejadas concluídas (${planned} de ${planned})`;
 
   const screen = h('div', { class: 'screen', 'data-screen': 'treino' },
-    h('div', { class: 'topbar' },
-      h('div', null,
-        h('h1', { class: 'title' }, draft.short ? `${tpl.name} (curto)` : tpl.name),
-        h('p', { class: 'subtitle muted' }, `Exercício ${idx + 1} de ${total}`))),
+    h('div', { class: 'stack tight' },
+      h('h1', { class: 'title' }, draft.short ? `${tpl.name} (curto)` : tpl.name),
+      h('p', { class: 'subtitle muted' }, `Exercício ${idx + 1} de ${total}`)),
     h('div', { class: 'chips', 'data-role': 'overview' },
       draft.entries.map((e, i) => h('button', {
         class: `chip${i === idx ? ' selected' : ''}`, 'data-overview': String(i),
@@ -220,7 +219,7 @@ export async function renderWorkout() {
         onclick: () => go(i),
       }, `${i + 1}: ${workSets(e).length}/${e.plannedSets}`))),
     timerNode
-      ? h('div', { class: 'card' },
+      ? h('div', { class: 'card stack', 'data-role': 'timer-card' },
         timerNode,
         h('button', {
           class: 'btn btn-ghost', 'data-action': 'skip-rest',
@@ -254,6 +253,9 @@ export async function renderWorkout() {
       h('p', { class: 'muted small' }, isTime ? 'segundos' : 'repetições'),
       h('p', { class: 'muted', 'data-role': 'previous' }, previousLine(entry, ex, prev, unit)),
       h('ul', { class: 'list' }, setRows),
+      hasAnySet
+        ? h('button', { class: 'btn btn-ghost', 'data-action': 'undo', onclick: onUndo }, 'Desfazer última série')
+        : null,
       done >= planned
         ? h('div', null,
           h('p', null, 'Como foi a última série?'),
@@ -263,22 +265,22 @@ export async function renderWorkout() {
               onclick: () => onFeel(key),
             }, label))))
         : null),
+    // Ending the workout sits in its own card at the end of the page, away from the one-handed logging buttons.
+    h('div', { class: 'card stack', 'data-role': 'end-workout' },
+      h('button', { class: 'btn btn-primary', 'data-action': 'finish', onclick: onFinish }, 'Finalizar treino'),
+      h('button', { class: 'btn btn-danger', 'data-action': 'discard', onclick: onDiscard }, 'Descartar treino')),
+    // The sticky bar keeps only what is used between sets: log the set, previous / next exercise.
     h('div', { class: 'bottom-bar' },
       h('button', { class: 'btn btn-big btn-primary', 'data-action': 'log-set', onclick: onLog }, 'Concluir série'),
-      h('div', { class: 'row' },
+      h('div', { class: 'row nav-row' },
         h('button', {
           class: 'btn', 'data-action': 'prev-exercise', disabled: idx === 0,
           onclick: () => go(idx - 1),
         }, '‹ Anterior'),
-        hasAnySet
-          ? h('button', { class: 'btn btn-ghost', 'data-action': 'undo', onclick: onUndo }, 'Desfazer última série')
-          : null,
         h('button', {
           class: 'btn', 'data-action': 'next-exercise', disabled: idx === total - 1,
           onclick: () => go(idx + 1),
-        }, 'Próximo ›')),
-      h('button', { class: 'btn btn-primary', 'data-action': 'finish', onclick: onFinish }, 'Finalizar treino'),
-      h('button', { class: 'btn btn-danger small', 'data-action': 'discard', onclick: onDiscard }, 'Descartar treino')));
+        }, 'Próximo ›'))));
 
   const paint = () => {
     if (!timerNode) return;

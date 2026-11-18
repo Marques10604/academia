@@ -15,7 +15,7 @@ export default async function (page) {
   assert.ok((await q('[data-role=mistakes]', 'e => e.querySelectorAll("li").length')) >= 2, '2+ erros comuns');
   assert.ok((await q('[data-role=muscles]', 'e => e.innerText.trim().length')) > 0, 'músculos');
   assert.ok((await q('[data-role=setup]', 'e => e.innerText.trim().length')) > 0, 'ajuste do aparelho');
-  assert.ok((await q('[data-role=alternative]', 'e => e.innerText')).includes('Não tem essa máquina'), 'alternativa do exercício');
+  assert.ok((await q('[data-role=alternative]', 'e => e.innerText')).includes('Não tem a máquina?'), 'alternativa do exercício');
   const href = await q('[data-action=youtube]', 'e => e.getAttribute("href")');
   assert.ok(href.startsWith('https://www.youtube.com/results?search_query='), 'busca do YouTube: ' + href);
   assert.equal(await q('[data-action=youtube]', 'e => e.getAttribute("target")'), '_blank');

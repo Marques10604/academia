@@ -62,10 +62,10 @@ export default async function (page) {
     assert.equal(await page.eval("document.querySelector('.tabbar .tab.active').getAttribute('data-tab')"), tab, 'aba ativa: ' + tab);
     assert.equal(await page.eval('!document.querySelector(".tabbar").hidden'), true, 'abas visiveis em ' + screen);
   }
-  // Sticky bottom buttons never sit under the bar.
-  await page.goto('#/corpo');
-  await page.waitFor(has('[data-screen=corpo] .bottom-bar'));
-  assert.equal(await page.eval("(() => { const b = document.querySelector('.bottom-bar').getBoundingClientRect(), t = document.querySelector('.tabbar').getBoundingClientRect(); return b.bottom <= t.top + 1; })()"), true, 'barra de baixo acima das abas');
+  // The last card of a long screen is never left under the bar once scrolled to the end.
+  await page.goto('#/config');
+  await page.waitFor(has('[data-screen=config]'));
+  assert.equal(await page.eval("(() => { window.scrollTo(0, document.body.scrollHeight); const l = document.querySelector('[data-screen=config]').lastElementChild.getBoundingClientRect(), t = document.querySelector('.tabbar').getBoundingClientRect(); return l.bottom <= t.top + 1; })()"), true, 'ultimo cartao acima das abas');
   await page.goto('#/hoje');
   await page.waitFor(has('[data-screen=hoje]'));
 

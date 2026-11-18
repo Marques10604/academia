@@ -25,7 +25,7 @@ function prescriptions(exercise) {
 const INCREMENTS = { reps: [1, 2, 2.5, 5, 10], time: [5, 10] };
 
 // "kg" or "placa" (only pin-loaded machines/cables). Changing it restarts that exercise's calibration.
-function unitCard(exercise, pref) {
+function unitSection(exercise, pref) {
   const current = unitFor(exercise, pref);
   const choose = (next) => async () => {
     if (next === current) return;
@@ -34,8 +34,8 @@ function unitCard(exercise, pref) {
     await savePref(exercise.id, { unit: next, unitChangedAt: Date.now() });
     await rerender();
   };
-  return h('div', { class: 'card', 'data-role': 'unit' },
-    h('h2', null, 'Unidade da carga'),
+  return h('div', { class: 'stack', 'data-role': 'unit' },
+    h('h3', { class: 'card-sub' }, 'Unidade da carga'),
     h('div', { class: 'chips' },
       ['kg', 'placa'].map((u) => h('button', {
         class: `chip${u === current ? ' selected' : ''}`, 'data-unit': u, onclick: choose(u),
@@ -56,16 +56,16 @@ function noteCard(exercise, pref) {
       await savePref(exercise.id, { note });
     },
   });
-  return h('div', { class: 'card', 'data-role': 'note' },
+  return h('div', { class: 'card stack', 'data-role': 'note' },
     h('h2', null, 'Minha regulagem'),
     field,
     h('p', { class: 'muted small' }, 'Aparece no treino e na tela Hoje, para você não esquecer o ajuste do aparelho.'));
 }
 
-function incrementCard(exercise, current, unitName) {
+function incrementSection(exercise, current, unitName) {
   if (unitName === 'placa') {
-    return h('div', { class: 'card', 'data-role': 'increment' },
-      h('h2', null, 'Incremento de carga'),
+    return h('div', { class: 'stack', 'data-role': 'increment' },
+      h('h3', { class: 'card-sub' }, 'Incremento de carga'),
       h('p', null, 'Em placa, o salto é sempre 1 placa.'),
       h('p', { class: 'muted small' }, 'A carga sugerida é só uma sugestão: no treino você pode trocar com − e + a qualquer momento.'));
   }
@@ -73,8 +73,8 @@ function incrementCard(exercise, current, unitName) {
   const values = [...INCREMENTS[exercise.type === 'time' ? 'time' : 'reps']];
   if (!values.includes(current)) values.push(current);
   values.sort((a, b) => a - b);
-  return h('div', { class: 'card', 'data-role': 'increment' },
-    h('h2', null, 'Incremento de carga'),
+  return h('div', { class: 'stack', 'data-role': 'increment' },
+    h('h3', { class: 'card-sub' }, 'Incremento de carga'),
     h('p', { class: 'muted small' }, 'Use o menor salto que sua academia permite: 1 pino, o próximo halter ou a menor anilha.'),
     h('div', { class: 'chips' },
       values.map((v) => h('button', {
@@ -105,27 +105,29 @@ export async function renderExercise(hash) {
   const { primary, secondary } = exercise.muscles;
   const muscles = 'Músculos: ' + primary.join(', ') + (secondary.length ? ' · também: ' + secondary.join(', ') : '');
 
+  // Cards, in order: Como fazer (setup + steps) · Erros comuns · Não tem a máquina? · Minha regulagem · Carga · links
   return h('div', { class: 'screen', 'data-screen': 'exercicio' },
-    h('div', { class: 'topbar' },
-      h('h1', { class: 'title' }, exercise.name)),
-    h('p', { class: 'muted', 'data-role': 'muscles' }, muscles),
-    h('div', { class: 'stack' },
-      prescriptions(exercise).map((line) => h('p', { class: 'small', 'data-role': 'prescription' }, line)),
+    h('div', { class: 'stack tight' },
+      h('h1', { class: 'title' }, exercise.name),
+      h('p', { class: 'muted', 'data-role': 'muscles' }, muscles),
+      prescriptions(exercise).map((line) => h('p', { class: 'muted small', 'data-role': 'prescription' }, line))),
+    h('div', { class: 'card stack' },
+      h('h2', null, 'Como fazer'),
+      h('p', { 'data-role': 'setup' }, exercise.setup),
+      h('ol', { 'data-role': 'steps' }, exercise.steps.map((s) => h('li', null, s)))),
+    h('div', { class: 'card stack' },
+      h('h2', null, 'Erros comuns'),
+      h('ul', { 'data-role': 'mistakes' }, exercise.mistakes.map((m) => h('li', null, m)))),
+    h('div', { class: 'card stack', 'data-role': 'alternative' },
+      h('h2', null, 'Não tem a máquina?'),
+      h('p', null, 'Está ocupada ou sua academia não tem? Use: ', h('strong', null, exercise.alternative))),
+    noteCard(exercise, pref),
+    h('div', { class: 'card stack', 'data-role': 'load-settings' },
+      h('h2', null, 'Carga'),
+      exercise.selectorized ? unitSection(exercise, pref) : null,
+      incrementSection(exercise, increment, unitName)),
+    h('div', { class: 'card stack' },
       h('a', { class: 'btn', 'data-action': 'exercise-history', href: '#/historico/' + exercise.id }, 'Ver histórico e gráfico'),
-      h('div', { class: 'card' },
-        h('h2', null, 'Ajuste do aparelho'),
-        h('p', { 'data-role': 'setup' }, exercise.setup)),
-      h('div', { class: 'card' },
-        h('h2', null, 'Como fazer'),
-        h('ol', { 'data-role': 'steps' }, exercise.steps.map((s) => h('li', null, s)))),
-      h('div', { class: 'card' },
-        h('h2', null, 'Erros comuns'),
-        h('ul', { 'data-role': 'mistakes' }, exercise.mistakes.map((m) => h('li', null, m)))),
-      noteCard(exercise, pref),
-      exercise.selectorized ? unitCard(exercise, pref) : null,
-      incrementCard(exercise, increment, unitName),
-      h('p', { class: 'small', 'data-role': 'alternative' },
-        h('strong', null, 'Não tem essa máquina ou está ocupada? Use: '), exercise.alternative),
       h('a', {
         class: 'btn btn-big btn-primary',
         'data-action': 'youtube',
@@ -133,6 +135,6 @@ export async function renderExercise(hash) {
         target: '_blank',
         rel: 'noopener',
       }, 'Ver vídeo no YouTube'),
-      h('p', { class: 'muted small' }, 'Precisa de internet. O app guarda seu treino enquanto você assiste.'),
-      h('button', { class: 'btn btn-ghost', 'data-action': 'back', onclick: () => history.back() }, '‹ Voltar')));
+      h('p', { class: 'muted small' }, 'Precisa de internet. O app guarda seu treino enquanto você assiste.')),
+    h('button', { class: 'btn btn-ghost', 'data-action': 'back', onclick: () => history.back() }, '‹ Voltar'));
 }

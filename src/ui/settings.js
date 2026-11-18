@@ -11,8 +11,9 @@ const p = (text) => h('p', { class: 'small' }, text);
 
 // Plain-language explanation of the program (source: .planning/research/TRAINING-SCIENCE.md).
 function planCard() {
-  return h('div', { class: 'card stack', style: { gap: '10px' }, 'data-role': 'plan' },
-    h('strong', null, 'Como funciona seu treino'),
+  return h('details', { class: 'card collapsible', 'data-role': 'plan' },
+    h('summary', null, 'Como funciona seu treino'),
+    h('div', { class: 'stack plan-body' },
     p('Full body: todo treino trabalha o corpo inteiro. Com 2 ou 3 treinos por semana cada músculo é treinado pelo menos 2 vezes, que é o que os estudos indicam para crescer. Faltou um dia? Nada quebra: o app segue do treino seguinte.'),
     p(`Treino A: ${PROGRAM.A.goal}`),
     p(`Treino B: ${PROGRAM.B.goal}`),
@@ -22,7 +23,7 @@ function planCard() {
     p('Semana 2 (treinos 4–6): adaptação. 2 séries, sobrando 3 e depois 2 repetições.'),
     p('Semanas 3 e 4 (treinos 7–12): base. 3 séries nos exercícios grandes, 2 nos pequenos; a última série sobrando 1–2 repetições. Não precisa ir até a falha.'),
     p('Descanso entre séries: 2 min nos grandes (leg press, supino, puxada, agachamento, desenvolvimento, remada, stiff), 1 min 30 s nos médios (mesa flexora, voador), 1 min nos pequenos.'),
-    p('Entre treinos: pelo menos 1 dia livre se der (ex: seg/qua/sex). Mesmos exercícios por 8 a 12 semanas. Ficou 10+ dias parado: volte com 90% da carga; 4+ semanas: 80% (o app faz sozinho).'));
+    p('Entre treinos: pelo menos 1 dia livre se der (ex: seg/qua/sex). Mesmos exercícios por 8 a 12 semanas. Ficou 10+ dias parado: volte com 90% da carga; 4+ semanas: 80% (o app faz sozinho).')));
 }
 
 // "Meu perfil": the name (text field, saved when it changes) and the plan in three lines. Weight is not here:
@@ -40,7 +41,7 @@ function profileCard(profile) {
     },
   });
   return h('div', { class: 'card stack', 'data-role': 'profile' },
-    h('strong', null, 'Meu perfil'),
+    h('h2', null, 'Meu perfil'),
     h('div', { class: 'field' }, h('label', null, 'Nome'), name),
     h('ul', { class: 'plan-list small', 'data-role': 'profile-plan' }, PLAN_LINES.map((line) => h('li', null, line))));
 }
@@ -74,17 +75,23 @@ export async function renderSettings() {
   return h('div', { class: 'screen', 'data-screen': 'config' },
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Configurações')),
     profileCard(profile),
-    h('div', { class: 'card' },
-      h('p', null, `Versão do app: ${APP_VERSION}`),
-      h('p', null, `Armazenamento protegido: ${persisted ? 'sim' : 'não'}`),
-      h('p', { class: 'muted small' }, 'Não limpe os dados do Chrome para este site: seus treinos ficam só neste celular.')),
     h('div', { class: 'card stack', 'data-role': 'backup' },
-      h('strong', null, 'Backup'),
+      h('h2', null, 'Backup'),
       h('p', { class: 'small' }, backupAgeText(backup)),
       h('button', { class: 'btn', 'data-action': 'open-backup', onclick: () => { location.hash = '#/backup'; } }, 'Backup e restauração')),
+    // Ajuda: placeholder, plan 04-02 fills it
+    h('div', { class: 'card stack', 'data-role': 'help' },
+      h('h2', null, 'Ajuda'),
+      h('p', { class: 'muted small' }, 'Em breve: como instalar o app, fazer backup e tirar dúvidas.')),
+    planCard(),
+    h('div', { class: 'card stack', 'data-role': 'about' },
+      h('h2', null, 'Sobre'),
+      h('p', null, `Versão do app: ${APP_VERSION}`),
+      h('p', null, `Armazenamento protegido: ${persisted ? 'sim' : 'não'}`),
+      h('p', { class: 'muted small' }, 'Não limpe os dados do Chrome para este site: seus treinos ficam só neste celular.'),
+      h('p', { class: 'muted small' }, 'Este app não é aconselhamento médico.')),
+    h('h2', { class: 'section-label' }, 'Zona de perigo'),
     h('div', { class: 'card stack', 'data-role': 'reset' },
       h('p', { class: 'muted small' }, 'Vai testar o app antes de começar? Depois de testar, apague tudo para começar o treino de verdade com o app limpo.'),
-      h('button', { class: 'btn btn-danger', 'data-action': 'reset-all', onclick: onResetAll }, 'Apagar tudo e começar do zero')),
-    planCard(),
-    h('div', { class: 'notice' }, 'Este app não é aconselhamento médico.'));
+      h('button', { class: 'btn btn-danger', 'data-action': 'reset-all', onclick: onResetAll }, 'Apagar tudo e começar do zero')));
 }

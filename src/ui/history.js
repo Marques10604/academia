@@ -31,12 +31,14 @@ function renderList(sessions) {
   const ids = [...PROGRAM.A.items, ...PROGRAM.B.items].map((i) => i.exerciseId);
   return h('div', { class: 'screen', 'data-screen': 'historico' },
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Histórico')),
-    h('h2', null, 'Treinos'),
-    rows.length === 0
-      ? h('p', { class: 'muted' }, 'Nenhum treino ainda. Seus treinos aparecem aqui quando você finalizar.')
-      : h('ul', { class: 'list' }, rows.map(workoutItem)),
-    h('h2', null, 'Exercícios'),
-    h('ul', { class: 'list' }, ids.map((id) => exerciseItem(EXERCISES[id], sessions))));
+    h('h2', { class: 'section-label' }, 'Treinos'),
+    h('div', { class: 'card' },
+      rows.length === 0
+        ? h('p', { class: 'muted' }, 'Nenhum treino ainda. Seus treinos aparecem aqui quando você finalizar.')
+        : h('ul', { class: 'list' }, rows.map(workoutItem))),
+    h('h2', { class: 'section-label' }, 'Exercícios'),
+    h('div', { class: 'card' },
+      h('ul', { class: 'list' }, ids.map((id) => exerciseItem(EXERCISES[id], sessions)))));
 }
 
 function chartHeading(chart) {
@@ -60,10 +62,12 @@ function renderExerciseHistory(exercise, sessions) {
           label: heading, xLabels: [brShort(first.localDate), brShort(last.localDate)],
         })
         : h('p', { class: 'muted' }, 'Faça mais um treino deste exercício para ver o gráfico.')),
-    log.length === 0
-      ? h('p', { class: 'muted' }, 'Ainda sem registro deste exercício.')
-      : h('ul', { class: 'list' }, log.map((r) => h('li', { class: 'list-item', 'data-role': 'history-row' },
-        brDate(r.localDate) + ' · ' + setsText(exercise, r.sets, r.unit)))),
+    h('h2', { class: 'section-label' }, 'Treinos'),
+    h('div', { class: 'card' },
+      log.length === 0
+        ? h('p', { class: 'muted' }, 'Ainda sem registro deste exercício.')
+        : h('ul', { class: 'list' }, log.map((r) => h('li', { class: 'list-item', 'data-role': 'history-row' },
+          brDate(r.localDate) + ' · ' + setsText(exercise, r.sets, r.unit))))),
     h('div', { class: 'bottom-bar' },
       h('a', { class: 'btn', 'data-action': 'how-to', href: '#/exercicio/' + exercise.id }, 'Como fazer'),
       h('button', { class: 'btn btn-ghost', 'data-action': 'back', onclick: () => history.back() }, '‹ Voltar')));

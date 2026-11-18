@@ -75,7 +75,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 export async function launchChrome(chrome) {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'academia-smoke-'));
   const proc = spawn(chrome, [
-    '--headless=new', '--no-first-run', '--no-default-browser-check',
+    '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
     '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank',
   ], { stdio: 'ignore' });
   const portFile = path.join(profile, 'DevToolsActivePort');

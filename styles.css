@@ -639,3 +639,89 @@ body.has-tabs .bottom-bar {
 .ex-details p {
   margin-top: 4px;
 }
+
+/* Card with a small sub-heading inside (exercise screen "Carga") */
+.card-sub {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card h2 + .stack .card-sub:first-child {
+  margin-top: 0;
+}
+
+/* Collapsible card (Settings: "Como funciona seu treino") */
+details.collapsible {
+  padding: 0;
+}
+
+details.collapsible > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+details.collapsible > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.collapsible > summary::after {
+  content: "+";
+  color: var(--accent);
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+details.collapsible[open] > summary::after {
+  content: "\2212";
+}
+
+.plan-body {
+  padding: 0 16px 16px;
+}
+
+/* Last row of a list inside a card has no divider */
+.card > .list > .list-item:last-child {
+  border-bottom: 0;
+}
+
+/* Live workout: current exercise card and the sticky bar */
+.card.current {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card.current h2 a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card.current h2 a::after {
+  content: " ›";
+  color: var(--accent);
+}
+
+.nav-row .btn {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.card .list {
+  padding-left: 0;
+}
+
+p + .chips,
+p + .row.chips {
+  margin-top: 8px;
+}
