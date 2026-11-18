@@ -358,3 +358,9 @@ textarea {
   content: " ›";
   color: var(--accent);
 }
+
+/* Row of small navigation buttons under the topbar (Today: Histórico, later Corpo) */
+.nav {
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}

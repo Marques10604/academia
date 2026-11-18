@@ -93,6 +93,8 @@ export async function renderToday() {
     h('div', { class: 'topbar' },
       h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
+    h('div', { class: 'row nav' },
+      h('button', { class: 'btn btn-ghost', 'data-action': 'history', onclick: () => { location.hash = '#/historico'; } }, 'Histórico')),
     h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
     weekCard(sessionsThisWeek(sessions, today)),
     backup.due

@@ -8,6 +8,7 @@ import { renderOnboarding } from './ui/onboarding.js';
 import { renderSettings } from './ui/settings.js';
 import { renderExercise } from './ui/exercise.js';
 import { renderBackup } from './ui/backup.js';
+import { renderHistory } from './ui/history.js';
 
 const ROUTES = {
   '#/exercicio': renderExercise,
@@ -17,6 +18,7 @@ const ROUTES = {
   '#/inicio': renderOnboarding,
   '#/config': renderSettings,
   '#/backup': renderBackup,
+  '#/historico': renderHistory,
 };
 
 const root = () => document.getElementById('app');

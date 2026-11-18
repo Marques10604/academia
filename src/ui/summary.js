@@ -10,7 +10,7 @@ import { loadLabel } from '../domain/units.js';
 
 // "30 kg × 12, 12, 11" when every set shares the load, else "30 kg × 12, 27,5 kg × 10"; time: "30 s, 35 s".
 // unit 'placa': "placa 6 × 12, 12, 11".
-function setsText(ex, sets, unit) {
+export function setsText(ex, sets, unit) {
   if (ex.type === 'time') return sets.map((s) => `${fmt(s.reps)} s`).join(', ');
   const sameLoad = sets.every((s) => s.load === sets[0].load);
   if (sameLoad) return `${loadLabel(sets[0].load, unit)} × ${sets.map((s) => s.reps).join(', ')}`;
@@ -38,7 +38,10 @@ export async function renderSummary(hash) {
     .filter((r) => r.sets.length > 0);
   const totalSets = rows.reduce((sum, r) => sum + r.sets.length, 0);
   const unitOf = (exerciseId) => session.entries.find((e) => e.exerciseId === exerciseId)?.unit ?? 'kg';
-  const prs = detectPRs(sessions.filter((s) => s.id !== session.id), session);
+  // Records are compared only with workouts that started before this one, so reopening an older
+  // workout from the history still shows the records it really set (later lifts cannot hide them).
+  const prs = detectPRs(sessions.filter((s) => s.startedAt < session.startedAt), session);
+  const isLatest = !sessions.some((s) => s.id !== session.id && s.startedAt > session.startedAt);
 
   return h('div', { class: 'screen', 'data-screen': 'resumo' },
     h('div', { class: 'topbar' },
@@ -53,10 +56,15 @@ export async function renderSummary(hash) {
         ' ' + prText(EXERCISES[pr.exerciseId], pr, unitOf(pr.exerciseId))))),
     h('div', { class: 'card', 'data-role': 'loads' },
       rows.map((r) => h('p', null, `${r.ex.name}: ${setsText(r.ex, r.sets, r.unit)}`))),
-    h('p', { class: 'muted' }, `Próximo treino: ${next.name}`),
+    isLatest ? h('p', { class: 'muted' }, `Próximo treino: ${next.name}`) : null,
     h('div', { class: 'bottom-bar' },
-      h('button', {
-        class: 'btn btn-big btn-primary', 'data-action': 'home',
-        onclick: () => { location.hash = '#/hoje'; },
-      }, 'Voltar ao início')));
+      isLatest
+        ? h('button', {
+          class: 'btn btn-big btn-primary', 'data-action': 'home',
+          onclick: () => { location.hash = '#/hoje'; },
+        }, 'Voltar ao início')
+        : h('button', {
+          class: 'btn btn-big btn-primary', 'data-action': 'history-back',
+          onclick: () => { location.hash = '#/historico'; },
+        }, '‹ Voltar ao histórico')));
 }
