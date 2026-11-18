@@ -2,7 +2,7 @@
 // Text that comes from the chosen file (summary, errors) always goes in through h() as text nodes.
 import { h } from './dom.js';
 import {
-  SCHEMA_VERSION, readStores, replaceStores, setSetting, getSetting, requestPersist,
+  SCHEMA_VERSION, readStores, replaceStores, setSetting, getSetting, getActive, requestPersist,
 } from '../data/db.js';
 import {
   BACKUP_STORES, buildBackup, parseBackup, backupSummary, prepareRestore, backupFileName,
@@ -11,6 +11,7 @@ import { localDate } from '../domain/dates.js';
 import { APP_VERSION } from '../version.js';
 
 const MAX_BYTES = 20 * 1024 * 1024;
+const OPEN_WORKOUT = 'Finalize ou descarte o treino em andamento antes de restaurar.';
 
 // Reads every store and returns the backup as text, plus the moment it was made.
 async function exportText() {
@@ -55,6 +56,11 @@ export async function renderBackup() {
     const button = e.currentTarget;
     button.disabled = true;
     try {
+      // the draft is never exported, so a restore over an open workout would silently drop it
+      if (await getActive()) {
+        button.disabled = false;
+        return showError(OPEN_WORKOUT);
+      }
       await replaceStores(prepareRestore(doc, Date.now()));
       await requestPersist(); // a restored phone never went through onboarding, where this is normally asked
       location.hash = '#/hoje';
@@ -71,8 +77,13 @@ export async function renderBackup() {
     if (file.size > MAX_BYTES) return showError('Arquivo grande demais para ser um backup deste app.');
     const parsed = parseBackup(await file.text(), SCHEMA_VERSION);
     if (!parsed.ok) return showError(parsed.error);
+    const summaryLine = h('p', { 'data-role': 'summary-line' }, backupSummary(parsed.doc));
+    if (await getActive()) {
+      importSummary.replaceChildren(summaryLine);
+      return showError(OPEN_WORKOUT);
+    }
     importSummary.replaceChildren(
-      h('p', { 'data-role': 'summary-line' }, backupSummary(parsed.doc)),
+      summaryLine,
       h('button', { class: 'btn btn-big btn-primary', 'data-action': 'confirm-import', onclick: onConfirm(parsed.doc) }, 'Restaurar este backup'),
       h('button', {
         class: 'btn', 'data-action': 'cancel-import',

@@ -12,6 +12,7 @@ export const BACKUP_STORES = Object.freeze({
   settings: 'key',
   sessions: 'id',
   exercisePrefs: 'exerciseId',
+  dailyLogs: 'localDate', // morning check-in, one row per local day
 });
 
 export function buildBackup({ stores, schemaVersion, appVersion, now }) {
@@ -49,7 +50,17 @@ const ROW_CHECKS = {
     && (r.unit === undefined || r.unit === 'kg' || r.unit === 'placa')
     && (r.note === undefined || isStr(r.note))
   ),
+  dailyLogs: (r) => (
+    DAY.test(r.localDate)
+    && (r.weightKg === undefined || isNum(r.weightKg))
+    && (r.waistCm === undefined || isNum(r.waistCm))
+    && (r.sleep === undefined || isRating(r.sleep))
+    && (r.energy === undefined || isRating(r.energy))
+  ),
 };
+
+const isRating = (v) => Number.isInteger(v) && v >= 1 && v <= 5;
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
 
 const NOT_A_BACKUP = 'Este arquivo não é um backup do app.';
 
@@ -102,6 +113,8 @@ export function backupSummary(doc) {
   if (sessions.length === 0) line = 'Nenhum treino';
   else if (sessions.length === 1) line = `1 treino, em ${brDate(sessions[0].localDate)}`;
   else line = `${sessions.length} treinos, de ${brDate(sessions[0].localDate)} a ${brDate(sessions[sessions.length - 1].localDate)}`;
+  const checkins = (doc.stores.dailyLogs || []).length;
+  if (checkins > 0) line += ` · ${checkins} ${checkins === 1 ? 'check-in' : 'check-ins'}`;
   const exported = Date.parse(doc.exportedAt);
   if (Number.isFinite(exported)) line += ` · salvo em ${brDate(localDate(exported))}`;
   return line;

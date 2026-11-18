@@ -150,3 +150,36 @@ test('backupFileName', () => {
   assert.equal(backupFileName('2026-11-18', 'json'), 'academia-backup-2026-11-18.json');
   assert.equal(backupFileName('2026-11-18', 'txt'), 'academia-backup-2026-11-18.txt');
 });
+
+const log = (extra = {}) => ({ localDate: '2026-11-17', weightKg: 70.4, sleep: 4, energy: 3, updatedAt: 1763380000000, ...extra });
+
+test('schema 1 backup without dailyLogs is accepted by schema 2 and gets an empty store', () => {
+  const r = parseBackup(JSON.stringify(doc()), 2);
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.doc.stores.dailyLogs, []);
+});
+
+test('schema 3 backup is refused by schema 2', () => {
+  const r = parseBackup(JSON.stringify(doc({ schemaVersion: 3 })), 2);
+  assert.equal(r.ok, false);
+  assert.ok(r.error.includes('versão mais nova'));
+});
+
+test('dailyLogs rows are validated and round trip unchanged', () => {
+  const d = buildBackup({ stores: { dailyLogs: [log(), log({ localDate: '2026-11-16', waistCm: 82 })] }, schemaVersion: 2, appVersion: '0.2.1', now: NOW });
+  const r = parseBackup(JSON.stringify(d), 2);
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.doc.stores.dailyLogs, d.stores.dailyLogs);
+  for (const bad of [log({ localDate: 'ontem' }), log({ sleep: 7 }), log({ weightKg: '70' }), log({ energy: 2.5 }), log({ waistCm: null })]) {
+    const rb = parseBackup(JSON.stringify({ ...d, stores: { dailyLogs: [bad] } }), 2);
+    assert.equal(rb.ok, false, JSON.stringify(bad));
+    assert.ok(rb.error.includes('Backup danificado'));
+  }
+});
+
+test('backupSummary adds the check-in count only when there are check-ins', () => {
+  const mk = (n) => ({ exportedAt: '2026-11-18T12:00:00.000Z', stores: { sessions: [sess('1', '2026-11-17')], dailyLogs: Array.from({ length: n }, (_, i) => log({ localDate: '2026-11-1' + i })) } });
+  assert.equal(backupSummary(mk(2)), '1 treino, em 17/11/2026 · 2 check-ins · salvo em 18/11/2026');
+  assert.equal(backupSummary(mk(1)), '1 treino, em 17/11/2026 · 1 check-in · salvo em 18/11/2026');
+  assert.equal(backupSummary(mk(0)), '1 treino, em 17/11/2026 · salvo em 18/11/2026');
+});

@@ -1,7 +1,7 @@
 // Raw IndexedDB access. The only module that touches indexedDB.
 
 export const DB_NAME = 'academia';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 let dbPromise = null;
 
@@ -19,6 +19,10 @@ export function openDb() {
       }
       if (!names.contains('active')) db.createObjectStore('active', { keyPath: 'id' });
       if (!names.contains('exercisePrefs')) db.createObjectStore('exercisePrefs', { keyPath: 'exerciseId' });
+      // schema 2: one row per local day 'YYYY-MM-DD' (weightKg, sleep 1-5, energy 1-5, waistCm, updatedAt),
+      // written by the morning check-in. Create-if-missing only: a schema-1 database keeps every row.
+      // A new store must ALSO be added to BACKUP_STORES in src/domain/backup.js or it is left out of backups.
+      if (!names.contains('dailyLogs')) db.createObjectStore('dailyLogs', { keyPath: 'localDate' });
     };
     req.onsuccess = () => {
       const db = req.result;
