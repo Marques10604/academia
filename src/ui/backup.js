@@ -79,7 +79,7 @@ export async function renderBackup() {
     const { text, now } = await exportText();
     const file = new File([text], backupFileName(localDate(now), 'txt'), { type: 'text/plain' });
     try {
-      await navigator.share({ files: [file], title: 'Backup do app Academia' });
+      await navigator.share({ files: [file], title: 'Backup do app Progride' });
       await saved(now);
       exportMsg.textContent = '';
     } catch (err) {

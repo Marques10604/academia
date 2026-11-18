@@ -13,8 +13,6 @@ const read = (p) => readFileSync(join(ROOT, p), 'utf8').replace(/\r\n/g, '\n');
 const APP_URL = 'https://marques10604.github.io/academia/';
 const ROOT_FILES = ['index.html', 'sw.js', 'styles.css', 'manifest.webmanifest', 'package.json', 'MANUAL.md', 'README.md', 'KIT-SOCORRO-IA.md'];
 
-const SKIP = new Set(['MANUAL.md', 'README.md']); // created in Task 2
-
 // Backticked tokens that look like repository paths.
 function backtickedPaths(text) {
   const out = [];
@@ -34,7 +32,7 @@ function plainPaths(text) {
 function assertPathsExist(text, name) {
   const paths = [...new Set([...backtickedPaths(text), ...plainPaths(text)])];
   assert.ok(paths.length > 0, `${name} deveria citar caminhos do repositório`);
-  for (const p of paths) if (!SKIP.has(p)) assert.ok(existsSync(join(ROOT, p)), `${name} cita "${p}", que não existe no repositório`);
+  for (const p of paths) assert.ok(existsSync(join(ROOT, p)), `${name} cita "${p}", que não existe no repositório`);
 }
 
 function uiSource() {
@@ -75,4 +73,47 @@ test('Config: o link do kit aponta para um arquivo que existe', () => {
   assert.ok(settings.includes(`'${KIT_URL}'`), 'settings.js deve conter KIT_URL exato');
   assert.ok(existsSync(join(ROOT, 'KIT-SOCORRO-IA.md')));
   assert.ok(settings.includes("rel: 'noopener noreferrer'") && settings.includes("target: '_blank'"), 'link externo com target e rel');
+});
+
+test('MANUAL.md: seções e conteúdo essencial', () => {
+  const manual = read('MANUAL.md');
+  for (const heading of [
+    '## Antes de qualquer mudança: faça um backup',
+    '## Publicar uma mudança',
+    '## Desfazer uma mudança que quebrou o app',
+    '## Adicionar ou trocar um exercício',
+    '## Restaurar um backup',
+    '## O que NÃO fazer',
+    '## Precisa de mais ajuda?',
+  ]) assert.ok(manual.includes(heading), `falta o título "${heading}"`);
+  for (const needle of ['node tools/stamp-sw.mjs', 'src/version.js', 'sw.js', 'ASSETS-START', 'src/data/exercises.js', 'src/data/program.js', 'manifest.webmanifest', APP_URL, 'Edit this file', 'Commit changes', 'Actions']) {
+    assert.ok(manual.includes(needle), `o manual deveria conter "${needle}"`);
+  }
+  assert.ok(manual.split('\n').length >= 90, 'manual curto demais');
+});
+
+test('MANUAL.md: todo caminho citado existe', () => {
+  assertPathsExist(read('MANUAL.md'), 'MANUAL.md');
+});
+
+test('MANUAL.md: todo rótulo do app citado existe em src/ui', () => {
+  const manual = read('MANUAL.md');
+  const ui = uiSource();
+  for (const label of ['Backup e restauração', 'Já tenho um backup — restaurar', 'Restaurar este backup', 'Restaurar um backup', 'Baixar arquivo', 'Precisa de ajuda?', 'Enviar (Drive, WhatsApp…)', 'Versão do app']) {
+    assert.ok(manual.includes(label), `o manual deveria citar "${label}"`);
+    assert.ok(ui.includes(label), `o rótulo "${label}" citado no manual não existe em src/ui`);
+  }
+});
+
+test('README.md aponta para o app e para os dois guias', () => {
+  const readme = read('README.md');
+  for (const needle of ['MANUAL.md', 'KIT-SOCORRO-IA.md', APP_URL]) assert.ok(readme.includes(needle), `README sem "${needle}"`);
+  assert.ok(/não renomeie/i.test(readme), 'README deve avisar para não renomear');
+});
+
+test('Config: o link do manual aponta para um arquivo que existe', () => {
+  const settings = read('src/ui/settings.js');
+  assert.ok(settings.includes(`'${MANUAL_URL}'`), 'settings.js deve conter MANUAL_URL exato');
+  assert.ok(existsSync(join(ROOT, 'MANUAL.md')));
+  assert.ok(settings.includes('#/primeiro-dia'), 'botão do checklist do 1º dia');
 });
