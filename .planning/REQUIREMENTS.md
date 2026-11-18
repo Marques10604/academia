@@ -47,10 +47,10 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Progresso (EVOL)
 
-- [ ] **EVOL-01**: Usuário vê o histórico de cada exercício (datas, cargas, repetições)
-- [ ] **EVOL-02**: Usuário vê gráfico da evolução de carga por exercício
+- [x] **EVOL-01**: Usuário vê o histórico de cada exercício (datas, cargas, repetições)
+- [x] **EVOL-02**: Usuário vê gráfico da evolução de carga por exercício
 - [x] **EVOL-03**: App detecta e comemora recorde pessoal (PR), ignorando aquecimento e calibração
-- [ ] **EVOL-04**: Usuário vê histórico de treinos realizados (lista por data)
+- [x] **EVOL-04**: Usuário vê histórico de treinos realizados (lista por data)
 
 ### Corpo e Check-in (CORPO)
 
@@ -162,10 +162,10 @@ Adiado. Rastreado, fora do roadmap atual.
 | CARGA-04 | Phase 1 | Complete |
 | CARGA-05 | Phase 1 | Complete |
 | CARGA-06 | Phase 1 | Complete |
-| EVOL-01 | Phase 2 | Pending |
-| EVOL-02 | Phase 2 | Pending |
+| EVOL-01 | Phase 2 | Complete |
+| EVOL-02 | Phase 2 | Complete |
 | EVOL-03 | Phase 1 | Complete |
-| EVOL-04 | Phase 2 | Pending |
+| EVOL-04 | Phase 2 | Complete |
 | CORPO-01 | Phase 2 | Pending |
 | CORPO-02 | Phase 2 | Pending |
 | CORPO-03 | Phase 3 | Pending |

@@ -85,12 +85,12 @@ Plans:
   5. User records the morning check-in in a few seconds (weight, sleep 1–5, energy 1–5, all optional) and sees a body-weight chart with a 7-day moving average.
   6. User records the waist measurement (tape at navel height) every 4 weeks and sees it next to the weight trend; Today's mini dashboard shows average weight.
 
-**Plans**: 1/3 plans executed (sequential)
+**Plans**: 2/3 plans executed (sequential)
 
 Plans:
 
 - [x] 02-01-PLAN.md — Backup e restauração (schema 2 com dailyLogs, share .txt, último backup, lembrete)
-- [ ] 02-02-PLAN.md — Histórico de treinos e por exercício, gráfico SVG próprio
+- [x] 02-02-PLAN.md — Histórico de treinos e por exercício, gráfico SVG próprio
 - [ ] 02-03-PLAN.md — Check-in matinal, peso médio 7 dias, cintura e publicação 0.3.0
 
 **UI hint**: yes
@@ -136,6 +136,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Today's Workout (Core Value) | 6/6 | In Progress|  |
-| 2. Backup, History & Check-in | 1/3 | In Progress|  |
+| 2. Backup, History & Check-in | 2/3 | In Progress|  |
 | 3. Food, Goals, Photos & AI | 0/TBD | Not started | - |
 | 4. Identity, Publish & Handoff | 0/TBD | Not started | - |
