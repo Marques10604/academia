@@ -125,3 +125,48 @@ None new. T-04-01 (settings row from an imported backup) mitigated: non-array be
 
 - FOUND: src/ui/firstday.js, tools/e2e/11-launch.mjs, icons/maskable-192.png, icons/maskable-512.png, icons/icon.svg
 - FOUND commits: aaca20c, 4c08bcb, d7ddfa0, d7f9b52 (ancestors of HEAD)
+
+
+## Organização das telas
+
+Passada de UI pedida no chat (sem PLAN.md): as telas pareciam "linhas soltas". Agora cada tela é uma coluna de blocos (cartões e rótulos de seção) com o mesmo espaçamento: 12 px entre blocos, 16 px dentro do cartão, rótulo de seção em maiúsculas cinza (`.section-label`). Versão segue 0.3.0; manifest `id`/`start_url`/`scope`, `DB_NAME` e `BACKUP_APP` intactos; nenhuma dependência nova. Todos os `data-role` / `data-action` / `data-screen` foram mantidos.
+
+| # | Item | Commit |
+|---|------|--------|
+| 1 | Boas-vindas sem formulário: logo, "Bem-vindo, Ivonilson!", cartão "Seu plano já está montado:", aviso médico em 2 linhas, "Começar" e "Já tenho um backup — restaurar". "Começar" grava `profile {name:'Ivonilson', weightKg:70}` e 70 kg como primeira pesagem de hoje em `dailyLogs` (`saveDay`, mesmo formato do check-in). Altura removida de tudo (também `parseHeightCm`). Portão `onboardingDone` intacto. | c2661e1 |
+| 2 | Config > "Meu perfil": nome editável (salvo ao mudar, texto limpo por `cleanName`) + resumo do plano. Sem peso nem altura. | 1b8da8c |
+| 3 | Saudação na tela Hoje (Bom dia até 11h59, Boa tarde 12h a 17h59, Boa noite a partir das 18h; sem nome: "Bom dia!"). Relógio lido só na UI; regra pura em `src/domain/profile.js` (+ `test/profile.test.js`). | b4ec46d |
+| 4 | Barra de abas fixa (Hoje, Histórico, Corpo, Config) em `src/ui/tabs.js`: ícones SVG inline (createElementNS), aba ativa com o acento, escondida no treino em andamento, boas-vindas e telas cheias (backup, checklist, exercício, resumo, evolução do exercício). Links do topo da tela Hoje e botões "Voltar" das telas com abas removidos; os `data-action` (`home`, `history`, `body`, `settings`) estão nas abas. Barras fixas de baixo ficam acima da barra de abas. | 1fffe47 |
+| 5 | Hoje em seções: saudação, cartão do resumo (data, semana, peso médio, último backup), cartão "Check-in da manhã" (com os valores de hoje quando feito), cartão do 1º dia, aviso de backup como cartão; rótulo TREINO DE HOJE com o cartão principal ("Treino B · corpo todo", objetivo, "N exercícios · ~55 min", fase do mês, "Iniciar/Continuar treino" grande e "Treino curto (~25 min)" dentro do cartão); rótulo EXERCÍCIOS com um cartão compacto por exercício (nome ›, fase, carga grande, "2 × 10–15 · descanso 2:00", regulagem quando houver e "ver detalhes" com esforço e motivo). | e0c196a |
+| 6 | Mesma estrutura nas outras telas: Exercício (Como fazer com ajuste do aparelho, Erros comuns, Não tem a máquina?, Minha regulagem, Carga com unidade + incremento, links); Config (Meu perfil, Backup, Ajuda placeholder, Como funciona seu treino recolhível, Sobre, Zona de perigo por último); Corpo (Check-in com o botão salvar dentro, Peso, Cintura); Histórico (TREINOS e EXERCÍCIOS). Treino em andamento: barra fixa só com "Concluir série" e Anterior/Próximo, "Desfazer última série" junto das séries, "Finalizar/Descartar treino" em cartão próprio no fim, título do exercício sem o link azul padrão. Comportamento dos controles inalterado. | 5ac9847 |
+
+### Testes e e2e atualizados (todos por mudança intencional de tela)
+
+- Onboarding sem campos: removido o preenchimento de peso/altura de todos os cenários; 01 confere nome, perfil `{Ivonilson, 70}` sem altura, pesagem de hoje = 70 e Config sem altura/peso; 10 apaga a pesagem de 70 kg do onboarding para manter o ponto de partida "sem pesagem"; 11 espera "70 kg · 1 pesagem" logo após o onboarding.
+- Cartão do check-in agora tem o título "Check-in da manhã" e a linha de valores em `data-role=checkin-values` (10 confere "sono 4" e "70,4 kg · sono 4 · energia 3" em vez de "Check-in de hoje: ...").
+- Motivo e esforço ficam dentro de `<details>` fechado: 02, 05-calibração e 06 leem `textContent` em vez de `innerText`.
+- Título da tela Hoje agora é a saudação: 05-treino-curto procura "Treino A/B" no texto da tela; 09 conta só `svg.chart` (as abas também usam SVG); 02 confere o título "Não tem a máquina?".
+- Novos: 01 (saudação e nome editável), 11 (abas: 4 abas, aba ativa, sem abas nas boas-vindas e no treino, sem links no topo de Hoje, último cartão da Config acima das abas).
+- `parseHeightCm` e seu teste removidos (sem uso).
+
+### Desvios
+
+**1. [Rule 1 - Bug] Flakes do smoke (Chrome da bateria de testes vazando).** `close()` só matava o processo principal do Chrome; renderer/GPU ficavam vivos entre cenários (8 processos sobrando, 171 perfis temporários) e deixavam o cenário seguinte lento (timeouts em 09/10/05-short e "Chrome não abriu a porta de depuração"). `tools/smoke.mjs`: `taskkill /T /F` na árvore, espera a saída do processo, remove o perfil, 20 s para a porta de depuração. Depois disso, 3 execuções completas seguidas sem falha (e 0 Chromes sobrando).
+**2. [Rule 1 - Bug] Onboarding esperava `navigator.storage.persist()`.** Agora é disparado sem `await` (uma promessa que não resolve prenderia o usuário na primeira tela). Mesmo efeito, sem bloqueio.
+**3. [Rule 3 - Blocking] Capturas de tela instáveis na máquina com pouca memória (~300 MB livres).** O harness do Chrome passou a usar `--disable-gpu`; `tools/screens.mjs` tenta de novo e rola a tela em vez de redimensionar a janela para a altura da página.
+**4. Extra:** `tools/screens.mjs` (novo, só desenvolvimento) tira as capturas 375x812 com dados de exemplo; `launchChrome`/`makePage`/`findChrome` de `tools/smoke.mjs` passaram a ser exportados.
+
+### Capturas (375x812, dados de exemplo)
+
+`.planning/phases/04-identity-publish-handoff/screens/`: `boas-vindas.png`, `hoje.png` (+ `hoje-2..4.png` rolando a tela), `treino-em-andamento.png` (+ `-2`, `-3`), `exercicio.png` (+ `-2`, `-3`), `historico.png` (+ `-2`, `-3`), `corpo.png` (+ `-2`), `config.png` (+ `-2`). Refazer: `node tools/screens.mjs`.
+
+### Verificação final
+
+- `node --test`: tests 122, pass 122, fail 0
+- `node tools/smoke.mjs` (duas vezes): `smoke: 12 passed, 0 failed` nas duas
+- `node tools/stamp-sw.mjs --check`: `sw.js em dia` (exit 0; 47 arquivos)
+
+### Pendente no celular
+
+- Sentir as abas e o botão "Concluir série" com uma mão; confirmar que a barra de abas não cobre nada no Android (safe area / gestos).
+- Antes de publicar (04-02): a versão continua 0.3.0.
