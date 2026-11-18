@@ -77,4 +77,43 @@ export default async function (page) {
   await page.reload();
   await page.waitFor(has('[data-screen=hoje]') + ' && ' + has('[data-role=streak]'));
   assert.equal(await page.eval(textOf('[data-role=streak]')), 'Sequência: 3 semanas');
+
+  // ---- Task 2: gap notice, then the progress-photo reminder ----
+  await page.eval(reseed([6]));
+  await page.reload();
+  await page.waitFor(has('[data-screen=hoje]') + ' && ' + has('[data-role=gap-notice]'));
+  const gap6 = await page.eval(textOf('[data-role=gap-notice]'));
+  assert.ok(gap6.includes('Faz 6 dias'), gap6);
+  assert.ok(gap6.includes('Tudo bem: o plano continua de onde parou.'), gap6);
+  assert.equal(gap6.includes('mais leves'), false, 'abaixo de 10 dias nao fala de cargas mais leves');
+  await page.eval(reseed([12]));
+  await page.reload();
+  await page.waitFor(has('[data-screen=hoje]') + ' && ' + has('[data-role=gap-notice]'));
+  const gap12 = await page.eval(textOf('[data-role=gap-notice]'));
+  assert.ok(gap12.includes('Faz 12 dias'), gap12);
+  assert.ok(gap12.includes('mais leves'), gap12);
+
+  // A workout exists and the user never took photos: the small reminder shows on Today.
+  assert.equal(await page.eval(has('[data-role=photo-reminder]')), true, 'lembrete de fotos na tela Hoje');
+  await page.click('[data-action=photos]');
+  await page.waitFor(has('[data-screen=corpo]') + ' && ' + has('[data-role=photos-status]'));
+  assert.ok((await page.eval(textOf('[data-role=photos-status]'))).includes('Hora de tirar as fotos'));
+  assert.ok((await page.eval(textOf('[data-role=photos]'))).includes('Progride'));
+
+  // "Tirei as fotos hoje" restarts the 28 days and never discards an unsaved check-in.
+  await page.eval("(() => { const i = document.querySelector('input[name=checkin-weight]'); i.value = ''; return true; })()");
+  await page.type('input[name=checkin-weight]', '71,2');
+  await page.click('[data-action=photos-done]');
+  await page.waitFor(`(document.querySelector('[data-role=photos-status]') || {}).textContent === 'Próximas fotos em 28 dias'`);
+  assert.equal(await page.eval(`(async () => { ${dbImport} ${datesImport} return (await db.getSetting('lastPhotosAt', null)) === dates.localDate(Date.now()); })()`), true);
+  assert.equal(await page.eval("document.querySelector('input[name=checkin-weight]').value"), '71,2', 'peso digitado continua no campo');
+  await page.goto('#/hoje');
+  await page.waitFor(has('[data-screen=hoje]'));
+  assert.equal(await page.eval(has('[data-role=photo-reminder]')), false, 'sem lembrete por 28 dias');
+
+  // A workout today: no gap notice.
+  await page.eval(reseed([0]));
+  await page.reload();
+  await page.waitFor(has('[data-screen=hoje]'));
+  assert.equal(await page.eval(has('[data-role=gap-notice]')), false, 'treinou hoje: sem aviso');
 }

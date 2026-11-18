@@ -7,7 +7,11 @@ import { nextTemplate, exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
 import { unitFor, incrementFor, historyOpts, noteOf } from '../domain/units.js';
-import { sessionsThisWeek, readWeeklyGoal, weeklyStreak } from '../domain/week.js';
+import {
+  sessionsThisWeek, readWeeklyGoal, weeklyStreak, daysSinceLastWorkout, GAP_NOTICE_DAYS,
+} from '../domain/week.js';
+import { RULES } from '../domain/progression.js';
+import { photoStatus } from '../domain/goals.js';
 import { startWorkout } from '../actions/workout.js';
 import { listDays } from '../data/daily.js';
 import { hasCheckin, averageWeight } from '../domain/body.js';
@@ -98,6 +102,22 @@ function firstDayCard() {
     h('button', { class: 'btn', 'data-action': 'first-day', onclick: () => { location.hash = '#/primeiro-dia'; } }, 'Ver checklist'));
 }
 
+// Every 4 weeks, once a workout exists: a small reminder that opens the photo how-to on Corpo (nothing is stored here).
+function photoReminderCard() {
+  return h('div', { class: 'card row between', 'data-role': 'photo-reminder' },
+    h('div', { class: 'stack tight' },
+      h('strong', null, 'Fotos de progresso'),
+      h('span', { class: 'muted small' }, 'Frente, lado e costas, no álbum Progride da galeria.')),
+    h('button', { class: 'btn', 'data-action': 'photos', onclick: () => { location.hash = '#/corpo'; } }, 'Ver como'));
+}
+
+// Kind, neutral note after a few days without training (no warning colour, no blame).
+function gapNotice(days) {
+  return h('p', { class: 'small', 'data-role': 'gap-notice' },
+    `Faz ${days} dias desde o último treino. Tudo bem: o plano continua de onde parou.`
+    + (days >= RULES.LAYOFF_DAYS ? ' Voltando de uma pausa, as cargas sugeridas já vêm mais leves.' : ''));
+}
+
 // Where this workout sits in the first-month plan (counted in workouts, not dates).
 function monthStep(n) {
   if (n <= 2) return `Treino ${n} · Semana de aprendizado: descubra a carga, 2 séries sobrando 3–4 reps`;
@@ -132,6 +152,8 @@ export async function renderToday() {
 
   const weeklyGoal = readWeeklyGoal(await getSetting('weeklyGoal', null));
   const anyDone = sessions.some((s) => s.complete === true);
+  const gapDays = draft ? null : daysSinceLastWorkout(sessions, today);
+  const photosDue = !draft && anyDone && photoStatus(await getSetting('lastPhotosAt', null), today).due;
   const days = await listDays();
   const todayRow = days.find((d) => d.localDate === today) ?? null;
   const avg = averageWeight(days, today);
@@ -172,6 +194,7 @@ export async function renderToday() {
         h('p', null, `Você tem ${backup.since} treinos sem backup. Salve uma cópia para não perder seus dados.`),
         h('button', { class: 'btn btn-primary', 'data-action': 'backup-now', onclick: () => { location.hash = '#/backup'; } }, 'Fazer backup agora'))
       : null,
+    photosDue ? photoReminderCard() : null,
     h('h2', { class: 'section-label' }, 'Treino de hoje'),
     // the hero card: what to do today, and the big start button
     h('div', { class: 'card stack hero', 'data-role': 'hero' },
@@ -179,6 +202,7 @@ export async function renderToday() {
       h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
       h('p', { 'data-role': 'workout-meta' }, `${rows.length} exercícios · ~${isShort ? SHORT_MINUTES : FULL_MINUTES} min`),
       h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
+      gapDays !== null && gapDays >= GAP_NOTICE_DAYS ? gapNotice(gapDays) : null,
       draft
         ? h('button', { class: 'btn btn-big btn-primary', 'data-action': 'resume', onclick: onResume }, 'Continuar treino')
         : [

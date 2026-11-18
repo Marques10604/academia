@@ -9,6 +9,8 @@ import {
 import { formatNumber } from '../domain/numbers.js';
 import { localDate, brDate, brShort } from '../domain/dates.js';
 import { lineChart } from './chart.js';
+import { getSetting, setSetting } from '../data/db.js';
+import { photoStatus } from '../domain/goals.js';
 
 // Five chips 1-5 for one rating. A tap selects, a tap on the selected chip clears. The selected class is
 // toggled in place (no re-render), so a weight typed in the field above is never lost.
@@ -126,6 +128,32 @@ function waistCard(days, today) {
   return node;
 }
 
+// Photos live in the phone gallery, never in the app: this card only reminds every 4 weeks and explains how.
+// "Tirei as fotos hoje" redraws only this card (replaceWith), so an unsaved check-in above is kept.
+function photosCard(lastPhotosAt, today) {
+  const status = photoStatus(lastPhotosAt, today);
+  const node = h('div', { class: 'card stack', 'data-role': 'photos' },
+    h('h2', null, 'Fotos de progresso'),
+    h('p', { 'data-role': 'photos-status' },
+      status.due
+        ? h('strong', null, 'Hora de tirar as fotos')
+        : `Próximas fotos em ${status.dueInDays} ${status.dueInDays === 1 ? 'dia' : 'dias'}`),
+    h('ul', { class: 'small plan-list' },
+      h('li', null, 'Frente, lado e costas, em pé e relaxado.'),
+      h('li', null, 'Mesmo lugar, mesma luz e mesma roupa, de manhã antes de comer.'),
+      h('li', null, 'Celular na altura do umbigo, a uns 2 metros.'),
+      h('li', null, 'Salve num álbum "Progride" na galeria do celular. As fotos não ficam no app e não vão no backup.')),
+    h('button', {
+      class: 'btn', 'data-action': 'photos-done',
+      onclick: async (e) => {
+        e.currentTarget.disabled = true;
+        await setSetting('lastPhotosAt', today);
+        node.replaceWith(photosCard(today, today));
+      },
+    }, 'Tirei as fotos hoje'));
+  return node;
+}
+
 export async function renderBody() {
   const today = localDate(Date.now()); // the clock is read here in the UI layer only
   const days = await listDays();
@@ -134,5 +162,6 @@ export async function renderBody() {
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Corpo')),
     checkin.node,
     weightCard(days, today),
-    waistCard(days, today));
+    waistCard(days, today),
+    photosCard(await getSetting('lastPhotosAt', null), today));
 }
