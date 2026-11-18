@@ -1,4 +1,4 @@
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const CACHE = 'academia-' + VERSION;
 const ASSETS = [
   // ASSETS-START
@@ -53,10 +53,13 @@ const ASSETS = [
 ];
 
 // Pre-cache atomico: ou a versao inteira entra no cache, ou nao instala.
+// Cada arquivo e pedido com cache: 'reload' (ignora o cache HTTP do navegador): o GitHub Pages
+// entrega os arquivos com cache de 10 minutos, e sem isso uma versao publicada logo depois da
+// anterior poderia guardar arquivos velhos no pre-cache.
 // Sem ativacao forcada e sem tomar clientes: uma versao nova espera todas as janelas
 // do app fecharem, para nunca trocar o codigo no meio de um treino.
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
+  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))));
 });
 
 self.addEventListener('activate', (event) => {
