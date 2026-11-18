@@ -1,45 +1,38 @@
 import { h } from './dom.js';
 import { setSetting, requestPersist } from '../data/db.js';
-import { parseDecimal, parseHeightCm } from '../domain/numbers.js';
+import { getDay, saveDay } from '../data/daily.js';
+import { localDate } from '../domain/dates.js';
+import { DEFAULT_PROFILE, PLAN_LINES, initialWeightLine } from '../domain/profile.js';
 
+// First screen: a ready welcome, nothing to type. "Começar" saves the default profile and the first weigh-in
+// (same dailyLogs row the morning check-in uses), then opens Today.
 export function renderOnboarding() {
-  const msg = h('div', { class: 'banner', 'data-role': 'error', hidden: true });
-  const weight = h('input', { type: 'text', inputmode: 'decimal', name: 'weight', autocomplete: 'off' });
-  const height = h('input', { type: 'text', inputmode: 'decimal', name: 'height', autocomplete: 'off' });
-
-  const fail = (text) => {
-    msg.textContent = text;
-    msg.hidden = false;
-  };
-
-  const onAccept = async (e) => {
-    const w = parseDecimal(weight.value);
-    const hCm = parseHeightCm(height.value);
-    if (w === null || w < 30 || w > 250) return fail('Digite um peso válido em kg, entre 30 e 250 (ex: 72,5).');
-    if (hCm === null || hCm < 120 || hCm > 230) return fail('Digite uma altura válida em cm, entre 120 e 230 (ex: 175).');
+  const onStart = async (e) => {
     e.currentTarget.disabled = true;
-    await setSetting('profile', { weightKg: Math.round(w * 100) / 100, heightCm: hCm, savedAt: Date.now() });
+    const now = Date.now();
+    await setSetting('profile', { name: DEFAULT_PROFILE.name, weightKg: DEFAULT_PROFILE.weightKg, savedAt: now });
+    const today = localDate(now); // the clock is read here in the UI layer only
+    const row = await getDay(today);
+    if (typeof row?.weightKg !== 'number') await saveDay(today, { weightKg: DEFAULT_PROFILE.weightKg });
     await setSetting('onboardingDone', true);
     await requestPersist(); // ask to protect the data right after the first real save
     location.hash = '#/hoje';
   };
 
-  return h('div', { class: 'screen', 'data-screen': 'inicio' },
-    h('div', { class: 'topbar' },
-      h('div', { class: 'brand' },
-        h('img', { class: 'brand-logo', src: './icons/icon.svg', alt: '', width: '56', height: '56' }),
-        h('h1', { class: 'title' }, 'Bem-vindo ao Progride'))),
-    h('div', { class: 'notice' },
-      h('p', null, 'Este app não é aconselhamento médico.'),
-      h('p', null, 'Antes de começar a treinar, faça um check-up médico (coração e pressão), principalmente se você nunca treinou.'),
-      h('p', null, 'Pare o exercício e procure ajuda se sentir dor no peito, falta de ar fora do normal, tontura ou dor forte nas articulações.')),
-    h('div', { class: 'field' },
-      h('label', null, 'Seu peso (kg)'), weight, h('span', { class: 'muted small' }, 'ex: 72,5')),
-    h('div', { class: 'field' },
-      h('label', null, 'Sua altura (cm)'), height, h('span', { class: 'muted small' }, 'ex: 175')),
-    msg,
+  return h('div', { class: 'screen welcome', 'data-screen': 'inicio' },
+    h('div', { class: 'brand brand-center' },
+      h('img', { class: 'brand-logo', src: './icons/icon.svg', alt: '', width: '72', height: '72' }),
+      h('span', { class: 'brand-name' }, 'Progride')),
+    h('h1', { class: 'title welcome-title' }, `Bem-vindo, ${DEFAULT_PROFILE.name}!`),
+    h('div', { class: 'card stack', 'data-role': 'plan-summary' },
+      h('strong', null, 'Seu plano já está montado:'),
+      h('ul', { class: 'plan-list' },
+        [...PLAN_LINES, initialWeightLine(DEFAULT_PROFILE.weightKg)].map((line) => h('li', null, line)))),
+    h('div', { class: 'notice small', 'data-role': 'medical-notice' },
+      h('p', null, 'Este app não é aconselhamento médico. Faça um check-up (coração e pressão) antes de começar.'),
+      h('p', null, 'Pare e procure ajuda se sentir dor no peito, falta de ar ou tontura.')),
     h('div', { class: 'bottom-bar' },
-      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'accept-onboarding', onclick: onAccept }, 'Entendi, começar'),
+      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'accept-onboarding', onclick: onStart }, 'Começar'),
       h('button', {
         class: 'btn btn-ghost', 'data-action': 'restore-backup',
         onclick: () => { location.hash = '#/backup'; },

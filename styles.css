@@ -447,3 +447,54 @@ textarea {
   fill: var(--muted);
   font-size: 10px;
 }
+
+/* Welcome screen (first open): logo, greeting, plan card, short notice */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.brand-center {
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.brand-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.welcome-title {
+  text-align: center;
+}
+
+.plan-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plan-list li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.plan-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.welcome .notice p + p {
+  margin-top: 6px;
+}

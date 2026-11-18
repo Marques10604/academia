@@ -15,9 +15,12 @@ const count = (sel) => `document.querySelectorAll(${JSON.stringify(sel)}).length
 export default async function (page) {
   await page.goto('');
   await page.waitFor(has('[data-screen=inicio]'));
-  await page.type('input[name=weight]', '72,5');
-  await page.type('input[name=height]', '175');
   await page.click('[data-action=accept-onboarding]');
+  await page.waitFor(has('[data-screen=hoje]'));
+  // Onboarding records 70 kg as today's first weigh-in; remove it so this scenario starts without any weigh-in.
+  assert.equal((await page.eval(todayRow)).weightKg, 70, 'onboarding grava 70 kg de hoje');
+  await page.eval(`(async () => { ${dbImport} ${datesImport} await db.del('dailyLogs', dates.localDate(Date.now())); return true; })()`);
+  await page.reload();
   await page.waitFor(has('[data-screen=hoje]'));
 
   // --- Task 1: check-in with only the sleep filled in ---

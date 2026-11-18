@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatNumber, parseDecimal, parseHeightCm } from '../src/domain/numbers.js';
+import { formatNumber, parseDecimal } from '../src/domain/numbers.js';
 import { nextTemplate, exerciseHistory, topSet } from '../src/domain/history.js';
 import { localDate, daysBetween } from '../src/domain/dates.js';
 
@@ -17,12 +17,6 @@ test('parseDecimal rejects junk', () => {
   assert.equal(parseDecimal('7,2,5'), null);
   assert.equal(parseDecimal('-3'), null);
   assert.equal(parseDecimal(null), null);
-});
-
-test('parseHeightCm treats small values as meters', () => {
-  assert.equal(parseHeightCm('175'), 175);
-  assert.equal(parseHeightCm('1,75'), 175);
-  assert.equal(parseHeightCm('x'), null);
 });
 
 test('formatNumber uses a comma decimal', () => {

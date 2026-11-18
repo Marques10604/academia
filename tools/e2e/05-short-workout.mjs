@@ -5,8 +5,6 @@ import assert from 'node:assert/strict';
 export default async function (page) {
   await page.goto('');
   await page.waitFor("!!document.querySelector('[data-screen=inicio]')");
-  await page.type('input[name=weight]', '72,5');
-  await page.type('input[name=height]', '175');
   await page.click('[data-action=accept-onboarding]');
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
 

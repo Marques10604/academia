@@ -24,6 +24,7 @@ const ASSETS = [
   './src/domain/history.js',
   './src/domain/numbers.js',
   './src/domain/plan.js',
+  './src/domain/profile.js',
   './src/domain/progress.js',
   './src/domain/progression.js',
   './src/domain/records.js',

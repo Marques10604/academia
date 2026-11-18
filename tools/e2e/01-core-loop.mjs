@@ -9,19 +9,23 @@ const draftSetCount = `(async () => {
 })()`;
 
 export default async function (page) {
-  // onboarding: medical notice, then weight with a comma decimal
+  // onboarding: ready welcome (nothing to type), medical notice, then one tap on Começar
   await page.goto('');
   await page.waitFor("!!document.querySelector('[data-screen=inicio]')");
   assert.ok((await page.text()).includes('não é aconselhamento médico'), 'aviso médico no primeiro acesso');
-  await page.type('input[name=weight]', '72,5');
-  await page.type('input[name=height]', '175');
+  assert.ok((await page.text()).includes('Bem-vindo, Ivonilson!'), 'boas-vindas');
+  assert.equal(await page.eval("document.querySelectorAll('[data-screen=inicio] input, [data-screen=inicio] textarea').length"), 0, 'sem campos');
   await page.click('[data-action=accept-onboarding]');
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
-  const weightKg = await page.eval(`(async () => {
+  const saved = await page.eval(`(async () => {
     const db = await import(new URL('src/data/db.js', location.href).href);
-    return (await db.getSetting('profile')).weightKg;
+    const dates = await import(new URL('src/domain/dates.js', location.href).href);
+    return { profile: await db.getSetting('profile'), day: await db.get('dailyLogs', dates.localDate(Date.now())) };
   })()`);
-  assert.equal(weightKg, 72.5, '72,5 deve virar 72.5 kg');
+  assert.equal(saved.profile.name, 'Ivonilson');
+  assert.equal(saved.profile.weightKg, 70, 'peso inicial 70 kg');
+  assert.equal('heightCm' in saved.profile, false, 'sem altura');
+  assert.equal(saved.day.weightKg, 70, 'primeira pesagem de hoje: 70 kg');
   const text = await page.text();
   assert.ok(text.includes('Treino A'), 'Today deve mostrar Treino A');
   assert.ok(text.includes('Leg press 45°'), 'Today deve listar Leg press 45°');
@@ -80,7 +84,7 @@ export default async function (page) {
   const cfg = await page.text();
   assert.ok(cfg.includes('Versão do app: ' + APP_VERSION), 'config mostra a versão');
   assert.ok(cfg.includes('Armazenamento protegido'), 'config mostra o armazenamento');
-  assert.ok(cfg.includes('72,5'), 'config mostra o peso');
+  assert.equal(cfg.includes('Altura'), false, 'config sem altura');
 
   // (f) the service worker is registered and active (precache finished)
   await page.waitFor('(async () => { const r = await navigator.serviceWorker.ready; return !!r.active; })()', 8000);

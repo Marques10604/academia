@@ -3,7 +3,6 @@ import { getSetting, isPersisted, listSessions, clearAll } from '../data/db.js';
 import { backupStatus } from '../domain/backup.js';
 import { localDate } from '../domain/dates.js';
 import { backupAgeText } from './backup.js';
-import { formatNumber } from '../domain/numbers.js';
 import { APP_VERSION } from '../version.js';
 import { PROGRAM } from '../data/program.js';
 
@@ -45,7 +44,6 @@ async function onResetAll(e) {
 
 export async function renderSettings() {
   const persisted = await isPersisted();
-  const profile = await getSetting('profile', null);
   const backup = backupStatus({
     lastBackupAt: await getSetting('lastBackupAt', null),
     sessions: await listSessions(),
@@ -56,8 +54,7 @@ export async function renderSettings() {
     h('div', { class: 'card' },
       h('p', null, `Versão do app: ${APP_VERSION}`),
       h('p', null, `Armazenamento protegido: ${persisted ? 'sim' : 'não'}`),
-      h('p', { class: 'muted small' }, 'Não limpe os dados do Chrome para este site: seus treinos ficam só neste celular.'),
-      profile ? h('p', null, `Peso: ${formatNumber(profile.weightKg)} kg · Altura: ${formatNumber(profile.heightCm)} cm`) : null),
+      h('p', { class: 'muted small' }, 'Não limpe os dados do Chrome para este site: seus treinos ficam só neste celular.')),
     h('div', { class: 'card stack', 'data-role': 'backup' },
       h('strong', null, 'Backup'),
       h('p', { class: 'small' }, backupAgeText(backup)),

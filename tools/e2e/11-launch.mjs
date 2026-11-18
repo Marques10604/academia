@@ -32,7 +32,8 @@ export default async function (page) {
 
   // --- identity: title, onboarding heading with the logo, manifest and its icons ---
   assert.equal(await page.eval('document.title'), 'Progride');
-  assert.ok((await page.text()).includes('Bem-vindo ao Progride'), 'titulo do onboarding');
+  assert.ok((await page.text()).includes('Bem-vindo, Ivonilson!'), 'titulo do onboarding');
+  assert.ok((await page.text()).includes('Progride'), 'nome do app no onboarding');
   await page.waitFor("(() => { const i = document.querySelector('img.brand-logo'); return !!i && i.complete && i.naturalWidth > 0; })()");
   const manifest = await page.eval("fetch('manifest.webmanifest').then((r) => r.json())");
   assert.equal(manifest.name, 'Progride');
@@ -44,8 +45,6 @@ export default async function (page) {
     assert.ok(String(type).startsWith('image/png'), `${icon.src} servido como ${type}`);
   }
 
-  await page.type('input[name=weight]', '72,5');
-  await page.type('input[name=height]', '175');
   await page.click('[data-action=accept-onboarding]');
   await page.waitFor(has('[data-screen=hoje]'));
 
@@ -55,7 +54,8 @@ export default async function (page) {
   assert.equal(await page.eval("document.querySelector('[data-role=dashboard] [data-role=week]').dataset.count"), '0');
   assert.ok((await page.eval(textOf('[data-role=dashboard] [data-role=week]'))).includes('0 de 3'));
   assert.equal(await page.eval("document.querySelector('[data-role=dashboard] [data-role=backup-status]').innerText"), 'Nenhum backup ainda');
-  assert.equal(await page.eval(has('[data-role=avg-weight]')), false, 'sem pesagem, sem media');
+  // Onboarding recorded 70 kg as today's first weigh-in: the average is there from the start.
+  assert.ok((await page.eval(textOf('[data-role=dashboard] [data-role=avg-weight]'))).includes('70 kg · 1 pesagem'));
   await page.eval(`(async () => {
     const dates = ${DATES};
     await (${DB}).put('dailyLogs', { localDate: dates.localDate(Date.now()), weightKg: 70.4, updatedAt: 1 });
@@ -154,10 +154,8 @@ export default async function (page) {
   const after = await page.eval(counts);
   for (const [name, n] of Object.entries(after)) assert.equal(n, 0, 'store vazio: ' + name);
   assert.equal(Object.keys(after).length, Object.keys(before).length, 'mesmos stores');
-  assert.ok((await page.text()).includes('Bem-vindo ao Progride'));
-  // It works as a first install again: onboarding, then Today with the first-day card.
-  await page.type('input[name=weight]', '71');
-  await page.type('input[name=height]', '176');
+  assert.ok((await page.text()).includes('Bem-vindo, Ivonilson!'));
+  // It works as a first install again: one tap, then Today with the first-day card.
   await page.click('[data-action=accept-onboarding]');
   await page.waitFor(has('[data-screen=hoje]') + ' && ' + has('[data-role=first-day]'));
 }
