@@ -45,7 +45,7 @@ export default async function (page) {
   await page.reload();
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
   await page.waitFor("!!document.querySelector('[data-exercise=leg_press_45] [data-role=reason]')");
-  const row = (id, role) => q(`[data-exercise=${id}] [data-role=${role}]`, 'e => e.innerText');
+  const row = (id, role) => q(`[data-exercise=${id}] [data-role=${role}]`, 'e => e.textContent'); // the reason sits in a closed "ver detalhes"
   assert.equal(await row('leg_press_45', 'phase'), 'Adaptação');
   assert.ok((await row('leg_press_45', 'reason')).includes('suba para 65 kg'), await row('leg_press_45', 'reason'));
   assert.equal(await row('db_bench_press', 'phase'), 'Calibração');

@@ -31,8 +31,8 @@ export default async function (page) {
   await page.click('[data-sleep="4"]');
   await page.click('[data-action=save-checkin]');
   await page.waitFor(has('[data-screen=hoje]') + ' && ' + has('[data-role=checkin-today]'));
-  const t1 = await page.eval(textOf('[data-role=checkin-today]'));
-  assert.ok(t1.includes('Check-in de hoje: sono 4'), 'so o sono: ' + t1);
+  const t1 = await page.eval(textOf('[data-role=checkin-values]'));
+  assert.equal(t1, 'sono 4', 'so o sono: ' + t1);
   assert.equal(t1.includes('kg'), false, 'sem peso, sem kg');
   let row = await page.eval(todayRow);
   assert.equal(row.sleep, 4);
@@ -47,7 +47,7 @@ export default async function (page) {
   await page.click('[data-action=save-checkin]');
   await page.waitFor(has('[data-screen=hoje]') + ' && ' + has('[data-role=avg-weight]'));
   const t2 = await page.text();
-  assert.ok(t2.includes('Check-in de hoje: 70,4 kg · sono 4 · energia 3'), 'linha do check-in');
+  assert.equal(await page.eval(textOf('[data-role=checkin-values]')), '70,4 kg · sono 4 · energia 3', 'linha do check-in');
   assert.ok((await page.eval(textOf('[data-role=avg-weight]'))).includes('70,4 kg · 1 pesagem'), 'media com 1 pesagem');
   row = await page.eval(todayRow);
   assert.equal(row.weightKg, 70.4);

@@ -55,7 +55,7 @@ export function startServer(root, port = 0) {
   });
 }
 
-function findChrome() {
+export function findChrome() {
   const candidates = [
     process.env.CHROME_PATH,
     'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -72,7 +72,7 @@ function findChrome() {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function launchChrome(chrome) {
+export async function launchChrome(chrome) {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'academia-smoke-'));
   const proc = spawn(chrome, [
     '--headless=new', '--no-first-run', '--no-default-browser-check',
@@ -80,7 +80,7 @@ async function launchChrome(chrome) {
   ], { stdio: 'ignore' });
   const portFile = path.join(profile, 'DevToolsActivePort');
   let port = null;
-  for (let i = 0; i < 100 && !port; i++) {
+  for (let i = 0; i < 200 && !port; i++) {
     try {
       const first = fs.readFileSync(portFile, 'utf8').split(/\r?\n/)[0];
       if (first) port = Number(first);
@@ -115,18 +115,26 @@ async function launchChrome(chrome) {
       pending.set(n, { resolve, reject });
       ws.send(JSON.stringify({ id: n, method, params }));
     });
-  const close = () => {
+  // Kills the whole Chrome process tree and waits for it to be gone, so the next scenario starts on a quiet machine
+  // (a leftover renderer/GPU process from the previous scenario slowed the next one down and made timeouts flaky).
+  const close = async () => {
     try { ws.close(); } catch { /* ignore */ }
-    proc.kill();
+    if (process.platform === 'win32' && proc.pid) spawnSync('taskkill', ['/pid', String(proc.pid), '/T', '/F'], { stdio: 'ignore' });
+    else proc.kill();
+    await new Promise((resolve) => {
+      if (proc.exitCode !== null || proc.signalCode !== null) resolve();
+      else {
+        proc.once('exit', resolve);
+        setTimeout(resolve, 3000);
+      }
+    });
     // Chrome can hold files on Windows for a moment
-    setTimeout(() => {
-      try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* ignore */ }
-    }, 500);
+    try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); } catch { /* ignore */ }
   };
   return { send, close };
 }
 
-function makePage(send, baseUrl) {
+export function makePage(send, baseUrl) {
   const page = {
     async goto(p = '') {
       await send('Page.navigate', { url: baseUrl + p });
@@ -211,7 +219,7 @@ async function main() {
       console.log(`FAIL ${name}: ${err.message}`);
       failed++;
     } finally {
-      if (browser) browser.close();
+      if (browser) await browser.close();
     }
   }
   server.close();

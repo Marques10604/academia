@@ -19,27 +19,33 @@ import { greetingFor } from '../domain/profile.js';
 import { dayText } from './datefmt.js';
 import { phaseLabel, effortText, loadText, restText, reasonText } from './reasons.js';
 
+const FULL_MINUTES = 55; // about how long the full workout takes
+const SHORT_MINUTES = 25;
+
 function plannedText(item, plan, exercise) {
   const range = `${item.repMin}–${item.repMax}`;
   const unit = exercise.type === 'time' ? ' s' : '';
   return `${plan.sets} × ${range}${unit} · ${restText(item.restSec)}`;
 }
 
-function exerciseRow(item, plan, note) {
+// One compact card per exercise: name ›, phase badge, the load big, "2 × 10–15 · descanso 2:00". The effort
+// and the reason of the suggestion sit behind a small "ver detalhes" toggle (a native <details>).
+function exerciseCard(item, plan, note) {
   const exercise = EXERCISES[item.exerciseId];
   const isTime = exercise.type === 'time';
   const reason = reasonText(plan.reasonCode, plan.reasonParams, exercise, plan.unit);
-  return h('li', { class: 'list-item', 'data-exercise': item.exerciseId },
-    h('div', { class: 'stack', style: { gap: '4px', flex: '1' } },
-      h('div', { class: 'row', style: { justifyContent: 'space-between' } },
-        h('a', { href: '#/exercicio/' + item.exerciseId }, exercise.name),
-        h('span', { class: 'badge badge-' + plan.phase, 'data-role': 'phase' }, phaseLabel(plan.phase))),
-      h('span', { class: 'muted small', 'data-role': 'prescription' }, plannedText(item, plan, exercise)),
-      isTime ? null : h('strong', { 'data-role': 'load' }, loadText(plan.load, exercise, plan.unit)),
-      h('span', { class: 'muted small', 'data-role': 'effort' }, effortText(plan.phase, exercise)),
-      reason ? h('span', { class: 'muted small', 'data-role': 'reason' }, reason) : null,
-      // user text: h() only ever adds it as a text node
-      note ? h('span', { class: 'small setup-note', 'data-role': 'setup-note' }, 'Minha regulagem: ', note) : null));
+  return h('div', { class: 'card ex-card', 'data-exercise': item.exerciseId },
+    h('div', { class: 'ex-head' },
+      h('a', { class: 'ex-name', href: '#/exercicio/' + item.exerciseId }, exercise.name),
+      h('span', { class: 'badge badge-' + plan.phase, 'data-role': 'phase' }, phaseLabel(plan.phase))),
+    isTime ? null : h('strong', { class: 'ex-load', 'data-role': 'load' }, loadText(plan.load, exercise, plan.unit)),
+    h('span', { class: 'muted small', 'data-role': 'prescription' }, plannedText(item, plan, exercise)),
+    // user text: h() only ever adds it as a text node
+    note ? h('span', { class: 'small setup-note', 'data-role': 'setup-note' }, 'Minha regulagem: ', note) : null,
+    h('details', { class: 'ex-details' },
+      h('summary', null, 'ver detalhes'),
+      h('p', { class: 'muted small', 'data-role': 'effort' }, effortText(plan.phase, exercise)),
+      reason ? h('p', { class: 'muted small', 'data-role': 'reason' }, reason) : null));
 }
 
 // "Esta semana ●●○ 2 de 3": filled dots for finished workouts this week; above the goal all dots stay filled.
@@ -56,25 +62,30 @@ function weekRow(done) {
 // button that opens the check-in (not primary: the primary button of Today is "Iniciar treino").
 function checkinBlock(row) {
   if (!hasCheckin(row)) {
-    return h('button', { class: 'btn', 'data-action': 'checkin', onclick: () => { location.hash = '#/corpo'; } },
-      'Check-in da manhã (peso, sono, energia)');
+    return h('div', { class: 'card row between', 'data-role': 'checkin-card' },
+      h('div', { class: 'stack tight' },
+        h('strong', null, 'Check-in da manhã'),
+        h('span', { class: 'muted small' }, 'Peso, sono e energia')),
+      h('button', { class: 'btn', 'data-action': 'checkin', onclick: () => { location.hash = '#/corpo'; } }, 'Fazer agora'));
   }
   const parts = [];
   if (typeof row.weightKg === 'number') parts.push(formatNumber(row.weightKg) + ' kg');
   if (typeof row.sleep === 'number') parts.push('sono ' + row.sleep);
   if (typeof row.energy === 'number') parts.push('energia ' + row.energy);
-  return h('div', { class: 'card row', 'data-role': 'checkin-today', style: { justifyContent: 'space-between' } },
-    h('span', null, 'Check-in de hoje: ' + parts.join(' · ')),
+  return h('div', { class: 'card row between', 'data-role': 'checkin-today' },
+    h('div', { class: 'stack tight' },
+      h('strong', null, 'Check-in da manhã'),
+      h('span', { 'data-role': 'checkin-values' }, parts.join(' · '))),
     h('button', { class: 'btn btn-ghost', 'data-action': 'edit-checkin', onclick: () => { location.hash = '#/corpo'; } }, 'editar'));
 }
 
 // Shown until the first completed workout: opens the first-gym-day checklist.
 function firstDayCard() {
-  return h('div', { class: 'card stack', 'data-role': 'first-day' },
-    h('strong', null, 'Primeiro dia na academia?'),
-    h('span', { class: 'muted small' }, 'Seis coisas para fazer no primeiro treino.'),
-    h('button', { class: 'btn', 'data-action': 'first-day', onclick: () => { location.hash = '#/primeiro-dia'; } },
-      'Ver checklist do 1º dia'));
+  return h('div', { class: 'card row between', 'data-role': 'first-day' },
+    h('div', { class: 'stack tight' },
+      h('strong', null, 'Primeiro dia na academia?'),
+      h('span', { class: 'muted small' }, 'Seis coisas para fazer no 1º treino.')),
+    h('button', { class: 'btn', 'data-action': 'first-day', onclick: () => { location.hash = '#/primeiro-dia'; } }, 'Ver checklist'));
 }
 
 // Where this workout sits in the first-month plan (counted in workouts, not dates).
@@ -105,8 +116,9 @@ export async function renderToday() {
       unit: unitFor(exercise, pref),
       today,
     });
-    return exerciseRow(item, plan, noteOf(pref));
+    return exerciseCard(item, plan, noteOf(pref));
   });
+  const isShort = draft ? draft.short === true : false;
 
   const anyDone = sessions.some((s) => s.complete === true);
   const days = await listDays();
@@ -129,9 +141,7 @@ export async function renderToday() {
 
   return h('div', { class: 'screen', 'data-screen': 'hoje' },
     h('div', { class: 'topbar' },
-      h('div', null,
-        h('h1', { class: 'title', 'data-role': 'greeting' }, greeting),
-        h('p', { class: 'subtitle muted' }, `Hoje: ${tpl.name}`))),
+      h('h1', { class: 'title', 'data-role': 'greeting' }, greeting)),
     // ONE compact card: date, week progress, 7-day average weight and last backup (the nudge below replaces the last line when due).
     h('div', { class: 'card dashboard', 'data-role': 'dashboard' },
       h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
@@ -139,20 +149,25 @@ export async function renderToday() {
       avg ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg)) : null,
       backup.due ? null : h('p', { class: 'muted small', 'data-role': 'backup-status' }, backupAgeText(backup))),
     checkinBlock(todayRow),
+    anyDone ? null : firstDayCard(),
     backup.due
       ? h('div', { class: 'notice stack', 'data-role': 'backup-nudge' },
         h('p', null, `Você tem ${backup.since} treinos sem backup. Salve uma cópia para não perder seus dados.`),
         h('button', { class: 'btn btn-primary', 'data-action': 'backup-now', onclick: () => { location.hash = '#/backup'; } }, 'Fazer backup agora'))
       : null,
-    anyDone ? null : firstDayCard(),
-    h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
-    h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
-    h('ul', { class: 'list' }, rows),
-    h('div', { class: 'bottom-bar' },
+    h('h2', { class: 'section-label' }, 'Treino de hoje'),
+    // the hero card: what to do today, and the big start button
+    h('div', { class: 'card stack hero', 'data-role': 'hero' },
+      h('h2', { class: 'hero-title', 'data-role': 'workout-name' }, `${tpl.name} · corpo todo`),
+      h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
+      h('p', { 'data-role': 'workout-meta' }, `${rows.length} exercícios · ~${isShort ? SHORT_MINUTES : FULL_MINUTES} min`),
+      h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
       draft
         ? h('button', { class: 'btn btn-big btn-primary', 'data-action': 'resume', onclick: onResume }, 'Continuar treino')
         : [
           h('button', { class: 'btn btn-big btn-primary', 'data-action': 'start', onclick: onStart(false) }, 'Iniciar treino'),
-          h('button', { class: 'btn', 'data-action': 'start-short', onclick: onStart(true) }, 'Treino curto (dia corrido, ~25 min)'),
-        ]));
+          h('button', { class: 'btn', 'data-action': 'start-short', onclick: onStart(true) }, `Treino curto (~${SHORT_MINUTES} min)`),
+        ]),
+    h('h2', { class: 'section-label' }, 'Exercícios'),
+    rows);
 }

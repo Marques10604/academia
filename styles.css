@@ -29,18 +29,21 @@ h1, h2, h3, p {
   margin: 0;
 }
 
+/* Every screen is a column of blocks (cards, labels, bars) with the same 12px gap between them */
 .screen {
   max-width: 560px;
   margin: 0 auto;
   padding: 16px;
   padding-bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
 }
 
 .title {
@@ -82,7 +85,32 @@ h1, h2, h3, p {
 .card {
   background: var(--surface);
   border-radius: var(--radius);
-  padding: 14px;
+  padding: 16px;
+}
+
+/* Card title (h2 inside a card or .card-title) */
+.card > h2,
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Small uppercase muted label that opens a group of cards ("TREINO DE HOJE") */
+.section-label {
+  margin: 8px 4px 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.row.between {
+  justify-content: space-between;
+}
+
+.stack.tight {
+  gap: 2px;
 }
 
 .card.current {
@@ -336,12 +364,6 @@ textarea {
   gap: 6px;
 }
 
-/* Breathing room between the blocks at the top of Today */
-[data-screen=hoje] > .card,
-[data-screen=hoje] > .notice {
-  margin-bottom: 10px;
-}
-
 .dashboard p {
   margin: 0;
 }
@@ -408,12 +430,6 @@ textarea {
   color: var(--accent);
 }
 
-/* Row of small navigation buttons under the topbar (Today: Histórico, later Corpo) */
-.nav {
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-
 /* SVG charts (src/ui/chart.js): colors follow the app theme */
 .chart {
   width: 100%;
@@ -470,7 +486,8 @@ textarea {
   text-align: center;
 }
 
-.plan-list {
+.plan-list,
+.card ul.plan-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -562,4 +579,63 @@ body.has-tabs .screen {
 
 body.has-tabs .bottom-bar {
   bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+}
+
+/* Today: hero card and one compact card per exercise */
+.hero-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.hero .btn-big {
+  margin-top: 4px;
+}
+
+.ex-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ex-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ex-name {
+  flex: 1;
+  display: block;
+  padding: 10px 0;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ex-name::after {
+  content: " ›";
+  margin-left: 4px;
+  color: var(--accent);
+}
+
+.ex-load {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ex-details summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.ex-details p {
+  margin-top: 4px;
 }

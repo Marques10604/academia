@@ -12,7 +12,7 @@ const prefOf = (id) => `(async () => {
   const db = await import(new URL('src/data/db.js', location.href).href);
   return (await db.get('exercisePrefs', ${JSON.stringify(id)})) || null;
 })()`;
-const rowText = (id, role) => `(document.querySelector('[data-exercise=${id}] [data-role=${role}]') || {}).innerText || ''`;
+const rowText = (id, role) => `(document.querySelector('[data-exercise=${id}] [data-role=${role}]') || {}).textContent || ''`;
 
 export default async function (page) {
   await page.goto('');

@@ -57,7 +57,7 @@ export default async function (page) {
   assert.equal(await page.eval("document.querySelectorAll('[data-role=pr]').length"), 0, 'sem recorde');
   await page.click('[data-action=home]');
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
-  const reason = await page.eval(`(document.querySelector('[data-exercise=leg_press_45] [data-role=reason]') || {}).innerText || ''`);
+  const reason = await page.eval(`(document.querySelector('[data-exercise=leg_press_45] [data-role=reason]') || {}).textContent || ''`);
   assert.ok(reason.includes('treino 2 de 2'), 'rampa não vira histórico, a série valendo sim: ' + reason);
 
   // Part 2: per-exercise increment preference drives the next workout's steppers.
