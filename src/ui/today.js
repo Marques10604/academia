@@ -12,6 +12,7 @@ import { startWorkout } from '../actions/workout.js';
 import { listDays } from '../data/daily.js';
 import { hasCheckin, averageWeight } from '../domain/body.js';
 import { formatNumber } from '../domain/numbers.js';
+import { avgWeightText } from './body.js';
 import { backupStatus } from '../domain/backup.js';
 import { backupAgeText } from './backup.js';
 import { dayText } from './datefmt.js';
@@ -123,7 +124,7 @@ export async function renderToday() {
     checkinBlock(todayRow),
     weekCard(sessionsThisWeek(sessions, today)),
     avg
-      ? h('p', { 'data-role': 'avg-weight' }, `Peso médio (7 dias): ${formatNumber(avg.avg)} kg · ${avg.n} ${avg.n === 1 ? 'pesagem' : 'pesagens'}`)
+      ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg))
       : null,
     backup.due
       ? h('div', { class: 'notice stack', 'data-role': 'backup-nudge' },

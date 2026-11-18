@@ -36,3 +36,46 @@ export function averageWeight(days, today) {
   if (w.length === 0) return null;
   return { avg: round1(w.reduce((a, d) => a + d.weightKg, 0) / w.length), n: w.length };
 }
+
+// Moving average of the weigh-ins: one point per weigh-in day -> [{localDate, avg}] ascending.
+export function movingAverage(days) {
+  const w = days.filter((d) => isNum(d.weightKg)).sort((a, b) => (a.localDate < b.localDate ? -1 : 1));
+  return w.map((d) => ({ localDate: d.localDate, avg: averageWeight(w, d.localDate).avg }));
+}
+
+// {raw, avg} ready for the chart: x = days since the first weigh-in, y = weight / 7-day average.
+export function weightSeries(days) {
+  const w = days.filter((d) => isNum(d.weightKg)).sort((a, b) => (a.localDate < b.localDate ? -1 : 1));
+  if (w.length === 0) return { raw: [], avg: [] };
+  const first = w[0].localDate;
+  const avgs = movingAverage(days);
+  return {
+    raw: w.map((d) => ({ x: daysBetween(first, d.localDate), y: d.weightKg, localDate: d.localDate })),
+    avg: avgs.map((a) => ({ x: daysBetween(first, a.localDate), y: a.avg, localDate: a.localDate })),
+  };
+}
+
+// When the waist is due: never measured, or the last measurement is 28+ days old.
+export function waistStatus(days, today) {
+  const m = days.filter((d) => isNum(d.waistCm)).sort((a, b) => (a.localDate < b.localDate ? -1 : 1));
+  if (m.length === 0) return { last: null, daysSince: null, due: true, dueInDays: 0 };
+  const last = m[m.length - 1];
+  const daysSince = daysBetween(last.localDate, today);
+  return {
+    last: { localDate: last.localDate, waistCm: last.waistCm },
+    daysSince,
+    due: daysSince >= WAIST_EVERY_DAYS,
+    dueInDays: Math.max(0, WAIST_EVERY_DAYS - daysSince),
+  };
+}
+
+// Measurements, most recent first: change versus the previous (older) one, and the 7-day average weight on that date.
+export function waistRows(days) {
+  const m = days.filter((d) => isNum(d.waistCm)).sort((a, b) => (a.localDate < b.localDate ? -1 : 1));
+  return m.map((d, i) => ({
+    localDate: d.localDate,
+    waistCm: d.waistCm,
+    delta: i === 0 ? null : round1(d.waistCm - m[i - 1].waistCm),
+    avgWeight: averageWeight(days, d.localDate)?.avg ?? null,
+  })).reverse();
+}
