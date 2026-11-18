@@ -178,3 +178,13 @@ None. T-01-09 mitigated (`parseDecimal` only, invalid value reverts, load clampe
 ## Self-Check: PASSED
 
 All created files exist; commits 14b2b2d, 365b603 and 4057935 are ancestors of HEAD.
+
+## Ajustes do usuário (pós 01-05)
+
+Cinco ajustes pedidos no chat depois do 01-05, um commit cada (versão segue 0.1.0; calibração/publicação ficam no 01-06):
+
+1. **Fundo preto neutro**: `--bg #000000`, superfícies `#121212`/`#1f1f1f`, texto e cinza neutros (sem tom azul-ardósia), acento verde mantido; `manifest.webmanifest` e `<meta theme-color>` em `#000000`; ícones regenerados com fundo preto (`tools/make-icons.mjs`).
+2. **Data na tela Hoje** (`data-role="date"`, ex.: "Quarta, 18 de novembro", `src/ui/datefmt.js`, relógio só na camada de UI) e a data do treino no resumo.
+3. **"Esta semana ●●○ 2 de 3"** (`data-role="week"`): contagem de treinos concluídos de segunda a domingo pela data local (`src/domain/week.js`, `test/week.test.js`), meta 3; acima de 3 todos os pontos ficam cheios com a contagem real.
+4. **Alternativa por exercício**: campo `alternative` nos 15 exercícios (de TRAINING-SCIENCE 2.2/2.3), mostrado na tela do exercício como "Não tem essa máquina ou está ocupada? Use: …" (`data-role="alternative"`); `test/catalog.test.js` e e2e 02 exigem.
+5. **Treino curto (dia corrido)**: botão `data-action="start-short"` na tela Hoje (sem rascunho aberto) inicia o mesmo treino só com os 4 primeiros itens (`SHORT_ITEMS`, `workoutItems` em `src/data/program.js`); rascunho/sessão guardam `short: true`; "Exercício N de 4"; ao finalizar conta como concluído (`isComplete` em `src/domain/draft.js`: curto vale com pelo menos 1 exercício feito; completo segue a regra dos 70%), avança A/B e conta na semana; título do resumo "Treino curto: …". Histórico dos exercícios fora do treino curto não é tocado. Cobertura: `test/short.test.js` e `tools/e2e/05-short-workout.mjs`.
