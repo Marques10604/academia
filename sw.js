@@ -1,4 +1,4 @@
-const VERSION = '0.2.1';
+const VERSION = '0.3.0';
 const CACHE = 'academia-' + VERSION;
 const ASSETS = [
   // ASSETS-START
@@ -9,11 +9,13 @@ const ASSETS = [
   './manifest.webmanifest',
   './src/actions/workout.js',
   './src/app.js',
+  './src/data/daily.js',
   './src/data/db.js',
   './src/data/exercises.js',
   './src/data/prefs.js',
   './src/data/program.js',
   './src/domain/backup.js',
+  './src/domain/body.js',
   './src/domain/dates.js',
   './src/domain/draft.js',
   './src/domain/history.js',
@@ -27,6 +29,7 @@ const ASSETS = [
   './src/domain/week.js',
   './src/platform/device.js',
   './src/ui/backup.js',
+  './src/ui/body.js',
   './src/ui/chart.js',
   './src/ui/datefmt.js',
   './src/ui/dom.js',
