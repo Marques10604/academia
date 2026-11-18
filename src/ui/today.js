@@ -7,7 +7,7 @@ import { nextTemplate, exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
 import { unitFor, incrementFor, historyOpts, noteOf } from '../domain/units.js';
-import { sessionsThisWeek, WEEKLY_GOAL } from '../domain/week.js';
+import { sessionsThisWeek, readWeeklyGoal, weeklyStreak } from '../domain/week.js';
 import { startWorkout } from '../actions/workout.js';
 import { listDays } from '../data/daily.js';
 import { hasCheckin, averageWeight } from '../domain/body.js';
@@ -51,13 +51,21 @@ function exerciseCard(item, plan, note) {
 }
 
 // "Esta semana ●●○ 2 de 3": filled dots for finished workouts this week; above the goal all dots stay filled.
-function weekRow(done) {
-  const dots = Array.from({ length: WEEKLY_GOAL }, (_, i) => (
+function weekRow(done, goal) {
+  const dots = Array.from({ length: goal }, (_, i) => (
     h('span', { class: i < done ? 'dot on' : 'dot', 'aria-hidden': 'true' }, i < done ? '●' : '○')));
   return h('div', { class: 'week', 'data-role': 'week', 'data-count': String(done) },
     h('span', { class: 'muted' }, 'Esta semana'),
     h('span', { class: 'dots' }, dots),
-    h('strong', null, `${done} de ${WEEKLY_GOAL}`));
+    h('strong', null, `${done} de ${goal}`));
+}
+
+// "Sequência: 3 semanas" (neutral text; a forgiven week is mentioned kindly). Nothing before the first full week.
+function streakLine(streak) {
+  if (streak.weeks < 1) return null;
+  return h('p', { class: 'small', 'data-role': 'streak' },
+    `Sequência: ${streak.weeks} ${streak.weeks === 1 ? 'semana' : 'semanas'}`
+    + (streak.lastWeekMissed ? ' · a semana passada foi de folga' : ''));
 }
 
 // "Check-in de hoje: 70,4 kg · sono 4 · energia 3" (only the parts filled in) + a small edit button, or the
@@ -122,6 +130,7 @@ export async function renderToday() {
   });
   const isShort = draft ? draft.short === true : false;
 
+  const weeklyGoal = readWeeklyGoal(await getSetting('weeklyGoal', null));
   const anyDone = sessions.some((s) => s.complete === true);
   const days = await listDays();
   const todayRow = days.find((d) => d.localDate === today) ?? null;
@@ -149,7 +158,8 @@ export async function renderToday() {
     // ONE compact card: date, week progress, 7-day average weight, protein of the day and last backup (the nudge below replaces the last line when due).
     h('div', { class: 'card dashboard', 'data-role': 'dashboard' },
       h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
-      weekRow(sessionsThisWeek(sessions, today)),
+      weekRow(sessionsThisWeek(sessions, today), weeklyGoal),
+      streakLine(weeklyStreak(sessions, today, weeklyGoal)),
       avg ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg)) : null,
       h('div', { class: 'row between', 'data-role': 'protein-today' },
         h('span', { 'data-role': 'protein-line' }, proteinLineText(dayTotal(todayRow), target.g)),

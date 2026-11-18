@@ -6,6 +6,7 @@ import { backupAgeText } from './backup.js';
 import { APP_VERSION } from '../version.js';
 import { PROGRAM } from '../data/program.js';
 import { PLAN_LINES, DEFAULT_PROFILE, NAME_MAX, cleanName } from '../domain/profile.js';
+import { readWeeklyGoal, WEEKLY_GOAL_MAX } from '../domain/week.js';
 
 const p = (text) => h('p', { class: 'small' }, text);
 
@@ -51,6 +52,25 @@ function profileCard(profile) {
     h('ul', { class: 'plan-list small', 'data-role': 'profile-plan' }, PLAN_LINES.map((line) => h('li', null, line))));
 }
 
+// "Meta de treinos": 1-6 workouts per week. A tap saves and moves the selected class in place (no re-render).
+function weeklyGoalCard(goal) {
+  let current = goal;
+  const chips = Array.from({ length: WEEKLY_GOAL_MAX }, (_, i) => i + 1).map((n) => h('button', {
+    type: 'button',
+    class: 'chip' + (n === current ? ' selected' : ''),
+    'data-weekly-goal': String(n),
+    onclick: async () => {
+      current = n;
+      chips.forEach((c, i) => c.classList.toggle('selected', i + 1 === current));
+      await setSetting('weeklyGoal', n);
+    },
+  }, String(n)));
+  return h('div', { class: 'card stack', 'data-role': 'weekly-goal' },
+    h('h2', null, 'Meta de treinos'),
+    h('div', { class: 'field' }, h('label', null, 'Treinos por semana'), h('div', { class: 'chips' }, chips)),
+    h('p', { class: 'muted small' }, 'A sequência conta as semanas em que você bateu a meta. Pode falhar 1 semana: ela só zera com 2 semanas seguidas abaixo da meta.'));
+}
+
 // Two confirmations, then every store is cleared and the app goes back to the first-install screen.
 // (Cancel on the first one leaves room to make a backup, right above on this screen.)
 async function onResetAll(e) {
@@ -80,6 +100,7 @@ export async function renderSettings() {
   return h('div', { class: 'screen', 'data-screen': 'config' },
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Configurações')),
     profileCard(profile),
+    weeklyGoalCard(readWeeklyGoal(await getSetting('weeklyGoal', null))),
     h('div', { class: 'card stack', 'data-role': 'backup' },
       h('h2', null, 'Backup'),
       h('p', { class: 'small' }, backupAgeText(backup)),
