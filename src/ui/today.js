@@ -67,6 +67,15 @@ function checkinBlock(row) {
     h('button', { class: 'btn btn-ghost', 'data-action': 'edit-checkin', onclick: () => { location.hash = '#/corpo'; } }, 'editar'));
 }
 
+// Shown until the first completed workout: opens the first-gym-day checklist.
+function firstDayCard() {
+  return h('div', { class: 'card stack', 'data-role': 'first-day' },
+    h('strong', null, 'Primeiro dia na academia?'),
+    h('span', { class: 'muted small' }, 'Seis coisas para fazer no primeiro treino.'),
+    h('button', { class: 'btn', 'data-action': 'first-day', onclick: () => { location.hash = '#/primeiro-dia'; } },
+      'Ver checklist do 1º dia'));
+}
+
 // Where this workout sits in the first-month plan (counted in workouts, not dates).
 function monthStep(n) {
   if (n <= 2) return `Treino ${n} · Semana de aprendizado: descubra a carga, 2 séries sobrando 3–4 reps`;
@@ -98,6 +107,7 @@ export async function renderToday() {
     return exerciseRow(item, plan, noteOf(pref));
   });
 
+  const anyDone = sessions.some((s) => s.complete === true);
   const days = await listDays();
   const todayRow = days.find((d) => d.localDate === today) ?? null;
   const avg = averageWeight(days, today);
@@ -122,6 +132,7 @@ export async function renderToday() {
       h('button', { class: 'btn btn-ghost', 'data-action': 'body', onclick: () => { location.hash = '#/corpo'; } }, 'Corpo')),
     h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
     checkinBlock(todayRow),
+    anyDone ? null : firstDayCard(),
     weekCard(sessionsThisWeek(sessions, today)),
     avg
       ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg))

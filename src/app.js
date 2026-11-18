@@ -10,8 +10,10 @@ import { renderExercise } from './ui/exercise.js';
 import { renderBackup } from './ui/backup.js';
 import { renderHistory } from './ui/history.js';
 import { renderBody } from './ui/body.js';
+import { renderFirstDay } from './ui/firstday.js';
 
 const ROUTES = {
+  '#/primeiro-dia': renderFirstDay,
   '#/exercicio': renderExercise,
   '#/hoje': renderToday,
   '#/treino': renderWorkout,
