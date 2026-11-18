@@ -140,3 +140,14 @@ Itens de requisito ainda pendentes só por causa do aparelho: FUND-01 (instalaç
 - Files present: tools/e2e/05-calibration.mjs, src/domain/progression.js, src/ui/exercise.js, sw.js (VERSION 0.2.0).
 - Commits present: 61b9b9c, ef835c5, 27276aa.
 - `node --test`: 61 pass, 0 fail. `node tools/smoke.mjs`: 6 passed, 0 failed. `node tools/stamp-sw.mjs --check`: sw.js em dia.
+
+## Ajustes 0.2.1
+
+Lote ad-hoc pedido e aprovado pelo usuario no chat (sem PLAN.md), apos a verificacao da Fase 1. Tudo opcional: kg continua o padrao e nada muda sem o usuario escolher.
+
+1. **Unidade da carga "kg" ou "placa" por exercicio** (commit 0885d61). So para maquinas/polias com pino: Puxada frontal, Mesa flexora, Panturrilha em pe, Remada baixa, Voador e Triceps na polia (campo `selectorized` em src/data/exercises.js; leg press, halteres e peso do corpo/tempo ficam de fora). Escolha na tela do exercicio ("Unidade da carga: kg | placa", com a linha de ajuda), salva em `exercisePrefs.unit`. Com "placa": cargas inteiras, passo de 1 placa, calibracao comeca na placa 3, e todos os textos dizem "placa N" (Hoje, carga e passos do treino, "anterior", motivo "suba para placa 6", resumo e recordes). A matematica da progressao nao mudou. Trocar a unidade com historico pede "Trocar a unidade recomeca a calibracao deste exercicio" e recomeca a calibracao (`unitChangedAt`; o historico e os recordes so consideram sessoes da mesma unidade). Registros e treinos da 0.2.0 (sem `unit`) continuam valendo como kg. Testes: test/units.test.js (10) e tools/e2e/06-unit-placa.mjs.
+2. **Nota "Minha regulagem" por exercicio** (commit 29b4ec5). Campo de texto (ate 3 linhas / 120 caracteres) na tela do exercicio, salvo em `exercisePrefs.note` ao sair do campo; aparece no topo do exercicio no treino e abaixo do exercicio em Hoje quando preenchida (`data-role="setup-note"`), sempre como texto (nunca HTML). A gravacao das preferencias passou a mesclar o registro (src/data/prefs.js), entao incremento, unidade e nota nao se sobrescrevem. Testes: test/note.test.js (4) e tools/e2e/07-setup-note.mjs.
+3. **Correcao da verificacao** (commit 5b33ebb). O toque em "Feito" do aquecimento agora chama `unlockAudio()` como os outros toques de serie, para o primeiro bipe de descanso nao ficar mudo.
+4. **Versao 0.2.1** (src/version.js) e `node tools/stamp-sw.mjs` (sw.js re-carimbado).
+
+Portoes: `node --test` (75 passam), `node tools/smoke.mjs` (8 passam), `node tools/stamp-sw.mjs --check` (sw.js em dia).
