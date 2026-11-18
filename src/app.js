@@ -12,6 +12,7 @@ import { renderHistory } from './ui/history.js';
 import { renderBody } from './ui/body.js';
 import { renderFirstDay } from './ui/firstday.js';
 import { renderProtein } from './ui/protein.js';
+import { renderReport } from './ui/report.js';
 import { updateTabs } from './ui/tabs.js';
 
 const ROUTES = {
@@ -26,6 +27,7 @@ const ROUTES = {
   '#/historico': renderHistory,
   '#/corpo': renderBody,
   '#/proteina': renderProtein,
+  '#/relatorio': renderReport,
 };
 
 const root = () => document.getElementById('app');

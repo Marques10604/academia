@@ -755,3 +755,17 @@ p + .row.chips {
   background: var(--muted);
   border-radius: 999px;
 }
+
+/* AI report: the long text must be readable and fully scrollable */
+textarea[name=ai-report] {
+  min-height: 300px;
+  font-size: 15px;
+  white-space: pre-wrap;
+  overflow-y: auto;
+}
+
+/* Morning-alarm guide: icon + text step cards */
+.step-icon {
+  flex: none;
+  color: var(--accent);
+}
