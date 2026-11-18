@@ -82,6 +82,7 @@ Se todo o resto falhar, isso precisa funcionar: treino do dia + registro de sér
 | Lembrete via alarme do Relógio/.ics, não push | Notification Triggers abandonado pelo Chrome | — Pending |
 | Construção em MVP vertical | Treino usável primeiro, resto em fatias | — Pending |
 | URL definitiva: https://marques10604.github.io/academia/ (repo público Marques10604/academia) | IndexedDB pertence à origem; nunca renomear conta/repo | ✓ Decidido |
+| Repo público inclui `.planning/` e `.claude/` (servidos também pelo Pages) | Usuário aprovou criar o repo público e enviar o planejamento (2026-11-18); foi avisado que idade/peso ficam visíveis e pode pedir remoção | ✓ Aceito |
 | Prazo: 5 dias (fim em 2026-11-23), versão enxuta sem blindagem | Uso só pessoal; proteções extras depois se precisar | — Pending |
 
 ## Evolution
