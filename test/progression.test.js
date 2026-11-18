@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { RULES, roundToStep, roundDownToStep, phaseFor, suggestNext } from '../src/domain/progression.js';
+import { RULES, roundToStep, roundDownToStep, phaseFor, suggestNext, calibrationStep } from '../src/domain/progression.js';
 import { planExercise } from '../src/domain/plan.js';
 import { EXERCISES } from '../src/data/exercises.js';
 
@@ -219,4 +219,32 @@ test('planExercise: sets by phase and shape preserved', () => {
   assert.equal(adapt.sets, 2);
   assert.equal(adapt.load, 65);
   assert.equal(adapt.incrementKg, 5);
+});
+
+// ---- calibrationStep: guided ramp of sets of 10 (TRAINING-SCIENCE 4) ----
+const ramp = (...pairs) => pairs.map(([load, rir]) => ({ load, reps: 10, rir }));
+
+test('calibrationStep: rir 4+ raises the load by one increment at least', () => {
+  assert.deepEqual(calibrationStep({ rampSets: ramp([20, 4]), incrementKg: 5 }), { done: false, nextLoad: 25 });
+});
+
+test('calibrationStep: the step is about +15% rounded to the increment', () => {
+  assert.deepEqual(calibrationStep({ rampSets: ramp([60, 4]), incrementKg: 5 }), { done: false, nextLoad: 70 });
+});
+
+test('calibrationStep: rir 3 or 2 keeps the load as the working load', () => {
+  assert.deepEqual(calibrationStep({ rampSets: ramp([20, 4], [25, 3]), incrementKg: 5 }), { done: true, workingLoad: 25 });
+  assert.deepEqual(calibrationStep({ rampSets: ramp([20, 2]), incrementKg: 5 }), { done: true, workingLoad: 20 });
+});
+
+test('calibrationStep: rir 1 or 0 steps back one increment, never to zero', () => {
+  assert.deepEqual(calibrationStep({ rampSets: ramp([20, 4], [25, 1]), incrementKg: 5 }), { done: true, workingLoad: 20 });
+  assert.deepEqual(calibrationStep({ rampSets: ramp([5, 0]), incrementKg: 5 }), { done: true, workingLoad: 5 });
+});
+
+test('calibrationStep: at most MAX_RAMP_SETS ramp sets', () => {
+  assert.equal(RULES.MAX_RAMP_SETS, 4);
+  const four = ramp([20, 4], [25, 4], [30, 4], [35, 4]);
+  assert.deepEqual(calibrationStep({ rampSets: four, incrementKg: 5 }), { done: true, workingLoad: 35 });
+  assert.equal(calibrationStep({ rampSets: four.slice(0, 3), incrementKg: 5 }).done, false);
 });

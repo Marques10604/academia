@@ -4,13 +4,14 @@ import { PROGRAM } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import {
   logSet, setCurrent, finishWorkout, discardWorkout,
-  adjustLoad, setLoad, adjustReps, setFeel, undoLastSet, logWarmup, skipRest,
+  adjustLoad, setLoad, adjustReps, setFeel, undoLastSet, logWarmup, skipRest, logRampSet, answerRamp,
 } from '../actions/workout.js';
 import { exerciseHistory } from '../domain/history.js';
 import { warmupSets } from '../domain/draft.js';
 import { formatNumber as fmt, parseDecimal } from '../domain/numbers.js';
 import { restRemainingMs, formatClock, overdueSeconds } from '../domain/timer.js';
 import { unlockAudio, beep, vibrate, requestWakeLock, releaseWakeLock, isWakeLockActive } from '../platform/device.js';
+import { phaseLabel, effortText, loadText } from './reasons.js';
 import { rerender } from '../app.js';
 
 const FEEL_CHIPS = [
@@ -45,9 +46,12 @@ function previousLine(entry, ex, prev) {
   return ex.type === 'time' ? `anterior: ${fmt(set.reps)} s` : `anterior: ${fmt(set.load)} kg × ${set.reps}`;
 }
 
-function setRowText(entry, ex, s, workNumber) {
+function setRowText(entry, ex, s, workNumber, rampNumber) {
   if (s.kind === 'warmup') return `Aquecimento: ${fmt(s.load)} kg × ${s.reps}`;
-  if (s.kind === 'ramp') return `Série de ajuste: ${fmt(s.load)} kg × ${s.reps}`;
+  if (s.kind === 'ramp') {
+    const left = s.rir === undefined ? '' : ` · sobravam ${s.rir >= 4 ? '4+' : s.rir}`;
+    return `Rampa ${rampNumber}: ${fmt(s.load)} kg × ${s.reps}${left}`;
+  }
   return ex.type === 'time' ? `${workNumber}ª série: ${fmt(s.reps)} s` : `${workNumber}ª série: ${fmt(s.load)} kg × ${s.reps}`;
 }
 
@@ -69,6 +73,15 @@ export async function renderWorkout() {
   const prev = exerciseHistory(await listSessions(), entry.exerciseId)[0];
 
   // The set goes to the entry shown on screen (index captured at render time).
+  const onRamp = async () => {
+    unlockAudio(); // needs the tap gesture so the end-of-rest beep can play later
+    await logRampSet(idx, Date.now());
+    await rerender();
+  };
+  const onRir = (rir) => async () => {
+    await answerRamp(idx, rir);
+    await rerender();
+  };
   const onLog = async () => {
     unlockAudio(); // needs the tap gesture so the end-of-rest beep can play later
     await logSet(idx, Date.now());
@@ -157,11 +170,35 @@ export async function renderWorkout() {
   });
 
   let workNumber = 0;
+  let rampNumber = 0;
   const setRows = entry.sets.map((s) => {
     if (s.kind === 'work') workNumber += 1;
+    if (s.kind === 'ramp') rampNumber += 1;
     return h('li', { class: `set-row${s.kind === 'work' ? '' : ' ' + s.kind}`, 'data-set-kind': s.kind },
-      setRowText(entry, ex, s, workNumber));
+      setRowText(entry, ex, s, workNumber, rampNumber));
   });
+
+  // Calibration (CARGA-01): ramp sets of ~10 reps; after each the user says how many reps were left.
+  const ramps = entry.sets.filter((s) => s.kind === 'ramp');
+  const awaitingRir = ramps.length > 0 && ramps[ramps.length - 1].rir === undefined;
+  const calibrationCard = entry.calibrating
+    ? h('div', { class: 'card', 'data-role': 'calibration' },
+      h('span', { class: 'badge badge-calibracao' }, 'Calibração'),
+      h('p', null, 'Descubra sua carga: faça 10 repetições com boa forma, sem pressa.'),
+      awaitingRir
+        ? h('div', null,
+          h('p', null, 'Quantas repetições ainda sobravam?'),
+          h('div', { class: 'chips' },
+            [0, 1, 2, 3, 4].map((n) => h('button', {
+              class: 'chip', 'data-rir': String(n), onclick: onRir(n),
+            }, n === 4 ? '4+' : String(n)))),
+          h('p', { class: 'muted small' }, 'Na dúvida, escolha o número maior.'))
+        : h('button', { class: 'btn btn-big btn-primary', 'data-action': 'log-ramp', onclick: onRamp }, 'Concluir série de rampa'))
+    : null;
+  const rampEndedBanner = !entry.calibrating && ramps.length > 0 && done === 0
+    ? h('div', { class: 'banner', 'data-role': 'ramp-result' },
+      'Sua carga de trabalho: ' + loadText(entry.load, ex) + '. Agora faça as séries valendo.')
+    : null;
 
   const planned = entry.plannedSets;
   const header = done < planned ? `Série ${done + 1} de ${planned}` : `Séries planejadas concluídas (${planned} de ${planned})`;
@@ -193,13 +230,17 @@ export async function renderWorkout() {
     h('div', { class: 'card current' },
       h('h2', { class: 'title' },
         h('a', { href: '#/exercicio/' + entry.exerciseId }, ex.name)),
+      entry.phase ? h('p', null, h('span', { class: `badge badge-${entry.phase}`, 'data-role': 'phase' }, phaseLabel(entry.phase))) : null, // drafts from 0.1.0 have no phase
+      entry.phase ? h('p', { class: 'muted small', 'data-role': 'effort' }, effortText(entry.phase, ex)) : null,
       h('p', { class: 'muted' }, `${planned} × ${entry.repMin}–${entry.repMax}${isTime ? ' s' : ''}`),
       h('p', { 'data-role': 'set-header' }, header),
+      calibrationCard,
+      rampEndedBanner,
       isTime ? null : h('div', { class: 'stepper' },
         h('button', { class: 'btn btn-icon', 'data-action': 'load-minus', 'aria-label': 'Menos carga', onclick: onLoadStep(-1) }, '−'),
         loadInput,
         h('button', { class: 'btn btn-icon', 'data-action': 'load-plus', 'aria-label': 'Mais carga', onclick: onLoadStep(1) }, '+')),
-      isTime ? null : h('p', { class: 'muted small' }, ex.equipment === 'halter' ? 'kg (cada halter)' : 'kg'),
+      isTime ? null : h('p', { class: 'muted small' }, loadText(1, ex).replace(/^1 /, '')),
       h('div', { class: 'stepper' },
         h('button', { class: 'btn btn-icon', 'data-action': 'reps-minus', 'aria-label': 'Menos repetições', onclick: onRepsStep(-1) }, '−'),
         repsSpan,

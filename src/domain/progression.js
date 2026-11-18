@@ -20,6 +20,8 @@ export const RULES = Object.freeze({
   LONG_LAYOFF_PCT: 0.80, // 3.3: ...at 80%
   CALIBRATION_RESTART_PCT: 0.90, // 4: second calibration session starts at 90% of the first
   CALIBRATION_REPS: 10, // 4: calibration sets aim at about 10 reps
+  MAX_RAMP_SETS: 4, // 4: at most 4 ramp sets, so discovery never tires the user out
+  RAMP_STEP_PCT: 0.15, // 4: each ramp step is +10-20% of the load (15% as the middle)
 });
 
 const clean = (v) => Math.max(0, Math.round(v * 100) / 100);
@@ -128,4 +130,21 @@ export function suggestNext({ item, exercise, history, incrementKg, today }) {
 
   // (g) Hold: same load, aim one more rep on the weakest set
   return out(L, Math.min(repMax, Math.min(...S) + 1), 'hold', { load: L });
+}
+
+// Guided ramp (TRAINING-SCIENCE 4): sets of ~10 reps, after each one the user says how many reps were left
+// (rir, 0..4 where 4 means "4 or more"). Target is "3 left". rampSets: [{load, reps, rir}] in order.
+// Returns {done:false, nextLoad} to keep ramping, or {done:true, workingLoad}.
+export function calibrationStep({ rampSets, incrementKg }) {
+  const inc = incrementKg > 0 ? incrementKg : 1;
+  const last = rampSets[rampSets.length - 1];
+  if (last.rir >= 4) {
+    if (rampSets.length >= RULES.MAX_RAMP_SETS) return { done: true, workingLoad: last.load };
+    const jump = Math.max(inc, roundToStep(RULES.RAMP_STEP_PCT * last.load, inc));
+    return { done: false, nextLoad: clean(last.load + jump) };
+  }
+  // 2 left is kept as is: people underestimate their reserve by about 1 rep (Halperin 2022).
+  if (last.rir >= 2) return { done: true, workingLoad: last.load };
+  // 1 or 0 left: too heavy, one increment down (never to zero).
+  return { done: true, workingLoad: last.load > inc ? clean(last.load - inc) : last.load };
 }

@@ -5,6 +5,7 @@ import { workoutItems } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import { exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
+import { calibrationStep } from '../domain/progression.js';
 import { localDate } from '../domain/dates.js';
 import { undoLast, isComplete } from '../domain/draft.js';
 
@@ -54,6 +55,9 @@ export function startWorkout(templateId, now, short = false) {
         incrementKg: plan.incrementKg,
         type: exercise.type,
         feel: null,
+        phase: plan.phase,
+        // Plank and crunch never ramp (calibrate:false in the library).
+        calibrating: plan.mode === 'calibration' && exercise.calibrate !== false,
         sets: [],
       };
     });
@@ -77,8 +81,20 @@ export function logSet(entryIdx, now) {
     const entry = draft.entries[entryIdx];
     if (!entry) return draft;
     entry.sets.push({ load: entry.load, reps: entry.reps, kind: 'work', at: now });
+    entry.calibrating = false; // a working set ends the ramp: the user can always skip calibration
     // The end time is saved with the set, so the timer survives reload and screen-off (TREINO-05).
     draft.restEndsAt = now + entry.restSec * 1000;
+    return draft;
+  });
+}
+
+// Calibration ramp set (sets of ~10 reps). kind 'ramp' keeps it out of history, records and the 70% rule.
+export function logRampSet(entryIdx, now) {
+  return mutate((draft) => {
+    const entry = draft.entries[entryIdx];
+    if (!entry) return draft;
+    entry.sets.push({ load: entry.load, reps: entry.reps, kind: 'ramp', at: now });
+    draft.restEndsAt = now + 60000;
     return draft;
   });
 }
@@ -121,6 +137,25 @@ export function setFeel(entryIdx, feel) {
     const entry = draft.entries[entryIdx];
     if (!entry || !FEELS.includes(feel)) return draft;
     entry.feel = feel;
+    return draft;
+  });
+}
+
+// "How many reps were left?" (0..4, 4 = four or more) after the latest ramp set: next ramp load or the working load.
+export function answerRamp(entryIdx, rir) {
+  return mutate((draft) => {
+    const entry = draft.entries[entryIdx];
+    if (!entry || !entry.calibrating || !Number.isInteger(rir) || rir < 0 || rir > 4) return draft;
+    const ramps = entry.sets.filter((s) => s.kind === 'ramp');
+    if (ramps.length === 0) return draft;
+    ramps[ramps.length - 1].rir = rir;
+    const step = calibrationStep({ rampSets: ramps, incrementKg: incrementOf(entry) });
+    if (step.done) {
+      entry.load = step.workingLoad;
+      entry.calibrating = false;
+    } else {
+      entry.load = step.nextLoad;
+    }
     return draft;
   });
 }
