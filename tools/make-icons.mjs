@@ -29,7 +29,7 @@ function chunk(type, data) {
   return Buffer.concat([len, body, crc]);
 }
 
-const BG = [0x0f, 0x17, 0x2a];
+const BG = [0x00, 0x00, 0x00];
 const FG = [0x22, 0xc5, 0x5e];
 
 // Halteres centralizado dentro de 60% do quadrado (seguro para icone maskable).

@@ -1,9 +1,9 @@
 :root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface-2: #334155;
-  --text: #f1f5f9;
-  --muted: #94a3b8;
+  --bg: #000000;
+  --surface: #121212;
+  --surface-2: #1f1f1f;
+  --text: #f3f4f6;
+  --muted: #9ca3af;
   --accent: #22c55e;
   --warn: #f59e0b;
   --danger: #ef4444;
