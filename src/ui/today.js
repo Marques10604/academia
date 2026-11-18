@@ -12,6 +12,8 @@ import { startWorkout } from '../actions/workout.js';
 import { listDays } from '../data/daily.js';
 import { hasCheckin, averageWeight } from '../domain/body.js';
 import { formatNumber } from '../domain/numbers.js';
+import { proteinTarget, dayTotal } from '../domain/protein.js';
+import { proteinLineText } from './protein.js';
 import { avgWeightText } from './body.js';
 import { backupStatus } from '../domain/backup.js';
 import { backupAgeText } from './backup.js';
@@ -128,6 +130,8 @@ export async function renderToday() {
   const profile = await getSetting('profile', null);
   const greeting = greetingFor(new Date().getHours(), profile?.name); // the clock is read here in the UI layer only
 
+  const target = proteinTarget({ settingG: await getSetting('proteinTargetG', null), avgKg: avg?.avg, profileKg: profile?.weightKg });
+
   const backup = backupStatus({ lastBackupAt: await getSetting('lastBackupAt', null), sessions, today });
 
   const onStart = (short) => async (e) => {
@@ -142,11 +146,14 @@ export async function renderToday() {
   return h('div', { class: 'screen', 'data-screen': 'hoje' },
     h('div', { class: 'topbar' },
       h('h1', { class: 'title', 'data-role': 'greeting' }, greeting)),
-    // ONE compact card: date, week progress, 7-day average weight and last backup (the nudge below replaces the last line when due).
+    // ONE compact card: date, week progress, 7-day average weight, protein of the day and last backup (the nudge below replaces the last line when due).
     h('div', { class: 'card dashboard', 'data-role': 'dashboard' },
       h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
       weekRow(sessionsThisWeek(sessions, today)),
       avg ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg)) : null,
+      h('div', { class: 'row between', 'data-role': 'protein-today' },
+        h('span', { 'data-role': 'protein-line' }, proteinLineText(dayTotal(todayRow), target.g)),
+        h('button', { class: 'btn btn-ghost', 'data-action': 'protein', onclick: () => { location.hash = '#/proteina'; } }, 'Anotar')),
       backup.due ? null : h('p', { class: 'muted small', 'data-role': 'backup-status' }, backupAgeText(backup))),
     checkinBlock(todayRow),
     anyDone ? null : firstDayCard(),

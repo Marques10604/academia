@@ -11,6 +11,7 @@ import { renderBackup } from './ui/backup.js';
 import { renderHistory } from './ui/history.js';
 import { renderBody } from './ui/body.js';
 import { renderFirstDay } from './ui/firstday.js';
+import { renderProtein } from './ui/protein.js';
 import { updateTabs } from './ui/tabs.js';
 
 const ROUTES = {
@@ -24,6 +25,7 @@ const ROUTES = {
   '#/backup': renderBackup,
   '#/historico': renderHistory,
   '#/corpo': renderBody,
+  '#/proteina': renderProtein,
 };
 
 const root = () => document.getElementById('app');
