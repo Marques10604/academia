@@ -25,7 +25,10 @@ export function renderOnboarding() {
   };
 
   return h('div', { class: 'screen', 'data-screen': 'inicio' },
-    h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Bem-vindo')),
+    h('div', { class: 'topbar' },
+      h('div', { class: 'brand' },
+        h('img', { class: 'brand-logo', src: './icons/icon.svg', alt: '', width: '56', height: '56' }),
+        h('h1', { class: 'title' }, 'Bem-vindo ao Progride'))),
     h('div', { class: 'notice' },
       h('p', null, 'Este app não é aconselhamento médico.'),
       h('p', null, 'Antes de começar a treinar, faça um check-up médico (coração e pressão), principalmente se você nunca treinou.'),

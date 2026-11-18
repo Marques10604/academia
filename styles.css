@@ -347,6 +347,20 @@ textarea {
   color: var(--accent);
 }
 
+/* Logo + name on the first screen */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  flex: none;
+}
+
 /* First-gym-day checklist */
 .check-item {
   display: flex;

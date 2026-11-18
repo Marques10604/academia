@@ -29,6 +29,21 @@ const completeSession = () => `(async () => {
 export default async function (page) {
   await page.goto('');
   await page.waitFor(has('[data-screen=inicio]'));
+
+  // --- identity: title, onboarding heading with the logo, manifest and its icons ---
+  assert.equal(await page.eval('document.title'), 'Progride');
+  assert.ok((await page.text()).includes('Bem-vindo ao Progride'), 'titulo do onboarding');
+  await page.waitFor("(() => { const i = document.querySelector('img.brand-logo'); return !!i && i.complete && i.naturalWidth > 0; })()");
+  const manifest = await page.eval("fetch('manifest.webmanifest').then((r) => r.json())");
+  assert.equal(manifest.name, 'Progride');
+  assert.equal(manifest.short_name, 'Progride');
+  assert.equal(manifest.id, 'academia');
+  assert.equal(manifest.icons.length, 4);
+  for (const icon of manifest.icons) {
+    const type = await page.eval(`fetch(${JSON.stringify(icon.src)}).then((r) => (r.ok ? r.headers.get('content-type') : 'HTTP ' + r.status))`);
+    assert.ok(String(type).startsWith('image/png'), `${icon.src} servido como ${type}`);
+  }
+
   await page.type('input[name=weight]', '72,5');
   await page.type('input[name=height]', '175');
   await page.click('[data-action=accept-onboarding]');
