@@ -12,7 +12,7 @@ export default async function (page) {
   assert.ok((await text('[data-role=date]')).length > 5, 'data do dia na tela Hoje');
   assert.equal(await page.eval("document.querySelector('[data-role=week]').getAttribute('data-count')"), '0', 'semana começa em 0');
   assert.ok((await text('[data-role=week]')).includes('0 de 3'), 'linha "0 de 3"');
-  assert.ok((await text('h1')).includes('Treino A'), 'Treino A é o próximo');
+  assert.ok((await text('[data-screen=hoje]')).includes('Treino A'), 'Treino A é o próximo');
 
   await page.click('[data-action=start-short]');
   await page.waitFor("!!document.querySelector('[data-screen=treino]')");
@@ -40,7 +40,7 @@ export default async function (page) {
 
   await page.click('[data-action=home]');
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
-  assert.ok((await text('h1')).includes('Treino B'), 'rotação avança para o Treino B');
+  assert.ok((await text('[data-screen=hoje]')).includes('Treino B'), 'rotação avança para o Treino B');
   assert.equal(await page.eval("document.querySelector('[data-role=week]').getAttribute('data-count')"), '1', 'semana = 1');
   assert.ok((await text('[data-role=week]')).includes('1 de 3'), 'linha "1 de 3"');
 }

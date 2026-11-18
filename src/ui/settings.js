@@ -86,10 +86,5 @@ export async function renderSettings() {
       h('p', { class: 'muted small' }, 'Vai testar o app antes de começar? Depois de testar, apague tudo para começar o treino de verdade com o app limpo.'),
       h('button', { class: 'btn btn-danger', 'data-action': 'reset-all', onclick: onResetAll }, 'Apagar tudo e começar do zero')),
     planCard(),
-    h('div', { class: 'notice' }, 'Este app não é aconselhamento médico.'),
-    h('div', { class: 'bottom-bar' },
-      h('button', {
-        class: 'btn btn-big', 'data-action': 'home',
-        onclick: () => { location.hash = '#/hoje'; },
-      }, 'Voltar')));
+    h('div', { class: 'notice' }, 'Este app não é aconselhamento médico.'));
 }

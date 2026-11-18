@@ -36,9 +36,7 @@ function renderList(sessions) {
       ? h('p', { class: 'muted' }, 'Nenhum treino ainda. Seus treinos aparecem aqui quando você finalizar.')
       : h('ul', { class: 'list' }, rows.map(workoutItem)),
     h('h2', null, 'Exercícios'),
-    h('ul', { class: 'list' }, ids.map((id) => exerciseItem(EXERCISES[id], sessions))),
-    h('div', { class: 'bottom-bar' },
-      h('a', { class: 'btn btn-big', 'data-action': 'back-today', href: '#/hoje' }, 'Voltar')));
+    h('ul', { class: 'list' }, ids.map((id) => exerciseItem(EXERCISES[id], sessions))));
 }
 
 function chartHeading(chart) {

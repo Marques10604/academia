@@ -45,7 +45,28 @@ export default async function (page) {
     assert.ok(String(type).startsWith('image/png'), `${icon.src} servido como ${type}`);
   }
 
+  // The welcome screen has no tab bar.
+  assert.equal(await page.eval('!!document.querySelector(".tabbar") && !document.querySelector(".tabbar").hidden'), false, 'sem abas no boas-vindas');
   await page.click('[data-action=accept-onboarding]');
+  await page.waitFor(has('[data-screen=hoje]'));
+
+  // --- bottom tab bar: four tabs on the main screens, active one highlighted, hidden on the live workout ---
+  const tabs = `Array.from(document.querySelectorAll('.tabbar .tab')).map((t) => t.getAttribute('data-tab') + (t.classList.contains('active') ? '*' : '') + ':' + t.innerText.trim() + ':' + (t.querySelector('svg') ? 'svg' : 'no-icon')).join(',')`;
+  assert.equal(await page.eval('!document.querySelector(".tabbar").hidden'), true, 'abas visiveis em Hoje');
+  assert.equal(await page.eval(tabs), 'hoje*:Hoje:svg,historico:Histórico:svg,corpo:Corpo:svg,config:Config:svg');
+  assert.equal(await page.eval("getComputedStyle(document.querySelector('.tabbar')).position"), 'fixed');
+  assert.equal(await page.eval("!!document.querySelector('[data-screen=hoje] [data-action=history], [data-screen=hoje] [data-action=settings], [data-screen=hoje] [data-action=body]')"), false, 'sem links no topo da tela Hoje');
+  for (const [action, screen, tab] of [['history', 'historico', 'historico'], ['body', 'corpo', 'corpo'], ['settings', 'config', 'config'], ['home', 'hoje', 'hoje']]) {
+    await page.click('.tabbar [data-action=' + action + ']');
+    await page.waitFor(has('[data-screen=' + screen + ']'));
+    assert.equal(await page.eval("document.querySelector('.tabbar .tab.active').getAttribute('data-tab')"), tab, 'aba ativa: ' + tab);
+    assert.equal(await page.eval('!document.querySelector(".tabbar").hidden'), true, 'abas visiveis em ' + screen);
+  }
+  // Sticky bottom buttons never sit under the bar.
+  await page.goto('#/corpo');
+  await page.waitFor(has('[data-screen=corpo] .bottom-bar'));
+  assert.equal(await page.eval("(() => { const b = document.querySelector('.bottom-bar').getBoundingClientRect(), t = document.querySelector('.tabbar').getBoundingClientRect(); return b.bottom <= t.top + 1; })()"), true, 'barra de baixo acima das abas');
+  await page.goto('#/hoje');
   await page.waitFor(has('[data-screen=hoje]'));
 
   // --- Today's top: one dashboard card with date, week, backup status; average weight only after a weigh-in ---
@@ -113,6 +134,7 @@ export default async function (page) {
   await page.waitFor(has('[data-action=start]'));
   await page.click('[data-action=start]'); // leaves an open workout draft behind
   await page.waitFor(has('[data-screen=treino]'));
+  assert.equal(await page.eval('document.querySelector(".tabbar").hidden'), true, 'sem abas no treino em andamento');
   await page.goto('#/config');
   await page.waitFor(has('[data-action=reset-all]'));
   const counts = `(async () => {

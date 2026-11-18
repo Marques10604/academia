@@ -135,6 +135,5 @@ export async function renderBody() {
     weightCard(days, today),
     waistCard(days, today),
     h('div', { class: 'bottom-bar' },
-      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'save-checkin', onclick: checkin.save }, 'Salvar check-in'),
-      h('a', { class: 'btn', 'data-action': 'back-today', href: '#/hoje' }, 'Voltar')));
+      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'save-checkin', onclick: checkin.save }, 'Salvar check-in')));
 }

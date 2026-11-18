@@ -11,6 +11,7 @@ import { renderBackup } from './ui/backup.js';
 import { renderHistory } from './ui/history.js';
 import { renderBody } from './ui/body.js';
 import { renderFirstDay } from './ui/firstday.js';
+import { updateTabs } from './ui/tabs.js';
 
 const ROUTES = {
   '#/primeiro-dia': renderFirstDay,
@@ -43,7 +44,10 @@ async function render() {
     return; // hashchange re-enters render()
   }
   const node = await ROUTES[key](hash);
-  if (node) mount(root(), node); // a screen that redirects returns null
+  if (node) {
+    mount(root(), node); // a screen that redirects returns null
+    updateTabs(node.getAttribute('data-screen')); // bottom tab bar only on the four main screens
+  }
 }
 
 export function rerender() {

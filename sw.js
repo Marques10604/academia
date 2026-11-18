@@ -44,6 +44,7 @@ const ASSETS = [
   './src/ui/reasons.js',
   './src/ui/settings.js',
   './src/ui/summary.js',
+  './src/ui/tabs.js',
   './src/ui/today.js',
   './src/ui/workout.js',
   './src/version.js',

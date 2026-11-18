@@ -15,7 +15,7 @@ export function renderOnboarding() {
     const row = await getDay(today);
     if (typeof row?.weightKg !== 'number') await saveDay(today, { weightKg: DEFAULT_PROFILE.weightKg });
     await setSetting('onboardingDone', true);
-    await requestPersist(); // ask to protect the data right after the first real save
+    requestPersist().catch(() => {}); // ask to protect the data right after the first real save; never wait on it
     location.hash = '#/hoje';
   };
 

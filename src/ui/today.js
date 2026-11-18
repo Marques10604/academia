@@ -131,11 +131,7 @@ export async function renderToday() {
     h('div', { class: 'topbar' },
       h('div', null,
         h('h1', { class: 'title', 'data-role': 'greeting' }, greeting),
-        h('p', { class: 'subtitle muted' }, `Hoje: ${tpl.name}`)),
-      h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
-    h('div', { class: 'row nav' },
-      h('button', { class: 'btn btn-ghost', 'data-action': 'history', onclick: () => { location.hash = '#/historico'; } }, 'Histórico'),
-      h('button', { class: 'btn btn-ghost', 'data-action': 'body', onclick: () => { location.hash = '#/corpo'; } }, 'Corpo')),
+        h('p', { class: 'subtitle muted' }, `Hoje: ${tpl.name}`))),
     // ONE compact card: date, week progress, 7-day average weight and last backup (the nudge below replaces the last line when due).
     h('div', { class: 'card dashboard', 'data-role': 'dashboard' },
       h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),

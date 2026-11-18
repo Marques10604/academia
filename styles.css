@@ -498,3 +498,68 @@ textarea {
 .welcome .notice p + p {
   margin-top: 6px;
 }
+
+/* Bottom tab bar (src/ui/tabs.js): Hoje · Histórico · Corpo · Config */
+:root {
+  --tabbar-h: 64px;
+}
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--surface-2);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabbar[hidden] {
+  display: none;
+}
+
+.tab {
+  flex: 1;
+  min-height: var(--tabbar-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+}
+
+.tab.active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tab.active .tab-icon {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+/* With the bar showing: room for it under the content, and sticky bottom buttons sit above it */
+body.has-tabs .screen {
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px);
+}
+
+body.has-tabs .bottom-bar {
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+}

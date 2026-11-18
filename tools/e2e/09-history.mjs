@@ -96,7 +96,7 @@ export default async function (page) {
   await page.waitFor("[...document.querySelectorAll('[data-role=history-row]')].some((e) => e.innerText.includes('placa 5 × 10'))");
   await open('pec_deck', 'Voador');
   await page.waitFor("document.body.innerText.includes('Ainda sem registro')");
-  assert.equal(await page.eval("document.querySelectorAll('svg').length"), 0, 'sem gráfico sem registros');
+  assert.equal(await page.eval("document.querySelectorAll('svg.chart').length"), 0, 'sem gráfico sem registros');
 
   await page.eval("location.hash = '#/exercicio/leg_press_45'");
   await page.click('[data-action=exercise-history]');
