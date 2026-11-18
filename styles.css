@@ -125,6 +125,13 @@ ol, ul {
   font-family: inherit;
   padding: 0 16px;
   cursor: pointer;
+  /* Links styled as buttons (e.g. "Ver vídeo no YouTube") center like real buttons */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .btn-primary {
