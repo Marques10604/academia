@@ -26,3 +26,10 @@ export function brShort(localDate) {
   const [, m, d] = localDate.split('-');
   return `${d}/${m}`;
 }
+
+// 'YYYY-MM-DD' plus n days (n may be negative), as 'YYYY-MM-DD'. UTC math: no local clock, no timezone shift.
+export function addDays(date, n) {
+  const [y, m, d] = date.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + n));
+  return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`;
+}

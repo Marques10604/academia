@@ -10,7 +10,9 @@ import { formatNumber } from '../domain/numbers.js';
 import { localDate, brDate, brShort } from '../domain/dates.js';
 import { lineChart } from './chart.js';
 import { getSetting, setSetting } from '../data/db.js';
-import { photoStatus } from '../domain/goals.js';
+import {
+  photoStatus, carbNudge, weightTrend, healthyPace, readWeightGoal, weightGoalStatus, paceVerdict, startWeight,
+} from '../domain/goals.js';
 
 // Five chips 1-5 for one rating. A tap selects, a tap on the selected chip clears. The selected class is
 // toggled in place (no re-render), so a weight typed in the field above is never lost.
@@ -70,8 +72,18 @@ export function avgWeightText(avg) {
   return `Peso médio (7 dias): ${formatNumber(avg.avg)} kg · ${avg.n} ${avg.n === 1 ? 'pesagem' : 'pesagens'}`;
 }
 
-function weightCard(days, today) {
+// The carbohydrate suggestion (no calories, only home portions). Also used by '#/proteina'.
+export function carbText(gainKg) {
+  const sign = gainKg > 0 ? '+' : gainKg < 0 ? '−' : '';
+  return `Seu peso médio quase não mudou nas últimas 2 semanas (${sign}${formatNumber(Math.abs(gainKg))} kg). `
+    + 'Para ganhar massa, acrescente 1 porção de carboidrato por dia: 1 banana com aveia, 4 colheres a mais de arroz ou 1 pão com ovo.';
+}
+
+const signed = (kg) => `${kg > 0 ? '+' : kg < 0 ? '−' : ''}${formatNumber(Math.abs(kg))}`;
+
+function weightCard(days, today, goal) {
   const avg = averageWeight(days, today);
+  const nudge = carbNudge(days, today, goal);
   const { raw, avg: line } = weightSeries(days);
   const chart = raw.length >= 2
     ? lineChart([{ points: raw, style: 'dots' }, { points: line, style: 'line' }], {
@@ -82,8 +94,85 @@ function weightCard(days, today) {
   return h('div', { class: 'card stack', 'data-role': 'weight' },
     h('h2', null, 'Peso'),
     avg ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg)) : null,
+    nudge ? h('p', { class: 'small', 'data-role': 'carb-nudge' }, carbText(nudge.gainKg)) : null,
     h('p', { class: 'muted small' }, 'O peso do dia varia 0,5 a 1,5 kg com água e comida. Olhe a linha da média.'),
     chart);
+}
+
+const PACE_NOTE = {
+  ok: ' (no ritmo)',
+  slow: ' (mais devagar que o sugerido)',
+  fast: ' (mais rápido que o sugerido: pode virar mais gordura que músculo)',
+};
+
+// "Meta de peso": target weight, what is left, the healthy pace and the user's own pace over the last 2 weeks.
+// Like the waist card it redraws only itself (replaceWith) after a save, so an unsaved check-in is kept.
+function weightGoalCard(days, today, goal, profileKg) {
+  const avg = averageWeight(days, today);
+  const nowKg = avg ? avg.avg : null;
+  const input = h('input', {
+    type: 'text', inputmode: 'decimal', name: 'weight-goal', autocomplete: 'off', placeholder: 'ex: 75',
+  });
+  const error = h('div', { class: 'banner', 'data-role': 'weight-goal-error', hidden: true });
+  const redraw = async () => node.replaceWith(weightGoalCard(await listDays(), today, readWeightGoal(await getSetting('weightGoal', null)), profileKg));
+
+  const status = goal && nowKg !== null ? weightGoalStatus(goal, nowKg) : null;
+  const direction = status && status.direction !== 'done' ? status.direction : (goal && goal.targetKg < goal.startKg ? 'lose' : 'gain');
+  const trend = weightTrend(days, today);
+  const parts = [];
+  if (!goal) {
+    const pace = healthyPace(startWeight(days, today, profileKg) ?? 70);
+    parts.push(h('p', { class: 'muted' },
+      `Defina um peso-alvo. Ritmo saudável para ganhar massa: 0,25% a 0,4% do peso por semana (cerca de ${formatNumber(pace.minKg)} a ${formatNumber(pace.maxKg)} kg).`));
+  } else {
+    parts.push(h('p', { 'data-role': 'weight-goal-status' },
+      status && status.direction === 'done'
+        ? h('strong', null, 'Meta alcançada! Defina uma nova quando quiser.')
+        : status
+          ? `Meta: ${formatNumber(goal.targetKg)} kg · faltam ${formatNumber(status.remainingKg)} kg`
+          : `Meta: ${formatNumber(goal.targetKg)} kg`));
+    if (status) {
+      parts.push(h('div', { class: 'bar', 'aria-hidden': 'true' }, h('div', { class: 'bar-fill', style: { width: `${status.progressPct}%` } })));
+      if (status.direction !== 'done') {
+        const pace = healthyPace(nowKg);
+        parts.push(h('p', { class: 'small', 'data-role': 'weight-goal-pace' },
+          `Ritmo saudável: ${formatNumber(pace.minKg)} a ${formatNumber(pace.maxKg)} kg por semana · de ${status.weeksMin} a ${status.weeksMax} semanas`));
+      }
+    }
+    parts.push(h('p', { class: 'small', 'data-role': 'weight-goal-trend' },
+      trend === null
+        ? 'Registre o peso por 2 semanas para ver o seu ritmo.'
+        : `Últimas 2 semanas: ${signed(trend.perWeekKg)} kg por semana`
+          + PACE_NOTE[paceVerdict(trend.perWeekKg, healthyPace(trend.nowKg), direction)]));
+  }
+  const node = h('div', { class: 'card stack', 'data-role': 'weight-goal' },
+    h('h2', null, 'Meta de peso'),
+    parts,
+    h('div', { class: 'field' }, h('label', null, 'Peso-alvo (kg)'), input),
+    error,
+    h('button', {
+      class: 'btn', 'data-action': 'save-weight-goal',
+      onclick: async (e) => {
+        const r = readOptionalNumber(input.value, WEIGHT_MIN, WEIGHT_MAX);
+        if (r.error || r.value === null) {
+          error.textContent = 'Digite o peso-alvo em kg, entre 30 e 250 (ex: 75).';
+          error.hidden = false;
+          return;
+        }
+        e.currentTarget.disabled = true;
+        await setSetting('weightGoal', { targetKg: r.value, startKg: startWeight(days, today, profileKg) ?? r.value, setAt: today });
+        await redraw();
+      },
+    }, 'Salvar meta'),
+    goal ? h('button', {
+      class: 'btn btn-ghost', 'data-action': 'clear-weight-goal',
+      onclick: async (e) => {
+        e.currentTarget.disabled = true;
+        await setSetting('weightGoal', null);
+        await redraw();
+      },
+    }, 'Remover meta') : null);
+  return node;
 }
 
 function deltaText(delta) {
@@ -157,11 +246,14 @@ function photosCard(lastPhotosAt, today) {
 export async function renderBody() {
   const today = localDate(Date.now()); // the clock is read here in the UI layer only
   const days = await listDays();
+  const goal = readWeightGoal(await getSetting('weightGoal', null));
+  const profile = await getSetting('profile', null);
   const checkin = checkinCard(days.find((d) => d.localDate === today) ?? null, today);
   return h('div', { class: 'screen', 'data-screen': 'corpo' },
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Corpo')),
     checkin.node,
-    weightCard(days, today),
+    weightCard(days, today, goal),
+    weightGoalCard(days, today, goal, profile?.weightKg),
     waistCard(days, today),
     photosCard(await getSetting('lastPhotosAt', null), today));
 }

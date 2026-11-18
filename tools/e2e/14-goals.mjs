@@ -116,4 +116,71 @@ export default async function (page) {
   await page.reload();
   await page.waitFor(has('[data-screen=hoje]'));
   assert.equal(await page.eval(has('[data-role=gap-notice]')), false, 'treinou hoje: sem aviso');
+
+  // ---- Task 3: body-weight goal with the healthy pace ----
+  await page.goto('#/corpo');
+  await page.waitFor(has('[data-screen=corpo]') + ' && ' + has('[data-role=weight-goal]'));
+  assert.equal(await page.eval(has('[data-role=weight-goal-status]')), false, 'sem meta, sem status');
+  assert.equal(await page.eval(count('[data-role=weight-goal] input[name=weight-goal]')), 1);
+  const order = await page.eval("Array.from(document.querySelectorAll('.screen > .card')).map((c) => c.getAttribute('data-role'))");
+  assert.deepEqual(order, ['checkin', 'weight', 'weight-goal', 'waist', 'photos'], 'ordem dos cartoes do Corpo: ' + order);
+
+  await page.type('input[name=weight-goal]', '300');
+  await page.click('[data-action=save-weight-goal]');
+  await page.waitFor("!document.querySelector('[data-role=weight-goal-error]').hidden");
+  assert.ok((await page.eval(textOf('[data-role=weight-goal-error]'))).includes('entre 30 e 250'));
+  assert.equal(await page.eval(setting('weightGoal')), null, '300 kg nao e salvo');
+
+  await page.eval("(() => { document.querySelector('input[name=weight-goal]').value = ''; return true; })()");
+  await page.type('input[name=weight-goal]', '75');
+  await page.click('[data-action=save-weight-goal]');
+  await page.waitFor(has('[data-role=weight-goal-status]'));
+  const goal = await page.eval(setting('weightGoal'));
+  assert.equal(goal.targetKg, 75);
+  assert.equal(typeof goal.startKg, 'number', 'peso inicial gravado');
+  const goalStatus = await page.eval(textOf('[data-role=weight-goal-status]'));
+  assert.ok(goalStatus.includes('Meta: 75 kg · faltam'), goalStatus);
+  assert.ok((await page.eval(textOf('[data-role=weight-goal-pace]'))).includes('kg por semana'));
+  assert.equal(await page.eval(count('[data-role=weight-goal] .bar-fill')), 1, 'barra de progresso neutra');
+  assert.ok((await page.eval(textOf('[data-role=weight-goal-trend]'))).includes('Registre o peso por 2 semanas'));
+
+  // ---- Task 3: carbohydrate nudge after a 2-week stall ----
+  const seedWeights = (rows) => `(async () => {
+    ${dbImport} ${datesImport}
+    for (const [daysAgo, kg] of ${JSON.stringify(rows)}) {
+      await db.put('dailyLogs', { localDate: dates.localDate(Date.now() - daysAgo * 86400000), weightKg: kg, updatedAt: 1 });
+    }
+    return true;
+  })()`;
+  await page.eval(seedWeights([[20, 70], [18, 70], [15, 70], [6, 70.1], [3, 70.0], [0, 70.2]]));
+  await page.reload();
+  await page.waitFor(has('[data-screen=corpo]') + ' && ' + has('[data-role=carb-nudge]'));
+  const nudge = await page.eval(textOf('[data-role=carb-nudge]'));
+  assert.ok(nudge.includes('1 porção de carboidrato'), nudge);
+  assert.ok(nudge.includes('(+0,1 kg)'), nudge);
+  assert.ok((await page.eval(textOf('[data-role=weight-goal-trend]'))).includes('kg por semana'));
+  assert.ok((await page.eval(textOf('[data-role=weight-goal-trend]'))).includes('mais devagar'), 'ritmo abaixo do sugerido');
+  assert.equal(await page.eval(`(() => { const a = document.querySelector('[data-role=weight]'); return !!a.querySelector('[data-role=carb-nudge]'); })()`), true, 'a sugestao fica no cartao Peso');
+
+  // Never calories (checked on the whole screen).
+  const corpoText = (await page.text()).toLowerCase();
+  assert.equal(corpoText.includes('kcal'), false, 'sem kcal');
+  assert.equal(corpoText.includes('caloria'), false, 'sem calorias');
+
+  await page.goto('#/proteina');
+  await page.waitFor(has('[data-screen=proteina]'));
+  assert.ok((await page.eval(textOf('[data-role=carb-nudge]'))).includes('1 porção de carboidrato'), 'sugestao tambem na proteina');
+
+  // The average rose 0,5 kg: no nudge.
+  await page.eval(seedWeights([[6, 70.5], [3, 70.6], [0, 70.4]]));
+  await page.goto('#/corpo');
+  await page.reload();
+  await page.waitFor(has('[data-screen=corpo]') + ' && ' + has('[data-role=weight-goal-trend]'));
+  assert.equal(await page.eval(has('[data-role=carb-nudge]')), false, 'peso subindo: sem sugestao');
+
+  // Removing the goal.
+  await page.click('[data-action=clear-weight-goal]');
+  await page.waitFor("!document.querySelector('[data-role=weight-goal-status]')");
+  assert.equal(await page.eval(setting('weightGoal')), null, 'meta removida');
+  assert.equal(await page.eval(has('[data-role=weight-goal-status]')), false);
 }

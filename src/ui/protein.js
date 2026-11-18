@@ -8,6 +8,8 @@ import { getSetting, setSetting } from '../data/db.js';
 import { averageWeight, readOptionalNumber } from '../domain/body.js';
 import { formatNumber } from '../domain/numbers.js';
 import { localDate } from '../domain/dates.js';
+import { carbNudge, readWeightGoal } from '../domain/goals.js';
+import { carbText } from './body.js';
 import {
   MEALS, PORTIONS, OTHER_ID, GRAMS_MIN, GRAMS_MAX, TARGET_MIN, TARGET_MAX,
   mealForHour, autoTarget, proteinTarget, proteinFloor, dayTotal, weekStats, portionLabel, mealLabel,
@@ -139,6 +141,9 @@ export async function renderProtein() {
     await setSetting('proteinTargetG', settingG);
   };
 
+  // One more carbohydrate portion when the 7-day average weight has stalled for 2 weeks (same text as Corpo).
+  const nudge = carbNudge(days, today, readWeightGoal(await getSetting('weightGoal', null)));
+
   refresh();
   return h('div', { class: 'screen', 'data-screen': 'proteina' },
     h('div', { class: 'topbar' }, h('h1', { class: 'title' }, 'Proteína')),
@@ -159,7 +164,9 @@ export async function renderProtein() {
         h('div', { class: 'row' }, gramsInput, h('button', { type: 'button', class: 'btn', 'data-action': 'add-grams', onclick: onAddGrams }, 'Somar'))),
       gramsError),
     h('h2', { class: 'section-label' }, 'Semana'),
-    h('div', { class: 'card' }, week),
+    h('div', { class: 'card stack' },
+      week,
+      nudge ? h('p', { class: 'small', 'data-role': 'carb-nudge' }, carbText(nudge.gainKg)) : null),
     h('div', { class: 'card stack', 'data-role': 'protein-target' },
       targetText,
       floorText,
