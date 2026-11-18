@@ -45,4 +45,20 @@ export default async function (page) {
   assert.ok((await page.text()).includes('Continuar treino'));
   await page.click('[data-action=resume]');
   await page.waitFor("!!document.querySelector('[data-screen=treino]')");
+  // (d) finish with 6 of 8 exercises done (75% >= 70%) -> summary -> rotation moves to Treino B
+  for (let i = 2; i <= 6; i++) {
+    await page.click('[data-action=next-exercise]');
+    await page.waitFor(`document.body.innerText.includes('Exercício ${i} de 8')`);
+    await page.click('[data-action=log-set]');
+    await page.waitFor("document.querySelectorAll('[data-set-kind=work]').length === 1");
+  }
+  await page.click('[data-action=finish]');
+  await page.waitFor("!!document.querySelector('[data-screen=resumo]')");
+  const summary = await page.text();
+  assert.ok(summary.includes('Treino A concluído'), 'resumo deve mostrar Treino A concluído');
+  assert.ok(summary.includes('Próximo treino: Treino B'), 'próximo treino deve ser B');
+  await page.click('[data-action=home]');
+  await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
+  const today = await page.text();
+  assert.ok(today.includes('Treino B') && today.includes('Iniciar treino'), 'Hoje deve oferecer Treino B');
 }

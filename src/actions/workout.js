@@ -1,6 +1,6 @@
 // Serialized write-through workout actions. IndexedDB is the only source of truth:
 // nothing here keeps a draft copy in memory between calls.
-import { getActive, putActive, listSessions, getAll } from '../data/db.js';
+import { getActive, putActive, listSessions, getAll, del, finishActive, SCHEMA_VERSION } from '../data/db.js';
 import { PROGRAM } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import { exerciseHistory } from '../domain/history.js';
@@ -83,4 +83,29 @@ export function setCurrent(idx) {
     draft.currentIdx = Math.max(0, Math.min(max, idx));
     return draft;
   });
+}
+
+// A workout counts as complete when at least 70% of its exercises have a work set
+// (TRAINING-SCIENCE 2.1). Runs in the queue so a set logged just before "Finalizar" is included.
+export function finishWorkout(now) {
+  return queue(async () => {
+    const draft = await getActive();
+    if (!draft) return null;
+    const done = draft.entries.filter((e) => e.sets.some((s) => s.kind === 'work')).length;
+    const complete = draft.entries.length > 0 && done / draft.entries.length >= 0.7;
+    const session = {
+      ...draft,
+      id: crypto.randomUUID(),
+      endedAt: now,
+      complete,
+      schemaVersion: SCHEMA_VERSION,
+      restEndsAt: null,
+    };
+    await finishActive(session);
+    return session;
+  });
+}
+
+export function discardWorkout() {
+  return queue(() => del('active', 'current'));
 }

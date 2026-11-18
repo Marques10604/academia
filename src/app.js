@@ -3,10 +3,12 @@ import { openDb, getActive } from './data/db.js';
 import { mount } from './ui/dom.js';
 import { renderToday } from './ui/today.js';
 import { renderWorkout } from './ui/workout.js';
+import { renderSummary } from './ui/summary.js';
 
 const ROUTES = {
   '#/hoje': renderToday,
   '#/treino': renderWorkout,
+  '#/resumo': renderSummary,
 };
 
 const root = () => document.getElementById('app');

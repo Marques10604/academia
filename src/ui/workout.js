@@ -2,10 +2,9 @@ import { h } from './dom.js';
 import { getActive } from '../data/db.js';
 import { PROGRAM } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
-import { logSet, setCurrent } from '../actions/workout.js';
+import { logSet, setCurrent, finishWorkout, discardWorkout } from '../actions/workout.js';
+import { formatNumber as fmt } from '../domain/numbers.js';
 import { rerender } from '../app.js';
-
-const fmt = (n) => Number(n).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
 
 export async function renderWorkout() {
   const draft = await getActive();
@@ -27,6 +26,17 @@ export async function renderWorkout() {
   const go = async (idx) => {
     await setCurrent(idx);
     await rerender();
+  };
+
+  const onFinish = async (e) => {
+    e.currentTarget.disabled = true;
+    const session = await finishWorkout(Date.now());
+    location.hash = session ? '#/resumo/' + session.id : '#/hoje';
+  };
+  const onDiscard = async () => {
+    if (!window.confirm('Descartar este treino? As séries registradas serão perdidas.')) return;
+    await discardWorkout();
+    location.hash = '#/hoje';
   };
 
   return h('div', { class: 'screen', 'data-screen': 'treino' },
@@ -53,5 +63,7 @@ export async function renderWorkout() {
         h('button', {
           class: 'btn', 'data-action': 'next-exercise', disabled: draft.currentIdx === total - 1,
           onclick: () => go(draft.currentIdx + 1),
-        }, 'Próximo ›'))));
+        }, 'Próximo ›')),
+      h('button', { class: 'btn btn-primary', 'data-action': 'finish', onclick: onFinish }, 'Finalizar treino'),
+      h('button', { class: 'btn btn-danger small', 'data-action': 'discard', onclick: onDiscard }, 'Descartar treino')));
 }
