@@ -64,4 +64,46 @@ export default async function (page) {
   await page.click('[data-session="h-4"] a');
   await page.waitFor("!!document.querySelector('[data-screen=resumo]')");
   assert.ok((await page.text()).includes('Próximo treino'), 'o treino mais recente mantém "Próximo treino"');
+
+  // --- Task 2: per-exercise history and the SVG chart ---
+  await page.click('[data-action=home]');
+  await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
+  await page.click('[data-action=history]');
+  await page.waitFor("!!document.querySelector('[data-screen=historico]')");
+  assert.equal(await page.eval("document.querySelectorAll('[data-history-exercise]').length"), 15, '15 exercícios na lista');
+  const last = await page.eval("document.querySelector('[data-history-exercise=leg_press_45]').innerText");
+  assert.ok(last.includes('último: 30 kg × 12'), 'último resultado: ' + last);
+  assert.ok((await page.eval("document.querySelector('[data-history-exercise=pec_deck]').innerText")).includes('ainda sem registro'));
+
+  await page.click('[data-history-exercise=leg_press_45] a');
+  await page.waitFor("!!document.querySelector('[data-screen=evolucao]')");
+  assert.equal(await page.eval("document.querySelectorAll('[data-role=history-row]').length"), 4, '4 treinos de leg press');
+  const first = await page.eval("document.querySelector('[data-role=history-row]').innerText");
+  assert.ok(first.includes('30 kg × 12'), 'linha mais recente: ' + first);
+  assert.equal(await page.eval("document.querySelectorAll('svg.chart').length"), 1, 'um gráfico');
+  assert.ok((await page.eval("document.querySelector('svg.chart').getAttribute('aria-label')")).includes('Carga'));
+  assert.equal(await page.eval("document.querySelectorAll('svg.chart circle.chart-dot').length"), 4, '4 pontos');
+  assert.equal(await page.eval("document.querySelectorAll('svg.chart path.chart-line').length"), 1, '1 linha');
+  assert.ok((await page.eval("document.querySelector('svg.chart path.chart-line').getAttribute('d')")).startsWith('M'));
+
+  // Hash navigation between two exercise screens: wait for the new title so the old screen is not mistaken for it.
+  const open = async (id, title) => {
+    await page.eval(`location.hash = '#/historico/${id}'`);
+    await page.waitFor(`!!document.querySelector('[data-screen=evolucao]') && document.querySelector('h1').innerText === ${JSON.stringify(title)}`);
+  };
+  await open('plank', 'Prancha');
+  await page.waitFor("[...document.querySelectorAll('[data-role=history-row]')].some((e) => e.innerText.includes('35 s'))");
+  assert.ok((await page.eval("document.querySelector('svg.chart').getAttribute('aria-label')")).includes('Tempo'), 'prancha em segundos');
+  await open('lat_pulldown', 'Puxada frontal');
+  await page.waitFor("[...document.querySelectorAll('[data-role=history-row]')].some((e) => e.innerText.includes('placa 5 × 10'))");
+  await open('pec_deck', 'Voador');
+  await page.waitFor("document.body.innerText.includes('Ainda sem registro')");
+  assert.equal(await page.eval("document.querySelectorAll('svg').length"), 0, 'sem gráfico sem registros');
+
+  await page.eval("location.hash = '#/exercicio/leg_press_45'");
+  await page.click('[data-action=exercise-history]');
+  await page.waitFor("!!document.querySelector('[data-screen=evolucao]') && !!document.querySelector('svg.chart')");
+
+  await page.eval("location.hash = '#/historico/nao_existe'");
+  await page.waitFor("document.body.innerText.includes('Exercício não encontrado')");
 }

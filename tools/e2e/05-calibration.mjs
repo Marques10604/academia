@@ -48,6 +48,7 @@ export default async function (page) {
   await page.waitFor(`(async () => (await ${draftEntry.trim()}).calibrating === false)()`);
   assert.equal((await page.eval(draftEntry)).load, L0 + jump, 'carga de trabalho');
   assert.equal(await page.eval("document.querySelectorAll('[data-set-kind=ramp]').length"), 2, '2 séries de rampa');
+  await page.waitFor("document.body.innerText.includes('carga de trabalho')"); // the screen re-renders after the draft is saved
   assert.ok((await page.text()).includes('carga de trabalho'), 'faixa da carga de trabalho');
 
   // a working set, finish: ramp sets are not records

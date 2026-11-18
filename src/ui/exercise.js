@@ -111,6 +111,7 @@ export async function renderExercise(hash) {
     h('p', { class: 'muted', 'data-role': 'muscles' }, muscles),
     h('div', { class: 'stack' },
       prescriptions(exercise).map((line) => h('p', { class: 'small', 'data-role': 'prescription' }, line)),
+      h('a', { class: 'btn', 'data-action': 'exercise-history', href: '#/historico/' + exercise.id }, 'Ver histórico e gráfico'),
       h('div', { class: 'card' },
         h('h2', null, 'Ajuste do aparelho'),
         h('p', { 'data-role': 'setup' }, exercise.setup)),

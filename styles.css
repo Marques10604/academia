@@ -364,3 +364,37 @@ textarea {
   flex-wrap: wrap;
   margin-bottom: 8px;
 }
+
+/* SVG charts (src/ui/chart.js): colors follow the app theme */
+.chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-dot {
+  fill: var(--accent);
+}
+
+.chart-raw {
+  fill: var(--muted);
+  opacity: 0.6;
+}
+
+.chart-grid {
+  stroke: var(--surface-2);
+  stroke-width: 1;
+}
+
+.chart-axis {
+  fill: var(--muted);
+  font-size: 10px;
+}

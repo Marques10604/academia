@@ -68,6 +68,8 @@ export default async function (page) {
   await page.waitFor("!!document.querySelector('[data-rir]')");
   await page.click('[data-rir="3"]');
   await page.waitFor(`(async () => (await ${draftEntry(2).trim()}).calibrating === false)()`);
+  // The draft is saved before the screen re-renders: wait for the text instead of reading it right away (was a flake).
+  await page.waitFor("document.body.innerText.includes('Sua carga de trabalho: placa 4.')");
   assert.ok((await page.text()).includes('Sua carga de trabalho: placa 4.'), 'faixa em placa');
   await page.click('[data-action=load-plus]');
   await page.waitFor("document.querySelector('input[name=load]').value === '5'");
