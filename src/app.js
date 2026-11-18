@@ -7,6 +7,7 @@ import { renderSummary } from './ui/summary.js';
 import { renderOnboarding } from './ui/onboarding.js';
 import { renderSettings } from './ui/settings.js';
 import { renderExercise } from './ui/exercise.js';
+import { renderBackup } from './ui/backup.js';
 
 const ROUTES = {
   '#/exercicio': renderExercise,
@@ -15,14 +16,16 @@ const ROUTES = {
   '#/resumo': renderSummary,
   '#/inicio': renderOnboarding,
   '#/config': renderSettings,
+  '#/backup': renderBackup,
 };
 
 const root = () => document.getElementById('app');
 
 async function render() {
   const hash = location.hash;
-  // First open always goes through the medical notice + weight/height screen.
-  if (hash !== '#/inicio' && (await getSetting('onboardingDone', false)) !== true) {
+  // First open always goes through the medical notice + weight/height screen. '#/backup' is let through
+  // so a fresh or wiped phone can restore a backup first (the restore brings onboardingDone back).
+  if (hash !== '#/inicio' && hash !== '#/backup' && (await getSetting('onboardingDone', false)) !== true) {
     location.hash = '#/inicio';
     return; // hashchange re-enters render()
   }

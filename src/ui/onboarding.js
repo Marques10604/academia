@@ -36,5 +36,9 @@ export function renderOnboarding() {
       h('label', null, 'Sua altura (cm)'), height, h('span', { class: 'muted small' }, 'ex: 175')),
     msg,
     h('div', { class: 'bottom-bar' },
-      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'accept-onboarding', onclick: onAccept }, 'Entendi, começar')));
+      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'accept-onboarding', onclick: onAccept }, 'Entendi, começar'),
+      h('button', {
+        class: 'btn btn-ghost', 'data-action': 'restore-backup',
+        onclick: () => { location.hash = '#/backup'; },
+      }, 'Já tenho um backup — restaurar')));
 }

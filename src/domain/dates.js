@@ -14,3 +14,15 @@ export function daysBetween(a, b) {
   const [by, bm, bd] = b.split('-').map(Number);
   return Math.round((Date.UTC(by, bm - 1, bd) - Date.UTC(ay, am - 1, ad)) / 86400000);
 }
+
+// 'YYYY-MM-DD' -> 'DD/MM/AAAA' by splitting the string (no Date object, no clock).
+export function brDate(localDate) {
+  const [y, m, d] = localDate.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+// 'YYYY-MM-DD' -> 'DD/MM'.
+export function brShort(localDate) {
+  const [, m, d] = localDate.split('-');
+  return `${d}/${m}`;
+}

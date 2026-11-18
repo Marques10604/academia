@@ -116,6 +116,45 @@ export async function finishActive(session) {
   });
 }
 
+// Backup export: every named store read in ONE readonly transaction -> { name: rows }.
+export async function readStores(names) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(names, 'readonly');
+    const out = {};
+    tx.oncomplete = () => resolve(out);
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+    for (const name of names) {
+      const req = tx.objectStore(name).getAll();
+      req.onsuccess = () => { out[name] = req.result; };
+    }
+  });
+}
+
+// Backup restore: clear and refill every given store in ONE readwrite transaction.
+// Any error aborts the whole transaction, so the current data stays untouched.
+export async function replaceStores(stores) {
+  const db = await openDb();
+  const names = Object.keys(stores);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(names, 'readwrite');
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+    try {
+      for (const name of names) {
+        const store = tx.objectStore(name);
+        store.clear();
+        for (const row of stores[name]) store.put(row);
+      }
+    } catch (err) {
+      try { tx.abort(); } catch { /* already finished */ }
+      reject(err);
+    }
+  });
+}
+
 export async function requestPersist() {
   if (navigator.storage && navigator.storage.persist) return navigator.storage.persist();
   return false;
