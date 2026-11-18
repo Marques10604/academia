@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const read = (p) => readFileSync(join(ROOT, p), 'utf8');
+// Normalize CRLF: git autocrlf on Windows rewrites the working copy when switching branches.
+const read = (p) => readFileSync(join(ROOT, p), 'utf8').replace(/\r\n/g, '\n');
 
 test('styles: shared vocabulary is defined', () => {
   const css = read('styles.css');
