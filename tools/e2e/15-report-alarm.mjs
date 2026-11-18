@@ -97,4 +97,45 @@ export default async function (page) {
 
   await page.click('[data-action=back]');
   await page.waitFor(has('[data-screen=config]'));
+
+  // ---- Task 2: the morning-alarm guide ----
+  await page.click('[data-action=reminder]');
+  await page.waitFor(has('[data-screen=lembrete]'));
+  assert.equal(await page.eval(tabbarHidden), true, 'lembrete esconde a barra de abas');
+  assert.equal(await page.eval(count('[data-role=alarm-step]')), 3, 'tres passos');
+  assert.equal(await page.eval(count('[data-role=alarm-step] svg')), 3, 'cada passo com um icone');
+  const guide = await page.text();
+  assert.ok(guide.includes('Relógio') && guide.includes('Treino'), guide);
+  assert.equal(await page.eval('typeof Notification === "undefined" || Notification.permission'), 'default', 'sem pedir permissao de notificacao');
+
+  // Capture the downloaded Blob and the file name, as in 08-backup.
+  await page.eval(`(() => {
+    window.__blobs = []; window.__downloads = [];
+    const create = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (b) => { window.__blobs.push(b); return create(b); };
+    const click = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () { window.__downloads.push(this.download); return click.call(this); };
+    return true;
+  })()`);
+  await page.type('input[name=reminder-time]', '06:45');
+  await page.click('[data-action=download-ics]');
+  await page.waitFor('window.__blobs.length === 1');
+  assert.equal(await page.eval('window.__blobs[0].type'), 'text/calendar');
+  const ics = await page.eval('window.__blobs[0].text()');
+  for (const part of ['BEGIN:VCALENDAR', 'RRULE:FREQ=DAILY', 'BEGIN:VALARM', 'SUMMARY:Treino']) {
+    assert.ok(ics.includes(part), 'ics tem: ' + part + '\n' + ics);
+  }
+  const today = await page.eval(`(async () => { ${datesImport} return dates.localDate(Date.now()).replace(/-/g, ''); })()`);
+  assert.ok(ics.includes(`DTSTART:${today}T064500`), ics);
+  assert.equal(await page.eval('window.__downloads[0]'), 'progride-lembrete.ics');
+  assert.ok((await page.eval(textOf('[data-role=ics-msg]'))).includes('progride-lembrete.ics'));
+  assert.equal(await page.eval(`(async () => { ${dbImport} return await db.getSetting('reminderTime', null); })()`), '06:45');
+
+  // The chosen time is remembered after a reload.
+  await page.reload();
+  await page.waitFor(has('[data-screen=lembrete]'));
+  assert.equal(await page.eval("document.querySelector('input[name=reminder-time]').value"), '06:45');
+
+  await page.click('[data-action=back]');
+  await page.waitFor(has('[data-screen=config]'));
 }
