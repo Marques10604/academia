@@ -9,16 +9,16 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Fundação (FUND)
 
-- [x] **FUND-01**: Usuário instala o app na tela inicial do Android (PWA standalone) e ele abre sem internet
-- [ ] **FUND-02**: Dados ficam salvos no celular (IndexedDB) com armazenamento persistente solicitado e status visível em Configurações
+- [ ] **FUND-01**: Usuário instala o app na tela inicial do Android (PWA standalone) e ele abre sem internet
+- [x] **FUND-02**: Dados ficam salvos no celular (IndexedDB) com armazenamento persistente solicitado e status visível em Configurações
 - [x] **FUND-03**: App mostra a versão atual e só aplica atualização entre treinos (nunca no meio de um treino)
-- [ ] **FUND-04**: Usuário digita pesos com vírgula ou ponto (ex: 72,5) e o app entende corretamente
-- [ ] **FUND-05**: Na primeira abertura, o usuário vê aviso de check-up médico / "não é aconselhamento médico" e informa peso e altura
+- [x] **FUND-04**: Usuário digita pesos com vírgula ou ponto (ex: 72,5) e o app entende corretamente
+- [x] **FUND-05**: Na primeira abertura, o usuário vê aviso de check-up médico / "não é aconselhamento médico" e informa peso e altura
 
 ### Programa e Exercícios (PROG)
 
 - [ ] **PROG-01**: App vem com programa full body A/B pronto — todo treino trabalha pernas, empurrar, puxar e core (A: Leg press 45°, Supino reto com halteres, Puxada frontal, Mesa flexora, Elevação lateral, Rosca direta, Panturrilha em pé, Prancha; B: Agachamento goblet, Desenvolvimento com halteres, Remada baixa, Stiff com halteres, Voador, Tríceps na polia, Abdominal)
-- [ ] **PROG-02**: Tela "Hoje" mostra o próximo treino (A ou B) pela rotação, sem depender do dia da semana — faltar não "quebra" o plano
+- [x] **PROG-02**: Tela "Hoje" mostra o próximo treino (A ou B) pela rotação, sem depender do dia da semana — faltar não "quebra" o plano
 - [ ] **PROG-03**: Cada exercício tem nome de academia brasileira, passo a passo de execução em pt-BR, erros comuns, músculos trabalhados e ajuste do aparelho
 - [ ] **PROG-04**: Cada exercício tem botão que abre busca do YouTube em português para ver a demonstração
 - [ ] **PROG-05**: Cada exercício mostra séries × repetições alvo, descanso e esforço esperado ("quantas repetições devem sobrar") conforme a fase (calibração / adaptação / base)
@@ -136,13 +136,13 @@ Adiado. Rastreado, fora do roadmap atual.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FUND-01 | Phase 1 | Complete |
-| FUND-02 | Phase 1 | Pending |
+| FUND-01 | Phase 1 | Pending (phone install check) |
+| FUND-02 | Phase 1 | Complete |
 | FUND-03 | Phase 1 | Complete |
-| FUND-04 | Phase 1 | Pending |
-| FUND-05 | Phase 1 | Pending |
+| FUND-04 | Phase 1 | Complete |
+| FUND-05 | Phase 1 | Complete |
 | PROG-01 | Phase 1 | Pending |
-| PROG-02 | Phase 1 | Pending |
+| PROG-02 | Phase 1 | Complete |
 | PROG-03 | Phase 1 | Pending |
 | PROG-04 | Phase 1 | Pending |
 | PROG-05 | Phase 1 | Pending |
