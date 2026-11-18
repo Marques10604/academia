@@ -329,21 +329,36 @@ textarea {
   font-style: italic;
 }
 
-.week-card {
+/* Today's top card: date, week, average weight, last backup */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Breathing room between the blocks at the top of Today */
+[data-screen=hoje] > .card,
+[data-screen=hoje] > .notice {
+  margin-bottom: 10px;
+}
+
+.dashboard p {
+  margin: 0;
+}
+
+.week {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 14px;
-  margin-bottom: 10px;
   font-size: 0.95rem;
 }
 
-.week-card .dots {
+.week .dots {
   letter-spacing: 2px;
   color: var(--muted);
 }
 
-.week-card .dot.on {
+.week .dot.on {
   color: var(--accent);
 }
 

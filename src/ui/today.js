@@ -42,10 +42,10 @@ function exerciseRow(item, plan, note) {
 }
 
 // "Esta semana ●●○ 2 de 3": filled dots for finished workouts this week; above the goal all dots stay filled.
-function weekCard(done) {
+function weekRow(done) {
   const dots = Array.from({ length: WEEKLY_GOAL }, (_, i) => (
     h('span', { class: i < done ? 'dot on' : 'dot', 'aria-hidden': 'true' }, i < done ? '●' : '○')));
-  return h('div', { class: 'card week-card', 'data-role': 'week', 'data-count': String(done) },
+  return h('div', { class: 'week', 'data-role': 'week', 'data-count': String(done) },
     h('span', { class: 'muted' }, 'Esta semana'),
     h('span', { class: 'dots' }, dots),
     h('strong', null, `${done} de ${WEEKLY_GOAL}`));
@@ -130,18 +130,19 @@ export async function renderToday() {
     h('div', { class: 'row nav' },
       h('button', { class: 'btn btn-ghost', 'data-action': 'history', onclick: () => { location.hash = '#/historico'; } }, 'Histórico'),
       h('button', { class: 'btn btn-ghost', 'data-action': 'body', onclick: () => { location.hash = '#/corpo'; } }, 'Corpo')),
-    h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
+    // ONE compact card: date, week progress, 7-day average weight and last backup (the nudge below replaces the last line when due).
+    h('div', { class: 'card dashboard', 'data-role': 'dashboard' },
+      h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
+      weekRow(sessionsThisWeek(sessions, today)),
+      avg ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg)) : null,
+      backup.due ? null : h('p', { class: 'muted small', 'data-role': 'backup-status' }, backupAgeText(backup))),
     checkinBlock(todayRow),
-    anyDone ? null : firstDayCard(),
-    weekCard(sessionsThisWeek(sessions, today)),
-    avg
-      ? h('p', { 'data-role': 'avg-weight' }, avgWeightText(avg))
-      : null,
     backup.due
       ? h('div', { class: 'notice stack', 'data-role': 'backup-nudge' },
         h('p', null, `Você tem ${backup.since} treinos sem backup. Salve uma cópia para não perder seus dados.`),
         h('button', { class: 'btn btn-primary', 'data-action': 'backup-now', onclick: () => { location.hash = '#/backup'; } }, 'Fazer backup agora'))
-      : h('p', { class: 'muted small', 'data-role': 'backup-status' }, backupAgeText(backup)),
+      : null,
+    anyDone ? null : firstDayCard(),
     h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
     h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
     h('ul', { class: 'list' }, rows),

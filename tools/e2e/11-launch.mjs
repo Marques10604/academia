@@ -49,6 +49,22 @@ export default async function (page) {
   await page.click('[data-action=accept-onboarding]');
   await page.waitFor(has('[data-screen=hoje]'));
 
+  // --- Today's top: one dashboard card with date, week, backup status; average weight only after a weigh-in ---
+  assert.equal(await page.eval(count('[data-role=dashboard]')), 1, 'um cartao de resumo');
+  assert.ok((await page.eval(textOf('[data-role=dashboard] [data-role=date]'))).length > 5, 'data no cartao');
+  assert.equal(await page.eval("document.querySelector('[data-role=dashboard] [data-role=week]').dataset.count"), '0');
+  assert.ok((await page.eval(textOf('[data-role=dashboard] [data-role=week]'))).includes('0 de 3'));
+  assert.equal(await page.eval("document.querySelector('[data-role=dashboard] [data-role=backup-status]').innerText"), 'Nenhum backup ainda');
+  assert.equal(await page.eval(has('[data-role=avg-weight]')), false, 'sem pesagem, sem media');
+  await page.eval(`(async () => {
+    const dates = ${DATES};
+    await (${DB}).put('dailyLogs', { localDate: dates.localDate(Date.now()), weightKg: 70.4, updatedAt: 1 });
+    return true;
+  })()`);
+  await page.reload(); // already on #/hoje: a hash navigation would not re-render
+  await page.waitFor(has('[data-role=dashboard] [data-role=avg-weight]'));
+  assert.ok((await page.eval(textOf('[data-role=dashboard] [data-role=avg-weight]'))).includes('70,4 kg · 1 pesagem'));
+
   // --- first-gym-day checklist ---
   assert.ok(await page.eval(has('[data-role=first-day]')), 'cartao do primeiro dia na tela Hoje');
   await page.click('[data-action=first-day]');
