@@ -34,7 +34,7 @@ export async function renderToday() {
     h('ul', { class: 'list' },
       tpl.items.map((item) =>
         h('li', { class: 'list-item row', 'data-exercise': item.exerciseId },
-          h('span', null, EXERCISES[item.exerciseId].name),
+          h('a', { href: '#/exercicio/' + item.exerciseId }, EXERCISES[item.exerciseId].name),
           h('span', { class: 'muted small' }, planned(item))))),
     h('div', { class: 'bottom-bar' },
       draft

@@ -6,8 +6,10 @@ import { renderWorkout } from './ui/workout.js';
 import { renderSummary } from './ui/summary.js';
 import { renderOnboarding } from './ui/onboarding.js';
 import { renderSettings } from './ui/settings.js';
+import { renderExercise } from './ui/exercise.js';
 
 const ROUTES = {
+  '#/exercicio': renderExercise,
   '#/hoje': renderToday,
   '#/treino': renderWorkout,
   '#/resumo': renderSummary,
