@@ -56,8 +56,8 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 - [ ] **CORPO-01**: Check-in matinal em poucos segundos: peso, sono (1–5) e energia (1–5) — todos opcionais
 - [ ] **CORPO-02**: Gráfico de peso corporal com média móvel de 7 dias
-- [ ] **CORPO-03**: Usuário tira fotos de progresso (frente/lado/costas) que ficam só no celular, reduzidas para não ocupar muito espaço
-- [ ] **CORPO-04**: Usuário compara duas fotos lado a lado (ex: dia 1 vs hoje)
+- [ ] **CORPO-03**: App lembra a cada 4 semanas de tirar fotos de progresso (frente/lado/costas) num álbum "Academia" da galeria do celular (fotos fora do app — decisão 2026-11-18)
+- [ ] **CORPO-05**: Usuário registra a medida da cintura com fita (na altura do umbigo) a cada 4 semanas e vê a evolução junto com o peso
 
 ### Alimentação (ALIM)
 
@@ -70,28 +70,26 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 - [ ] **META-01**: Usuário define meta de treinos por semana (padrão: 3) e vê sequência de semanas cumpridas, com 1 semana de folga permitida sem zerar
 - [ ] **META-02**: Usuário define meta de peso corporal e vê progresso com ritmo saudável sugerido (~0,25–0,4% do peso/semana)
-- [ ] **META-03**: Usuário define metas de carga por exercício, liberadas só após a calibração, com barra de progresso
 - [ ] **META-04**: App guia o usuário a criar alarme matinal recorrente no Relógio do Android (e/ou arquivo de calendário .ics)
 - [ ] **META-05**: Tela Hoje mostra aviso "há N dias sem treinar" quando aplicável, sem linguagem de culpa
 
 ### Análise por IA (IA)
 
 - [ ] **IA-01**: Usuário toca em "Gerar relatório para IA" e o app monta um texto com resumo do histórico (cargas por exercício, frequência, peso médio, sono/energia, proteína) + pergunta pronta, copiável para colar em qualquer IA gratuita (ChatGPT, Gemini, Claude)
-- [ ] **IA-02**: Usuário cadastra a própria chave da API do Gemini (guardada só no celular) e pede análise dos dados dentro do app, vendo a resposta em pt-BR
-- [ ] **IA-03**: Se a IA dentro do app falhar (sem internet, chave inválida, modelo descontinuado), o app mostra mensagem clara e oferece o relatório para colar como alternativa; o nome do modelo é configurável sem mexer no código
 
 ### Backup (BKP)
 
 - [ ] **BKP-01**: Usuário exporta todos os dados (sem fotos) num arquivo de backup versionado e pode enviá-lo pelo compartilhamento do Android (Drive, WhatsApp) ou baixar
 - [ ] **BKP-02**: Usuário importa um backup, vê prévia do que será restaurado e confirma
 - [ ] **BKP-03**: App mostra "último backup há N dias" e lembra de fazer backup após vários treinos sem backup
-- [ ] **BKP-04**: Usuário exporta as fotos de progresso separadamente
 
 ### Identidade e Manutenção (LANC)
 
 - [ ] **LANC-01**: App tem nome e logo/ícone próprios na tela inicial do Android
 - [ ] **LANC-02**: App fica hospedado gratuitamente (GitHub Pages) numa URL definitiva
 - [ ] **LANC-03**: Existe um guia em pt-BR de como manter o app sem IA (publicar, adicionar exercício, restaurar backup)
+- [ ] **LANC-04**: "Kit de socorro com IA grátis": um texto pronto para colar no ChatGPT/Gemini explicando o projeto + passo a passo para aplicar e publicar uma correção
+- [ ] **LANC-05**: Checklist do 1º dia na academia (pedir ao professor, conferir máquinas que não existem, ver se a carga é em kg ou placa, anotar regulagens)
 
 ## v2 Requirements
 
@@ -100,14 +98,16 @@ Adiado. Rastreado, fora do roadmap atual.
 ### Treino
 
 - **TREINO-V2-01**: Trocar exercício na hora ("aparelho ocupado") por alternativa equivalente
-- **TREINO-V2-02**: Versão curta do treino (4 exercícios principais) que conta como treino feito
 - **TREINO-V2-03**: Sinal de dor/desconforto por exercício que bloqueia aumento de carga e sugere alternativa
 - **TREINO-V2-04**: Calculadora de anilhas
 - **TREINO-V2-05**: Troca de 2–3 acessórios após 8–12 semanas
 
 ### Corpo e Progresso
 
-- **CORPO-V2-01**: Medidas com fita (braço, peito, cintura, coxa) a cada 4 semanas
+- **CORPO-V2-01**: Medidas com fita (braço, peito, coxa) a cada 4 semanas (cintura já é CORPO-05 na v1)
+- **CORPO-V2-02**: Fotos de progresso dentro do app, comparação lado a lado e exportação separada (cortado da v1 em 2026-11-18)
+- **META-V2-01**: Metas de carga por exercício com barra de progresso (cortado da v1 em 2026-11-18: a dupla progressão já é a meta do iniciante)
+- **IA-V2-01**: Gemini dentro do app com a chave do usuário, com fallback para o relatório (cortado da v1 em 2026-11-18)
 - **EVOL-V2-01**: Gráficos de 1RM estimado e volume
 - **EVOL-V2-02**: Correlação sono/energia × desempenho
 
@@ -169,26 +169,24 @@ Adiado. Rastreado, fora do roadmap atual.
 | CORPO-01 | Phase 2 | Pending |
 | CORPO-02 | Phase 2 | Pending |
 | CORPO-03 | Phase 3 | Pending |
-| CORPO-04 | Phase 3 | Pending |
+| CORPO-05 | Phase 2 | Pending |
 | ALIM-01 | Phase 3 | Pending |
 | ALIM-02 | Phase 3 | Pending |
 | ALIM-03 | Phase 3 | Pending |
 | ALIM-04 | Phase 3 | Pending |
 | META-01 | Phase 3 | Pending |
 | META-02 | Phase 3 | Pending |
-| META-03 | Phase 3 | Pending |
 | META-04 | Phase 3 | Pending |
 | META-05 | Phase 3 | Pending |
 | IA-01 | Phase 3 | Pending |
-| IA-02 | Phase 3 | Pending |
-| IA-03 | Phase 3 | Pending |
 | BKP-01 | Phase 2 | Pending |
 | BKP-02 | Phase 2 | Pending |
 | BKP-03 | Phase 2 | Pending |
-| BKP-04 | Phase 3 | Pending |
 | LANC-01 | Phase 4 | Pending |
 | LANC-02 | Phase 4 | Pending |
 | LANC-03 | Phase 4 | Pending |
+| LANC-04 | Phase 4 | Pending |
+| LANC-05 | Phase 4 | Pending |
 
 **Coverage:**
 

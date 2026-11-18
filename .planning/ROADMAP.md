@@ -35,10 +35,12 @@ Phases 1 and 2 are the minimum to train safely with data protected. Phases 3 and
 
 Decimal phases appear between their surrounding integers in numeric order.
 
+**Execution order (decided 2026-11-18):** 1 → 2 → 4 → 3. The handoff (Phase 4) runs before Phase 3 so the maintenance guide and AI rescue kit exist before 2026-11-23 even if time runs out; Phase 3 is the cut zone.
+
 - [ ] **Phase 1: Today's Workout (Core Value)** - Installable offline PWA with the A/B program, live set logging, rest timer, calibration and automatic load progression
 - [ ] **Phase 2: Backup, History & Check-in** - Backup export/import, per-exercise history and charts, workout list, morning weight/sleep/energy check-in
-- [ ] **Phase 3: Food, Goals, Photos & AI** - Protein checklist, goals and streak, morning-alarm guide, progress photos, AI report and in-app Gemini analysis
-- [ ] **Phase 4: Identity, Publish & Handoff** - Final name and logo, permanent GitHub Pages URL, maintenance guide, real-phone end-to-end test
+- [ ] **Phase 3: Food, Goals, Photos & AI** - Protein checklist (cheap Brazilian portions), weekly goal and streak, body-weight goal, morning-alarm guide, 4-week photo reminder, copyable AI report
+- [ ] **Phase 4: Identity, Publish & Handoff** - Final name and logo, permanent GitHub Pages URL, maintenance guide, free-AI rescue kit, first-gym-day checklist, real-phone end-to-end test
 
 ## Phase Details
 
@@ -73,7 +75,7 @@ Plans:
 **Goal:** As a lifter with real data on my phone, I want to back up and restore my data and see my history, charts and a quick morning body check-in, so that nothing is lost and I can see my progress.
 **Mode:** mvp
 **Depends on**: Phase 1
-**Requirements**: BKP-01, BKP-02, BKP-03, EVOL-01, EVOL-02, EVOL-04, CORPO-01, CORPO-02
+**Requirements**: BKP-01, BKP-02, BKP-03, EVOL-01, EVOL-02, EVOL-04, CORPO-01, CORPO-02, CORPO-05
 **Success Criteria** (what must be TRUE):
 
   1. User exports all data (without photos) as a versioned backup file and sends it through the Android share sheet (Drive, WhatsApp) or downloads it.
@@ -81,6 +83,7 @@ Plans:
   3. The app shows "último backup há N dias" and reminds the user to back up after several workouts without one.
   4. User opens any exercise and sees its history (dates, loads, reps) and a simple load-over-time chart, and sees the list of completed workouts by date.
   5. User records the morning check-in in a few seconds (weight, sleep 1–5, energy 1–5, all optional) and sees a body-weight chart with a 7-day moving average.
+  6. User records the waist measurement (tape at navel height) every 4 weeks and sees it next to the weight trend; Today's mini dashboard shows average weight.
 
 **Plans**: TBD
 **UI hint**: yes
@@ -89,15 +92,15 @@ Plans:
 
 **Goal:** As a user who wants more than a logger, I want to track protein lightly, set goals, get a morning-alarm guide, take progress photos and ask an AI about my data, so that I stay consistent and understand my progress.
 **Mode:** mvp
-**Depends on**: Phase 2
-**Requirements**: ALIM-01, ALIM-02, ALIM-03, ALIM-04, META-01, META-02, META-03, META-04, META-05, CORPO-03, CORPO-04, BKP-04, IA-01, IA-02, IA-03
+**Depends on**: Phase 4 (runs last)
+**Requirements**: ALIM-01, ALIM-02, ALIM-03, ALIM-04, META-01, META-02, META-04, META-05, CORPO-03, IA-01
 **Success Criteria** (what must be TRUE):
 
-  1. User sees a daily protein target computed from body weight (about 120 g at 70 kg, editable), taps Brazilian portion shortcuts (ovo, frango, carne, feijão, leite, whey...) per meal to add grams, and sees the day total and weekly average (days ≥ 112 g) in neutral colors with no calorie counting; if average weight has not risen in 2 weeks the app suggests adding 1 carb portion per day.
-  2. User sets a weekly workout goal (default 3) and sees a weekly streak that tolerates 1 grace week, sees a no-guilt "há N dias sem treinar" notice on Today when applicable, sets a body-weight goal with a suggested healthy pace, and sets per-exercise load goals (available only after calibration) with a progress bar.
+  1. User sees a daily protein target computed from body weight (about 120 g at 70 kg, editable), taps cheap Brazilian home-portion shortcuts (2 ovos, frango, sardinha em lata, 1 concha de feijão, 1 copo de leite, carne moída...) per meal to add grams, and sees the day total and weekly average (days ≥ 112 g) in neutral colors with no calorie counting; if average weight has not risen in 2 weeks the app suggests adding 1 carb portion per day.
+  2. User sets a weekly workout goal (default 3) and sees a weekly streak that tolerates 1 grace week, sees a no-guilt "há N dias sem treinar" notice on Today when applicable, and sets a body-weight goal with a suggested healthy pace.
   3. The app walks the user through creating a recurring morning alarm in the Android Clock and/or downloads a calendar (.ics) file for it.
-  4. User takes front/side/back progress photos that stay only on the phone (downsized), compares two photos side by side, and exports the photos separately from the main backup.
-  5. User taps "Gerar relatório para IA" and gets a copyable text summary (loads, frequency, average weight, sleep/energy, protein) with a ready question; user can also save their own Gemini key, ask for an analysis inside the app and read the answer in pt-BR; when the in-app call fails (offline, bad key, retired model) a clear message appears with the paste-in report as the alternative, and the model name can be changed in Settings without touching code.
+  4. Every 4 weeks the app reminds the user to take front/side/back photos into a phone-gallery album (no photos stored in the app).
+  5. User taps "Gerar relatório para IA" and gets a copyable text summary (loads, frequency, average weight, sleep/energy, protein) with a ready question, to paste into any free AI.
 
 **Plans**: TBD
 **UI hint**: yes
@@ -106,13 +109,15 @@ Plans:
 
 **Goal:** As the only user, who will soon lose access to Claude, I want the app published at its permanent URL with its own name, logo and a maintenance guide, so that it keeps working and I can maintain it without AI.
 **Mode:** mvp
-**Depends on**: Phase 3
-**Requirements**: LANC-01, LANC-02, LANC-03
+**Depends on**: Phase 2
+**Requirements**: LANC-01, LANC-02, LANC-03, LANC-04, LANC-05
 **Success Criteria** (what must be TRUE):
 
   1. The app shows its own name and logo/icon on the Android home screen after installation.
   2. The app is reachable at its permanent free GitHub Pages URL, installs from there on the user's real phone and runs a full workout end to end in airplane mode.
   3. A pt-BR guide in the repository explains, step by step and without assuming programming knowledge, how to publish a change, add an exercise and restore a backup.
+  4. A free-AI rescue kit (project context text to paste into ChatGPT/Gemini + steps to apply and publish a fix) exists in the repository and is linked from Settings.
+  5. A first-gym-day checklist is available in the app.
 
 **Plans**: TBD
 

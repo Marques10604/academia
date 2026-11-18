@@ -84,6 +84,7 @@ Se todo o resto falhar, isso precisa funcionar: treino do dia + registro de sér
 | URL definitiva: https://marques10604.github.io/academia/ (repo público Marques10604/academia) | IndexedDB pertence à origem; nunca renomear conta/repo | ✓ Decidido |
 | Repo público inclui `.planning/` e `.claude/` (servidos também pelo Pages) | Usuário aprovou criar o repo público e enviar o planejamento (2026-11-18); foi avisado que idade/peso ficam visíveis e pode pedir remoção | ✓ Aceito |
 | Prazo: 5 dias (fim em 2026-11-23), versão enxuta sem blindagem | Uso só pessoal; proteções extras depois se precisar | — Pending |
+| Reescopo 2026-11-18: ordem de fases 1 → 2 → 4 → 3; cortar Gemini no app, fotos no app e metas de carga (v2); cintura com fita na Fase 2; kit de socorro com IA grátis e checklist do 1º dia na Fase 4; treino curto, alternativa por exercício, placa/regulagem e fundo preto adicionados à Fase 1 | Garantir o que mantém o app vivo sem o Claude antes de 23/11; balança de bioimpedância não é confiável (só peso); usuário aceitou as recomendações | ✓ Decidido |
 
 ## Evolution
 
