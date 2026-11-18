@@ -29,6 +29,14 @@ function exerciseRow(item, plan) {
       reason ? h('span', { class: 'muted small', 'data-role': 'reason' }, reason) : null));
 }
 
+// Where this workout sits in the first-month plan (counted in workouts, not dates).
+function monthStep(n) {
+  if (n <= 2) return `Treino ${n} · Semana de aprendizado: descubra a carga, 2 séries sobrando 3–4 reps`;
+  if (n <= 6) return `Treino ${n} · Adaptação: 2 séries sobrando 3 → 2 reps`;
+  if (n <= 12) return `Treino ${n} · Base: 3 séries nos grandes, última sobrando 1–2 reps`;
+  return `Treino ${n} · Siga a carga sugerida e anote cada série`;
+}
+
 export async function renderToday() {
   const draft = await getActive();
   const sessions = await listSessions();
@@ -63,6 +71,8 @@ export async function renderToday() {
     h('div', { class: 'topbar' },
       h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
+    h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
+    h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
     h('ul', { class: 'list' }, rows),
     h('div', { class: 'bottom-bar' },
       draft
