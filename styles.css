@@ -325,3 +325,15 @@ input {
 .week-card .dot.on {
   color: var(--accent);
 }
+
+/* Exercise names on Today: readable on black, still clearly tappable */
+.list-item a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.list-item a::after {
+  content: " ›";
+  color: var(--accent);
+}
