@@ -207,3 +207,24 @@ test('backupStatus counts workouts saved since the last backup', () => {
   assert.equal(backupStatus({ lastBackupAt: at('14', '12'), sessions: [open], today: '2026-11-18' }).since, 1);
   assert.equal(backupStatus({ lastBackupAt: at('15', '12'), sessions: [open], today: '2026-11-18' }).since, 0);
 });
+
+test('dailyLogs protein lists: partial entries are accepted, damaged ones are refused', () => {
+  const protein = [{ meal: 'almoco', food: 'frango', g: 28, at: 1 }, { g: 10 }];
+  const d = buildBackup({ stores: { dailyLogs: [log({ protein }), { localDate: '2026-11-15', protein: [{ g: 5 }] }] }, schemaVersion: 2, appVersion: '0.4.0', now: NOW });
+  const r = parseBackup(JSON.stringify(d), 2);
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.doc.stores.dailyLogs, d.stores.dailyLogs);
+  for (const bad of ['abc', [{ g: 'x' }], [{ g: -1 }], [{ g: 1000 }], [{ g: 10, food: 3 }], [{ g: 10, meal: 5 }], [null], [{ g: 10, at: 'x' }], null]) {
+    const rb = parseBackup(JSON.stringify({ ...d, stores: { dailyLogs: [log({ protein: bad })] } }), 2);
+    assert.equal(rb.ok, false, JSON.stringify(bad));
+    assert.ok(rb.error.includes('Backup danificado'));
+  }
+});
+
+test('backupSummary counts only real check-ins, not protein-only or waist-only days', () => {
+  const doc2 = { exportedAt: '2026-11-18T12:00:00.000Z', stores: { sessions: [sess('1', '2026-11-17')], dailyLogs: [
+    log({ localDate: '2026-11-10' }), log({ localDate: '2026-11-11' }),
+    { localDate: '2026-11-12', protein: [{ g: 28 }] }, { localDate: '2026-11-13', waistCm: 82 },
+  ] } };
+  assert.equal(backupSummary(doc2), '1 treino, em 17/11/2026 · 2 check-ins · salvo em 18/11/2026');
+});

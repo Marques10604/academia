@@ -92,6 +92,19 @@ export default async function (page) {
   await page.eval(seedSession('b-3', 1));
   await page.eval(seedLog(1, 70.4));
   await page.eval(seedLog(2, 70.1));
+  // a day with ONLY protein (second entry partial) and every Phase 3 settings key: they must come back unchanged
+  await page.eval(`(async () => {
+    const db = ${DB};
+    const dates = ${DATES};
+    const at = Date.now() - 3 * 86400000;
+    await db.put('dailyLogs', { localDate: dates.localDate(at), protein: [{ meal: 'almoco', food: 'frango', g: 28, at }, { g: 10 }], updatedAt: at });
+    await db.put('settings', { key: 'proteinTargetG', value: 130 });
+    await db.put('settings', { key: 'weeklyGoal', value: 4 });
+    await db.put('settings', { key: 'weightGoal', value: { targetKg: 75, startKg: 70.2, setAt: '2026-11-18' } });
+    await db.put('settings', { key: 'lastPhotosAt', value: '2026-11-01' });
+    await db.put('settings', { key: 'reminderTime', value: '06:45' });
+    return true;
+  })()`);
   // partial preference rows are normal: a note-only one and a unit-only one next to the full one
   await page.eval(`(async () => {
     const db = ${DB};
@@ -102,7 +115,7 @@ export default async function (page) {
   const before = await page.eval(SNAPSHOT);
   assert.equal(before.sessions.length, 3);
   assert.equal(before.exercisePrefs.length, 3);
-  assert.equal(before.dailyLogs.length, 2);
+  assert.equal(before.dailyLogs.length, 3);
 
   // 3 workouts and no backup yet: Today reminds, and the button leads to the backup screen.
   await page.goto('#/hoje');
@@ -175,6 +188,16 @@ export default async function (page) {
   assert.deepEqual(stripped(after.settings), stripped(before.settings));
   assert.equal(after.settings.find((r) => r.key === 'lastBackupAt').value, Date.parse(doc.exportedAt));
   assert.ok(beforeWithStamp.settings.some((r) => r.key === 'lastBackupAt'));
+  // protein and the Phase 3 settings keys came back exactly as seeded
+  const proteinRow = before.dailyLogs.find((r) => Array.isArray(r.protein));
+  assert.ok(proteinRow && !('weightKg' in proteinRow), 'o dia so de proteina existe no antes');
+  assert.deepEqual(after.dailyLogs.find((r) => r.localDate === proteinRow.localDate), proteinRow, 'linha de proteina identica');
+  const setting = (key) => (after.settings.find((r) => r.key === key) || {}).value;
+  assert.equal(setting('proteinTargetG'), 130);
+  assert.equal(setting('weeklyGoal'), 4);
+  assert.deepEqual(setting('weightGoal'), { targetKg: 75, startKg: 70.2, setAt: '2026-11-18' });
+  assert.equal(setting('lastPhotosAt'), '2026-11-01');
+  assert.equal(setting('reminderTime'), '06:45');
   // lastBackupAt = exportedAt is after every session: no reminder after the restore
   assert.equal(await page.eval("!!document.querySelector('[data-role=backup-nudge]')"), false);
 

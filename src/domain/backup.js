@@ -16,7 +16,7 @@ export const BACKUP_STORES = Object.freeze({
   settings: 'key',
   sessions: 'id',
   exercisePrefs: 'exerciseId',
-  dailyLogs: 'localDate', // morning check-in, one row per local day
+  dailyLogs: 'localDate', // one row per local day: morning check-in, waist, protein list
 });
 
 export function buildBackup({ stores, schemaVersion, appVersion, now }) {
@@ -41,6 +41,16 @@ function validSet(s) {
   return isObj(s) && isNum(s.load) && isNum(s.reps) && isStr(s.kind);
 }
 
+// Protein entries of a day: {meal?, food?, g, at?}. Only g is required; the rest is checked when present.
+function validProtein(list) {
+  return Array.isArray(list) && list.every((e) => (
+    isObj(e) && isNum(e.g) && e.g >= 0 && e.g < 1000
+    && (e.meal === undefined || isStr(e.meal))
+    && (e.food === undefined || isStr(e.food))
+    && (e.at === undefined || isNum(e.at))
+  ));
+}
+
 function validEntry(e) {
   return isObj(e) && isStr(e.exerciseId) && Array.isArray(e.sets) && e.sets.every(validSet);
 }
@@ -60,6 +70,7 @@ const ROW_CHECKS = {
     && (r.waistCm === undefined || isNum(r.waistCm))
     && (r.sleep === undefined || isRating(r.sleep))
     && (r.energy === undefined || isRating(r.energy))
+    && (r.protein === undefined || validProtein(r.protein))
   ),
 };
 
@@ -117,7 +128,8 @@ export function backupSummary(doc) {
   if (sessions.length === 0) line = 'Nenhum treino';
   else if (sessions.length === 1) line = `1 treino, em ${brDate(sessions[0].localDate)}`;
   else line = `${sessions.length} treinos, de ${brDate(sessions[0].localDate)} a ${brDate(sessions[sessions.length - 1].localDate)}`;
-  const checkins = (doc.stores.dailyLogs || []).length;
+  // a day with only protein or only the waist is not a check-in
+  const checkins = (doc.stores.dailyLogs || []).filter((r) => isNum(r.weightKg) || isNum(r.sleep) || isNum(r.energy)).length;
   if (checkins > 0) line += ` · ${checkins} ${checkins === 1 ? 'check-in' : 'check-ins'}`;
   const exported = Date.parse(doc.exportedAt);
   if (Number.isFinite(exported)) line += ` · salvo em ${brDate(localDate(exported))}`;
