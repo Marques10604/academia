@@ -1,6 +1,7 @@
 // Pure protein rules (no DOM, no IndexedDB, never reads the clock; the UI passes the hour and "today").
 // Protein of a local day lives in that day's dailyLogs row as `protein: [{meal, food, g, at}]`. The grams are
 // stored per entry, so editing the portion table later never rewrites history.
+import { daysBetween } from './dates.js';
 
 // 1,7 g per kg of body weight a day (TRAINING-SCIENCE 5.1): 70 kg -> 120 g.
 export const PROTEIN_PER_KG = 1.7;
@@ -74,4 +75,19 @@ export function portionLabel(food) {
 
 export function mealLabel(id) {
   return MEALS.find((m) => m.id === id)?.label ?? '';
+}
+
+// The 7 days ending today (today and the 6 before): only days with something noted count as "logged".
+// -> {logged, avg (rounded mean of those days' totals, null when none), hit (days with a total >= floor)}.
+export function weekStats(days, today, floor) {
+  const totals = days
+    .filter((d) => { const n = daysBetween(d.localDate, today); return n >= 0 && n <= 6; })
+    .map(dayTotal)
+    .filter((t) => t > 0);
+  if (totals.length === 0) return { logged: 0, avg: null, hit: 0 };
+  return {
+    logged: totals.length,
+    avg: Math.round(totals.reduce((a, t) => a + t, 0) / totals.length),
+    hit: totals.filter((t) => t >= floor).length,
+  };
 }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  MEALS, PORTIONS, mealForHour, autoTarget, proteinTarget, proteinFloor, dayTotal, portionLabel, mealLabel,
+  MEALS, PORTIONS, mealForHour, autoTarget, proteinTarget, proteinFloor, dayTotal, weekStats, portionLabel, mealLabel,
 } from '../src/domain/protein.js';
 
 test('autoTarget: 1,7 g per kg rounded to 5 g', () => {
@@ -54,4 +54,17 @@ test('PORTIONS and labels', () => {
   assert.equal(mealLabel('almoco'), 'Almoço');
   assert.equal(mealLabel('zzz'), '');
   assert.deepEqual(MEALS.map((m) => m.id), ['cafe', 'almoco', 'lanche', 'jantar']);
+});
+
+test('weekStats: days with protein in the last 7 days, average and days at or above the floor', () => {
+  const today = '2026-11-18';
+  const day = (localDate, total) => ({ localDate, protein: [{ g: total }] });
+  const days = [
+    day('2026-11-10', 200), // 8 days ago: outside
+    day('2026-11-13', 130), day('2026-11-14', 90), day('2026-11-15', 115), day('2026-11-16', 100), day('2026-11-17', 120),
+    day('2026-11-18', 71),
+  ];
+  assert.deepEqual(weekStats(days, today, 112), { logged: 6, avg: 104, hit: 3 });
+  assert.deepEqual(weekStats([{ localDate: '2026-11-17' }, { localDate: '2026-11-16', protein: [] }], today, 112), { logged: 0, avg: null, hit: 0 });
+  assert.deepEqual(weekStats([], today, 112), { logged: 0, avg: null, hit: 0 });
 });
