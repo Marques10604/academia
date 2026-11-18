@@ -9,6 +9,7 @@ import { renderSettings } from './ui/settings.js';
 import { renderExercise } from './ui/exercise.js';
 import { renderBackup } from './ui/backup.js';
 import { renderHistory } from './ui/history.js';
+import { renderBody } from './ui/body.js';
 
 const ROUTES = {
   '#/exercicio': renderExercise,
@@ -19,6 +20,7 @@ const ROUTES = {
   '#/config': renderSettings,
   '#/backup': renderBackup,
   '#/historico': renderHistory,
+  '#/corpo': renderBody,
 };
 
 const root = () => document.getElementById('app');

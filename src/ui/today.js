@@ -9,6 +9,9 @@ import { localDate } from '../domain/dates.js';
 import { unitFor, incrementFor, historyOpts, noteOf } from '../domain/units.js';
 import { sessionsThisWeek, WEEKLY_GOAL } from '../domain/week.js';
 import { startWorkout } from '../actions/workout.js';
+import { listDays } from '../data/daily.js';
+import { hasCheckin, averageWeight } from '../domain/body.js';
+import { formatNumber } from '../domain/numbers.js';
 import { backupStatus } from '../domain/backup.js';
 import { backupAgeText } from './backup.js';
 import { dayText } from './datefmt.js';
@@ -47,6 +50,22 @@ function weekCard(done) {
     h('strong', null, `${done} de ${WEEKLY_GOAL}`));
 }
 
+// "Check-in de hoje: 70,4 kg · sono 4 · energia 3" (only the parts filled in) + a small edit button, or the
+// button that opens the check-in (not primary: the primary button of Today is "Iniciar treino").
+function checkinBlock(row) {
+  if (!hasCheckin(row)) {
+    return h('button', { class: 'btn', 'data-action': 'checkin', onclick: () => { location.hash = '#/corpo'; } },
+      'Check-in da manhã (peso, sono, energia)');
+  }
+  const parts = [];
+  if (typeof row.weightKg === 'number') parts.push(formatNumber(row.weightKg) + ' kg');
+  if (typeof row.sleep === 'number') parts.push('sono ' + row.sleep);
+  if (typeof row.energy === 'number') parts.push('energia ' + row.energy);
+  return h('div', { class: 'card row', 'data-role': 'checkin-today', style: { justifyContent: 'space-between' } },
+    h('span', null, 'Check-in de hoje: ' + parts.join(' · ')),
+    h('button', { class: 'btn btn-ghost', 'data-action': 'edit-checkin', onclick: () => { location.hash = '#/corpo'; } }, 'editar'));
+}
+
 // Where this workout sits in the first-month plan (counted in workouts, not dates).
 function monthStep(n) {
   if (n <= 2) return `Treino ${n} · Semana de aprendizado: descubra a carga, 2 séries sobrando 3–4 reps`;
@@ -78,6 +97,10 @@ export async function renderToday() {
     return exerciseRow(item, plan, noteOf(pref));
   });
 
+  const days = await listDays();
+  const todayRow = days.find((d) => d.localDate === today) ?? null;
+  const avg = averageWeight(days, today);
+
   const backup = backupStatus({ lastBackupAt: await getSetting('lastBackupAt', null), sessions, today });
 
   const onStart = (short) => async (e) => {
@@ -94,9 +117,14 @@ export async function renderToday() {
       h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
     h('div', { class: 'row nav' },
-      h('button', { class: 'btn btn-ghost', 'data-action': 'history', onclick: () => { location.hash = '#/historico'; } }, 'Histórico')),
+      h('button', { class: 'btn btn-ghost', 'data-action': 'history', onclick: () => { location.hash = '#/historico'; } }, 'Histórico'),
+      h('button', { class: 'btn btn-ghost', 'data-action': 'body', onclick: () => { location.hash = '#/corpo'; } }, 'Corpo')),
     h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
+    checkinBlock(todayRow),
     weekCard(sessionsThisWeek(sessions, today)),
+    avg
+      ? h('p', { 'data-role': 'avg-weight' }, `Peso médio (7 dias): ${formatNumber(avg.avg)} kg · ${avg.n} ${avg.n === 1 ? 'pesagem' : 'pesagens'}`)
+      : null,
     backup.due
       ? h('div', { class: 'notice stack', 'data-role': 'backup-nudge' },
         h('p', null, `Você tem ${backup.since} treinos sem backup. Salve uma cópia para não perder seus dados.`),
