@@ -76,6 +76,8 @@ export function logSet(entryIdx, now) {
     const entry = draft.entries[entryIdx];
     if (!entry) return draft;
     entry.sets.push({ load: entry.load, reps: entry.reps, kind: 'work', at: now });
+    // The end time is saved with the set, so the timer survives reload and screen-off (TREINO-05).
+    draft.restEndsAt = now + entry.restSec * 1000;
     return draft;
   });
 }
@@ -132,6 +134,14 @@ export function logWarmup(entryIdx, load, reps, now) {
     const entry = draft.entries[entryIdx];
     if (!entry) return draft;
     entry.sets.push({ load, reps, kind: 'warmup', at: now });
+    draft.restEndsAt = now + 60000;
+    return draft;
+  });
+}
+
+export function skipRest() {
+  return mutate((draft) => {
+    draft.restEndsAt = null;
     return draft;
   });
 }

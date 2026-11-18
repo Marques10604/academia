@@ -4,11 +4,13 @@ import { PROGRAM } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import {
   logSet, setCurrent, finishWorkout, discardWorkout,
-  adjustLoad, setLoad, adjustReps, setFeel, undoLastSet, logWarmup,
+  adjustLoad, setLoad, adjustReps, setFeel, undoLastSet, logWarmup, skipRest,
 } from '../actions/workout.js';
 import { exerciseHistory } from '../domain/history.js';
 import { warmupSets } from '../domain/draft.js';
 import { formatNumber as fmt, parseDecimal } from '../domain/numbers.js';
+import { restRemainingMs, formatClock, overdueSeconds } from '../domain/timer.js';
+import { unlockAudio, beep, vibrate, requestWakeLock, releaseWakeLock, isWakeLockActive } from '../platform/device.js';
 import { rerender } from '../app.js';
 
 const FEEL_CHIPS = [
@@ -16,6 +18,24 @@ const FEEL_CHIPS = [
   ['ponto', 'No ponto (sobrou 1–2)'],
   ['pesado', 'Pesado (não sobrou nada)'],
 ];
+
+// Rest timer state. The countdown is always restEndsAt - now (never a decremented counter).
+// One 250 ms interval updates only the timer node's text; the screen is never re-rendered by it.
+let tick = null;
+let currentUpdate = null;
+let alertedFor = null; // restEndsAt value that already alerted
+let doneText = '';
+
+function stopTick() {
+  if (tick !== null) clearInterval(tick);
+  tick = null;
+  currentUpdate = null;
+}
+
+// Back in the app after the screen was off or another app was in front: recompute at once.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && currentUpdate) currentUpdate();
+});
 
 const workSets = (entry) => entry.sets.filter((s) => s.kind === 'work');
 
@@ -32,6 +52,7 @@ function setRowText(entry, ex, s, workNumber) {
 }
 
 export async function renderWorkout() {
+  stopTick();
   const draft = await getActive();
   if (!draft) {
     location.hash = '#/hoje';
@@ -49,6 +70,7 @@ export async function renderWorkout() {
 
   // The set goes to the entry shown on screen (index captured at render time).
   const onLog = async () => {
+    unlockAudio(); // needs the tap gesture so the end-of-rest beep can play later
     await logSet(idx, Date.now());
     await rerender();
   };
@@ -66,11 +88,15 @@ export async function renderWorkout() {
   };
   const onFinish = async (e) => {
     e.currentTarget.disabled = true;
+    stopTick();
+    releaseWakeLock();
     const session = await finishWorkout(Date.now());
     location.hash = session ? '#/resumo/' + session.id : '#/hoje';
   };
   const onDiscard = async () => {
     if (!window.confirm('Descartar este treino? As séries registradas serão perdidas.')) return;
+    stopTick();
+    releaseWakeLock();
     await discardWorkout();
     location.hash = '#/hoje';
   };
@@ -123,6 +149,13 @@ export async function renderWorkout() {
       h('p', { class: 'muted small' }, 'Séries de aquecimento não contam para recorde.'))
     : null;
 
+  const endsAt = draft.restEndsAt;
+  const timerNode = endsAt == null ? null : h('div', { class: 'timer', 'data-role': 'timer' });
+  const wakeNode = h('p', { class: 'muted small', 'data-role': 'wakelock' });
+  requestWakeLock().then(() => {
+    wakeNode.textContent = isWakeLockActive() ? 'Tela ligada durante o treino' : '';
+  });
+
   let workNumber = 0;
   const setRows = entry.sets.map((s) => {
     if (s.kind === 'work') workNumber += 1;
@@ -133,7 +166,7 @@ export async function renderWorkout() {
   const planned = entry.plannedSets;
   const header = done < planned ? `Série ${done + 1} de ${planned}` : `Séries planejadas concluídas (${planned} de ${planned})`;
 
-  return h('div', { class: 'screen', 'data-screen': 'treino' },
+  const screen = h('div', { class: 'screen', 'data-screen': 'treino' },
     h('div', { class: 'topbar' },
       h('div', null,
         h('h1', { class: 'title' }, tpl.name),
@@ -144,6 +177,18 @@ export async function renderWorkout() {
         'aria-label': EXERCISES[e.exerciseId].name,
         onclick: () => go(i),
       }, `${i + 1}: ${workSets(e).length}/${e.plannedSets}`))),
+    timerNode
+      ? h('div', { class: 'card' },
+        timerNode,
+        h('button', {
+          class: 'btn btn-ghost', 'data-action': 'skip-rest',
+          onclick: async () => {
+            await skipRest();
+            await rerender();
+          },
+        }, 'Pular'))
+      : null,
+    wakeNode,
     warmupCard,
     h('div', { class: 'card current' },
       h('h2', { class: 'title' },
@@ -187,4 +232,48 @@ export async function renderWorkout() {
         }, 'Próximo ›')),
       h('button', { class: 'btn btn-primary', 'data-action': 'finish', onclick: onFinish }, 'Finalizar treino'),
       h('button', { class: 'btn btn-danger small', 'data-action': 'discard', onclick: onDiscard }, 'Descartar treino')));
+
+  const paint = () => {
+    if (!timerNode) return;
+    const now = Date.now();
+    const remaining = restRemainingMs(endsAt, now);
+    if (remaining > 0) {
+      timerNode.classList.remove('done');
+      timerNode.textContent = `Descanso ${formatClock(remaining)}`;
+      return;
+    }
+    timerNode.classList.add('done');
+    if (alertedFor !== endsAt) {
+      if (document.visibilityState === 'visible') {
+        alertedFor = endsAt;
+        const over = overdueSeconds(endsAt, now);
+        if (over > 2) {
+          // came back to a timer that ended while away: one vibration, no beep
+          doneText = `Descanso terminou há ${over} s`;
+          vibrate(200);
+        } else {
+          doneText = 'Descanso terminou — próxima série!';
+          beep();
+          vibrate([300, 150, 300]);
+        }
+      } else {
+        doneText = 'Descanso terminou — próxima série!';
+      }
+    }
+    timerNode.textContent = doneText;
+  };
+  const update = () => {
+    // The screen was replaced or left: stop. Leaving the workout route also frees the wake lock.
+    if (!screen.isConnected) {
+      stopTick();
+      if (location.hash !== '#/treino') releaseWakeLock();
+      return;
+    }
+    paint();
+  };
+  paint();
+  stopTick();
+  currentUpdate = update;
+  tick = setInterval(update, 250);
+  return screen;
 }

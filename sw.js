@@ -18,6 +18,8 @@ const ASSETS = [
   './src/domain/numbers.js',
   './src/domain/plan.js',
   './src/domain/progression.js',
+  './src/domain/timer.js',
+  './src/platform/device.js',
   './src/ui/dom.js',
   './src/ui/exercise.js',
   './src/ui/onboarding.js',

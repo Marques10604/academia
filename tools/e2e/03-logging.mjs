@@ -94,6 +94,24 @@ export default async function (page) {
   await page.waitFor("document.querySelectorAll('[data-set-kind=work]').length === 1");
   assert.ok((await page.eval("document.querySelector('[data-set-kind=work]').innerText")).includes('22,5 kg'));
 
+  // rest timer starts and survives a reload
+  await page.waitFor("!!document.querySelector('[data-role=timer]')");
+  assert.ok((await page.eval("document.querySelector('[data-role=timer]').innerText")).includes('Descanso'));
+  assert.equal(await page.eval(`(async () => {
+    const db = await import(new URL('src/data/db.js', location.href).href);
+    return (await db.getActive()).restEndsAt > Date.now();
+  })()`), true, 'restEndsAt no futuro');
+  await page.reload();
+  await page.waitFor("!!document.querySelector('[data-screen=treino]')");
+  await page.waitFor("!!document.querySelector('[data-role=timer]')");
+  assert.equal(await page.eval("document.querySelectorAll('[data-set-kind=work]').length"), 1);
+  await page.click('[data-action=skip-rest]');
+  await page.waitFor("!document.querySelector('[data-role=timer]')");
+  assert.equal(await page.eval(`(async () => {
+    const db = await import(new URL('src/data/db.js', location.href).href);
+    return (await db.getActive()).restEndsAt;
+  })()`), null, 'restEndsAt limpo');
+
   await page.click('[data-action=undo]');
   await page.waitFor("document.querySelectorAll('[data-set-kind=work]').length === 0");
 
