@@ -1,5 +1,6 @@
 // Core loop: Today -> start -> log set -> reload resumes.
 import assert from 'node:assert/strict';
+import { APP_VERSION } from '../../src/version.js';
 
 const draftSetCount = `(async () => {
   const db = await import(new URL('src/data/db.js', location.href).href);
@@ -77,7 +78,7 @@ export default async function (page) {
   await page.click('[data-action=settings]');
   await page.waitFor("!!document.querySelector('[data-screen=config]')");
   const cfg = await page.text();
-  assert.ok(cfg.includes('Versão do app: 0.1.0'), 'config mostra a versão');
+  assert.ok(cfg.includes('Versão do app: ' + APP_VERSION), 'config mostra a versão');
   assert.ok(cfg.includes('Armazenamento protegido'), 'config mostra o armazenamento');
   assert.ok(cfg.includes('72,5'), 'config mostra o peso');
 
