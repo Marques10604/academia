@@ -3,6 +3,9 @@ import { h } from './dom.js';
 import { EXERCISES, youtubeUrl } from '../data/exercises.js';
 import { PROGRAM } from '../data/program.js';
 import { restText } from './reasons.js';
+import { get, put } from '../data/db.js';
+import { formatNumber } from '../domain/numbers.js';
+import { rerender } from '../app.js';
 
 function prescriptions(exercise) {
   const lines = [];
@@ -13,6 +16,28 @@ function prescriptions(exercise) {
     lines.push(`${tpl.name}: ${item.sets} × ${item.repMin}–${item.repMax}${unit} · ${restText(item.restSec)}`);
   }
   return lines;
+}
+
+// Fixed lists only (no free text): the stored value is always one of these numbers.
+const INCREMENTS = { reps: [1, 2, 2.5, 5, 10], time: [5, 10] };
+
+function incrementCard(exercise, current) {
+  const unit = exercise.type === 'time' ? ' s' : ' kg';
+  const values = [...INCREMENTS[exercise.type === 'time' ? 'time' : 'reps']];
+  if (!values.includes(current)) values.push(current);
+  values.sort((a, b) => a - b);
+  return h('div', { class: 'card', 'data-role': 'increment' },
+    h('h2', null, 'Incremento de carga'),
+    h('p', { class: 'muted small' }, 'Use o menor salto que sua academia permite: 1 pino, o próximo halter ou a menor anilha.'),
+    h('div', { class: 'chips' },
+      values.map((v) => h('button', {
+        class: `chip${v === current ? ' selected' : ''}`, 'data-increment': String(v),
+        onclick: async () => {
+          await put('exercisePrefs', { exerciseId: exercise.id, incrementKg: v });
+          await rerender();
+        },
+      }, formatNumber(v) + unit))),
+    h('p', { class: 'muted small' }, 'A carga sugerida é só uma sugestão: no treino você pode trocar com − e + a qualquer momento.'));
 }
 
 export async function renderExercise(hash) {
@@ -27,6 +52,8 @@ export async function renderExercise(hash) {
       h('a', { class: 'btn btn-primary', href: '#/hoje' }, 'Voltar para Hoje'));
   }
 
+  const pref = await get('exercisePrefs', exercise.id);
+  const increment = pref?.incrementKg ?? exercise.incrementKg;
   const { primary, secondary } = exercise.muscles;
   const muscles = 'Músculos: ' + primary.join(', ') + (secondary.length ? ' · também: ' + secondary.join(', ') : '');
 
@@ -45,6 +72,7 @@ export async function renderExercise(hash) {
       h('div', { class: 'card' },
         h('h2', null, 'Erros comuns'),
         h('ul', { 'data-role': 'mistakes' }, exercise.mistakes.map((m) => h('li', null, m)))),
+      incrementCard(exercise, increment),
       h('p', { class: 'small', 'data-role': 'alternative' },
         h('strong', null, 'Não tem essa máquina ou está ocupada? Use: '), exercise.alternative),
       h('a', {

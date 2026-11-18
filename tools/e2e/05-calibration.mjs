@@ -60,4 +60,23 @@ export default async function (page) {
   await page.waitFor("!!document.querySelector('[data-screen=hoje]')");
   const reason = await page.eval(`(document.querySelector('[data-exercise=leg_press_45] [data-role=reason]') || {}).innerText || ''`);
   assert.ok(reason.includes('treino 2 de 2'), 'rampa não vira histórico, a série valendo sim: ' + reason);
+
+  // Part 2: per-exercise increment preference drives the next workout's steppers.
+  await page.goto('#/exercicio/leg_press_45');
+  await page.waitFor("!!document.querySelector('[data-screen=exercicio] [data-increment]')");
+  await page.click('[data-increment="2.5"]');
+  await page.waitFor("document.querySelector('[data-increment=\"2.5\"]').classList.contains('selected')");
+  const pref = await page.eval(`(async () => {
+    const db = await import(new URL('src/data/db.js', location.href).href);
+    return (await db.get('exercisePrefs', 'leg_press_45')).incrementKg;
+  })()`);
+  assert.equal(pref, 2.5, 'preferência salva');
+  await page.goto('#/hoje');
+  await page.waitFor("!!document.querySelector('[data-action=start]')");
+  await page.click('[data-action=start]');
+  await page.waitFor("!!document.querySelector('[data-screen=treino]')");
+  const e1 = await page.eval(draftEntry);
+  assert.equal(e1.incrementKg, 2.5, 'rascunho usa o incremento escolhido');
+  await page.click('[data-action=load-plus]');
+  await page.waitFor(`document.querySelector('input[name=load]').value === ${JSON.stringify(fmt(e1.load + 2.5))}`);
 }
