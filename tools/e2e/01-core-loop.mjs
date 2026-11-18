@@ -85,6 +85,13 @@ export default async function (page) {
   assert.ok(cfg.includes('Versão do app: ' + APP_VERSION), 'config mostra a versão');
   assert.ok(cfg.includes('Armazenamento protegido'), 'config mostra o armazenamento');
   assert.equal(cfg.includes('Altura'), false, 'config sem altura');
+  assert.equal(cfg.includes('Peso:'), false, 'peso fica fora do perfil');
+  assert.ok(cfg.includes('Meu perfil') && cfg.includes('Full body, 3x por semana'), 'cartão Meu perfil com o plano');
+  assert.equal(await page.eval("document.querySelector('input[name=profile-name]').value"), 'Ivonilson');
+  // the name is saved when it changes (extra spaces cleaned) and Today greets with it
+  await page.type('input[name=profile-name]', '  Ivo   Silva ');
+  await page.waitFor("(async () => { const db = await import(new URL('src/data/db.js', location.href).href); return (await db.getSetting('profile')).name === 'Ivo Silva'; })()");
+  assert.equal(await page.eval("document.querySelector('input[name=profile-name]').value"), 'Ivo Silva');
 
   // (f) the service worker is registered and active (precache finished)
   await page.waitFor('(async () => { const r = await navigator.serviceWorker.ready; return !!r.active; })()', 8000);
