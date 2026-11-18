@@ -126,7 +126,12 @@ Plans:
   4. A free-AI rescue kit (project context text to paste into ChatGPT/Gemini + steps to apply and publish a fix) exists in the repository and is linked from Settings.
   5. A first-gym-day checklist is available in the app.
 
-**Plans**: TBD
+**Plans**: 2 plans (sequential)
+
+Plans:
+
+- [ ] 04-01-PLAN.md — Progride identity (dumbbell-with-arrow icons any + maskable + SVG, manifest name, title, onboarding), first-gym-day checklist from Today, Today dashboard card (wave 1)
+- [ ] 04-02-PLAN.md — KIT-SOCORRO-IA.md, MANUAL.md, README, Config help card + brand + checklist button, publish 0.4.0 at the permanent URL (wave 2)
 
 ## Progress
 
