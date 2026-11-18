@@ -26,6 +26,8 @@ export default async function (page) {
   assert.equal(saved.profile.weightKg, 70, 'peso inicial 70 kg');
   assert.equal('heightCm' in saved.profile, false, 'sem altura');
   assert.equal(saved.day.weightKg, 70, 'primeira pesagem de hoje: 70 kg');
+  const greeting = await page.eval("document.querySelector('[data-role=greeting]').innerText");
+  assert.match(greeting, /^(Bom dia|Boa tarde|Boa noite), Ivonilson!$/, 'saudação com o nome: ' + greeting);
   const text = await page.text();
   assert.ok(text.includes('Treino A'), 'Today deve mostrar Treino A');
   assert.ok(text.includes('Leg press 45°'), 'Today deve listar Leg press 45°');
@@ -92,6 +94,10 @@ export default async function (page) {
   await page.type('input[name=profile-name]', '  Ivo   Silva ');
   await page.waitFor("(async () => { const db = await import(new URL('src/data/db.js', location.href).href); return (await db.getSetting('profile')).name === 'Ivo Silva'; })()");
   assert.equal(await page.eval("document.querySelector('input[name=profile-name]').value"), 'Ivo Silva');
+  await page.goto('#/hoje');
+  await page.waitFor("(document.querySelector('[data-role=greeting]') || {}).innerText && document.querySelector('[data-role=greeting]').innerText.endsWith(', Ivo Silva!')");
+  await page.click('[data-action=settings]');
+  await page.waitFor("!!document.querySelector('[data-screen=config]')");
 
   // (f) the service worker is registered and active (precache finished)
   await page.waitFor('(async () => { const r = await navigator.serviceWorker.ready; return !!r.active; })()', 8000);

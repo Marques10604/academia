@@ -15,6 +15,7 @@ import { formatNumber } from '../domain/numbers.js';
 import { avgWeightText } from './body.js';
 import { backupStatus } from '../domain/backup.js';
 import { backupAgeText } from './backup.js';
+import { greetingFor } from '../domain/profile.js';
 import { dayText } from './datefmt.js';
 import { phaseLabel, effortText, loadText, restText, reasonText } from './reasons.js';
 
@@ -112,6 +113,9 @@ export async function renderToday() {
   const todayRow = days.find((d) => d.localDate === today) ?? null;
   const avg = averageWeight(days, today);
 
+  const profile = await getSetting('profile', null);
+  const greeting = greetingFor(new Date().getHours(), profile?.name); // the clock is read here in the UI layer only
+
   const backup = backupStatus({ lastBackupAt: await getSetting('lastBackupAt', null), sessions, today });
 
   const onStart = (short) => async (e) => {
@@ -125,7 +129,9 @@ export async function renderToday() {
 
   return h('div', { class: 'screen', 'data-screen': 'hoje' },
     h('div', { class: 'topbar' },
-      h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
+      h('div', null,
+        h('h1', { class: 'title', 'data-role': 'greeting' }, greeting),
+        h('p', { class: 'subtitle muted' }, `Hoje: ${tpl.name}`)),
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
     h('div', { class: 'row nav' },
       h('button', { class: 'btn btn-ghost', 'data-action': 'history', onclick: () => { location.hash = '#/historico'; } }, 'Histórico'),
