@@ -4,6 +4,7 @@ import { PROGRAM, ROTATION } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import { nextTemplate } from '../domain/history.js';
 import { detectPRs } from '../domain/records.js';
+import { dayText } from './datefmt.js';
 import { formatNumber as fmt } from '../domain/numbers.js';
 
 // "30 kg × 12, 12, 11" when every set shares the load, else "30 kg × 12, 27,5 kg × 10"; time: "30 s, 35 s".
@@ -39,6 +40,7 @@ export async function renderSummary(hash) {
   return h('div', { class: 'screen', 'data-screen': 'resumo' },
     h('div', { class: 'topbar' },
       h('h1', { class: 'title' }, session.complete ? `${tpl.name} concluído` : 'Treino registrado (incompleto)')),
+    h('p', { class: 'muted small', 'data-role': 'date' }, dayText(session.startedAt)),
     h('div', { class: 'card' },
       h('p', null, `Duração: ${minutes} min`),
       h('p', null, `Séries: ${totalSets}`)),

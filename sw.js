@@ -21,6 +21,7 @@ const ASSETS = [
   './src/domain/records.js',
   './src/domain/timer.js',
   './src/platform/device.js',
+  './src/ui/datefmt.js',
   './src/ui/dom.js',
   './src/ui/exercise.js',
   './src/ui/onboarding.js',

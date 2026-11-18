@@ -6,6 +6,7 @@ import { nextTemplate, exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
 import { startWorkout } from '../actions/workout.js';
+import { dayText } from './datefmt.js';
 import { phaseLabel, effortText, loadText, restText, reasonText } from './reasons.js';
 
 function plannedText(item, plan, exercise) {
@@ -71,6 +72,7 @@ export async function renderToday() {
     h('div', { class: 'topbar' },
       h('h1', { class: 'title' }, `Hoje: ${tpl.name}`),
       h('button', { class: 'btn btn-ghost', 'data-action': 'settings', onclick: () => { location.hash = '#/config'; } }, 'Config')),
+    h('p', { class: 'muted small', 'data-role': 'date' }, dayText(Date.now())),
     h('p', { class: 'muted small', 'data-role': 'goal' }, tpl.goal),
     h('p', { class: 'small', 'data-role': 'month-step' }, monthStep(sessions.length + 1)),
     h('ul', { class: 'list' }, rows),
