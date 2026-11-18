@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 4
 current_phase_name: Identity, Publish & Handoff
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-11-18T20:50:30.657Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-11-18T22:41:03.097Z"
 last_activity: 2026-11-18
 last_activity_desc: Completed 04-01 (Progride identity, first-day checklist, Today dashboard, reset-all)
-state_head: d7f9b52ccf84f5002073f9a908dff7c77fe17306
+state_head: 2de5e3c762053b73579078eed7497443f633020f
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 0
 ---
 
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-18)
 
 **Core value:** In the gym, open the app and know exactly which workout to do today, how to do each exercise and with what weight, log each set in seconds, and have the next load suggested automatically, offline.
-**Current focus:** Phase 4 — Identity, Publish & Handoff (04-01 done on branch gsd/phase-04-identity-publish-handoff; 04-02 publishes 0.4.0; Phases 1-2 live as 0.3.0, phone checks pending)
+**Current focus:** Phase 4 — Identity, Publish & Handoff complete and live as 0.4.0 (phone checks pending); next: verify the phase, then Phase 3
 
 **Hard deadline:** whole app finished in 5 days, target finish 2026-11-23 (started 2026-11-18). First gym session is in December 2026. Keep every implementation as simple as works for one person.
 
 ## Current Position
 
 Phase: 4 (Identity, Publish & Handoff) — EXECUTING
-Plan: 1 of 2 complete (04-02: version 0.4.0, publish, maintenance guide, rescue kit)
-Status: 04-01 complete, not published (Phase 2 plans complete, 0.3.0 live)
-Last activity: 2026-11-18 — Completed 04-01 (Progride identity, first-day checklist, Today dashboard, Apagar tudo)
+Plan: 2 of 2 complete (04-02: version 0.4.0, publish, maintenance guide, rescue kit)
+Status: Phase 4 plans complete; 0.4.0 live at https://marques10604.github.io/academia/ (phone checks pending, see 04-02-SUMMARY)
+Last activity: 2026-11-18 — Completed 04-02 (MANUAL, KIT-SOCORRO-IA, README, Config help, release 0.4.0 published)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -70,6 +70,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P02 | 45 min | 2 tasks | 14 files |
 | Phase 02 P03 | 40min | 3 tasks | 9 files |
 | Phase 04 P01 | 35min | 4 tasks | 18 files |
+| Phase 04 P02 | 45min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,7 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-03: only body weight from the scale is recorded; saving the waist rebuilds only the waist card so an unsaved check-in is never lost
 - [Phase 04]: Rebrand to Progride touches user-visible text only; manifest id/start_url/scope, DB_NAME, BACKUP_APP stay 'academia'
 - [Phase 04]: Settings has 'Apagar tudo e começar do zero' (db.clearAll, two confirms) for the pre-December test install
+- [Phase 04]: 04-02: guides follow the current card/tab UI; docs test checks plain and backticked paths plus quoted UI labels; sw.js precache uses cache 'reload'
 
 ### Pending Todos
 
@@ -118,6 +120,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T20:50:30.463Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-11-18T22:41:02.395Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None

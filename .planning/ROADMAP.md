@@ -126,12 +126,12 @@ Plans:
   4. A free-AI rescue kit (project context text to paste into ChatGPT/Gemini + steps to apply and publish a fix) exists in the repository and is linked from Settings.
   5. A first-gym-day checklist is available in the app.
 
-**Plans**: 1/2 plans executed (sequential)
+**Plans**: 2/2 plans executed (sequential)
 
 Plans:
 
 - [x] 04-01-PLAN.md — Progride identity (dumbbell-with-arrow icons any + maskable + SVG, manifest name, title, onboarding), first-gym-day checklist from Today, Today dashboard card (wave 1)
-- [ ] 04-02-PLAN.md — KIT-SOCORRO-IA.md, MANUAL.md, README, Config help card + brand + checklist button, publish 0.4.0 at the permanent URL (wave 2)
+- [x] 04-02-PLAN.md — KIT-SOCORRO-IA.md, MANUAL.md, README, Config help card + brand + checklist button, publish 0.4.0 at the permanent URL (wave 2)
 
 ## Progress
 
@@ -143,4 +143,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Today's Workout (Core Value) | 6/6 | In Progress|  |
 | 2. Backup, History & Check-in | 3/3 | In Progress|  |
 | 3. Food, Goals, Photos & AI | 0/TBD | Not started | - |
-| 4. Identity, Publish & Handoff | 1/2 | In Progress|  |
+| 4. Identity, Publish & Handoff | 2/2 | In Progress|  |
