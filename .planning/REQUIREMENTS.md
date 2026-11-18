@@ -26,13 +26,13 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Treino ao Vivo (TREINO)
 
-- [ ] **TREINO-01**: Usuário inicia o treino do dia com um toque
+- [x] **TREINO-01**: Usuário inicia o treino do dia com um toque
 - [ ] **TREINO-02**: Usuário registra uma série em 1–2 toques, com carga e repetições pré-preenchidas pela sugestão e ajustáveis por botões +/−
 - [ ] **TREINO-03**: Ao registrar, o app mostra o que foi feito na sessão anterior desse exercício (ex: "anterior: 20 kg × 10")
 - [ ] **TREINO-04**: Usuário informa "quanto sobrou" (leve / no ponto / pesado) na última série
 - [ ] **TREINO-05**: Timer de descanso inicia sozinho após cada série, vibra/toca ao terminar e continua correto se a tela apagar ou o app for trocado
 - [ ] **TREINO-06**: Tela não apaga durante o treino (wake lock)
-- [ ] **TREINO-07**: Treino em andamento é salvo a cada série — se o app fechar, recarregar ou o usuário voltar do YouTube, ele retoma de onde parou
+- [x] **TREINO-07**: Treino em andamento é salvo a cada série — se o app fechar, recarregar ou o usuário voltar do YouTube, ele retoma de onde parou
 - [ ] **TREINO-08**: Usuário pode desfazer a última série registrada
 - [ ] **TREINO-09**: Usuário finaliza o treino e vê um resumo (duração, séries, cargas, recordes)
 
@@ -147,13 +147,13 @@ Adiado. Rastreado, fora do roadmap atual.
 | PROG-04 | Phase 1 | Pending |
 | PROG-05 | Phase 1 | Pending |
 | PROG-06 | Phase 1 | Pending |
-| TREINO-01 | Phase 1 | Pending |
+| TREINO-01 | Phase 1 | Complete |
 | TREINO-02 | Phase 1 | Pending |
 | TREINO-03 | Phase 1 | Pending |
 | TREINO-04 | Phase 1 | Pending |
 | TREINO-05 | Phase 1 | Pending |
 | TREINO-06 | Phase 1 | Pending |
-| TREINO-07 | Phase 1 | Pending |
+| TREINO-07 | Phase 1 | Complete |
 | TREINO-08 | Phase 1 | Pending |
 | TREINO-09 | Phase 1 | Pending |
 | CARGA-01 | Phase 1 | Pending |
@@ -191,6 +191,7 @@ Adiado. Rastreado, fora do roadmap atual.
 | LANC-03 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 53 total
 - Mapped to phases: 53 (Phase 1: 27, Phase 2: 8, Phase 3: 15, Phase 4: 3)
 - Unmapped: 0 ✓

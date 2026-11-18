@@ -7,6 +7,7 @@ A personal gym PWA for one person (Android, pt-BR, beginner, first gym session i
 **Hard constraint:** whole app finished in 5 days, target finish **2026-11-23** (started 2026-11-18). Keep every requirement's implementation as simple as works for one person.
 
 **Lean build rules (apply to every phase):**
+
 - No build step. Vanilla JS or Preact + htm vendored; hand-written SVG charts; service worker kept tiny.
 - Storage in IndexedDB with a single `schemaVersion` number. No migration framework.
 - Service worker uses one cache-version constant and no `skipWaiting`: a new version takes effect after the app is fully closed and reopened. Version number shown in Settings.
@@ -28,6 +29,7 @@ Phases 1 and 2 are the minimum to train safely with data protected. Phases 3 and
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
@@ -41,63 +43,77 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Today's Workout (Core Value)
+
 **Goal:** As a gym beginner, I want to open the installed app offline, see today's workout, log each set in seconds and be told what load to use next, so that I always know what to do and my loads progress automatically.
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
 **Requirements**: FUND-01, FUND-02, FUND-03, FUND-04, FUND-05, PROG-01, PROG-02, PROG-03, PROG-04, PROG-05, PROG-06, TREINO-01, TREINO-02, TREINO-03, TREINO-04, TREINO-05, TREINO-06, TREINO-07, TREINO-08, TREINO-09, CARGA-01, CARGA-02, CARGA-03, CARGA-04, CARGA-05, CARGA-06, EVOL-03
 **Success Criteria** (what must be TRUE):
+
   1. User installs the app to the Android home screen from a hosted HTTPS URL and it opens and navigates with the phone in airplane mode; first open shows the "not medical advice / see a doctor" notice and asks weight and height, and typing "72,5" or "72.5" is understood as 72.5 kg.
   2. Settings shows the app version and whether storage is persistent; data survives closing the app, and a newly published version only takes effect after the app is fully closed and reopened (never swaps while in use).
   3. The Today screen shows the next workout (A or B, advancing only when a workout is completed, regardless of weekday) with each exercise's sets × reps target, rest time and expected effort for its phase (calibration / adaptation / base); each exercise opens pt-BR step-by-step instructions, common mistakes, muscles and machine adjustment offline, plus a button that opens a Portuguese YouTube search; the first exercise offers a guided warm-up whose sets are marked as warm-up.
   4. User starts the workout with one tap and logs each set in 1–2 taps with load and reps pre-filled and adjustable with +/−, sees the previous session's result ("anterior: 20 kg × 10"), can mark "leve / no ponto / pesado" on the last set, can undo the last set; the rest timer starts by itself, vibrates or beeps at the end and stays correct after the screen turns off or the app is switched; the screen stays awake during the workout.
   5. Closing, reloading or returning from YouTube mid-workout resumes exactly where the user stopped; finishing shows a summary (duration, sets, loads) and celebrates a personal record when beaten (ignoring warm-up and calibration); in the first 2 sessions of each exercise the app guides ramp sets and asks "quantas repetições ainda sobravam?", afterwards it suggests the next load by double progression with a one-line explanation, lowers the load after repeated failure or stagnation, suggests 90% / 80% after 10+ / 28+ days away, and lets the user change the per-exercise increment and override any suggestion.
-**Plans**: 6 plans
+
+**Plans**: 1/6 plans executed
 Plans:
-- [ ] 01-01-PLAN.md — Tracer: Today (Treino A) → one-tap start → write-through set logging (queued, double-tap safe) → reload resumes; exercise navigation; zero-dependency E2E runner (wave 1)
+
+- [x] 01-01-PLAN.md — Tracer: Today (Treino A) → one-tap start → write-through set logging (queued, double-tap safe) → reload resumes; exercise navigation; zero-dependency E2E runner (wave 1)
 - [ ] 01-02-PLAN.md — Install shell: styles vocabulary, package.json, manifest + icons, .nojekyll, versioned service worker + stamp tool (wave 1, parallel)
 - [ ] 01-03-PLAN.md — Finish → summary → A/B rotation, onboarding + medical notice (comma decimals), Settings (version, storage), SW registration, publish 0.1.0 (wave 2)
 - [ ] 01-04-PLAN.md — pt-BR library for the 15 exercises + YouTube search, Today prescription (sets × reps, rest, phase, effort) and tested double-progression suggestions with reasons (wave 3)
 - [ ] 01-05-PLAN.md — Live logger: +/− steppers, typed loads, "anterior", leve/no ponto/pesado, undo, warm-up, rest timer + wake lock, summary with PRs (wave 3, parallel)
 - [ ] 01-06-PLAN.md — Calibration ramp ("quantas sobravam?"), per-exercise increments, publish 0.2.0, consolidated real-phone check (wave 4)
+
 **UI hint**: yes
 
 ### Phase 2: Backup, History & Check-in
+
 **Goal:** As a lifter with real data on my phone, I want to back up and restore my data and see my history, charts and a quick morning body check-in, so that nothing is lost and I can see my progress.
 **Mode:** mvp
 **Depends on**: Phase 1
 **Requirements**: BKP-01, BKP-02, BKP-03, EVOL-01, EVOL-02, EVOL-04, CORPO-01, CORPO-02
 **Success Criteria** (what must be TRUE):
+
   1. User exports all data (without photos) as a versioned backup file and sends it through the Android share sheet (Drive, WhatsApp) or downloads it.
   2. User imports a backup, sees a one-line summary of what it contains, confirms, and the app restores everything; exporting, clearing the app's data and importing brings back all workouts, loads and settings.
   3. The app shows "último backup há N dias" and reminds the user to back up after several workouts without one.
   4. User opens any exercise and sees its history (dates, loads, reps) and a simple load-over-time chart, and sees the list of completed workouts by date.
   5. User records the morning check-in in a few seconds (weight, sleep 1–5, energy 1–5, all optional) and sees a body-weight chart with a 7-day moving average.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 3: Food, Goals, Photos & AI
+
 **Goal:** As a user who wants more than a logger, I want to track protein lightly, set goals, get a morning-alarm guide, take progress photos and ask an AI about my data, so that I stay consistent and understand my progress.
 **Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: ALIM-01, ALIM-02, ALIM-03, ALIM-04, META-01, META-02, META-03, META-04, META-05, CORPO-03, CORPO-04, BKP-04, IA-01, IA-02, IA-03
 **Success Criteria** (what must be TRUE):
+
   1. User sees a daily protein target computed from body weight (about 120 g at 70 kg, editable), taps Brazilian portion shortcuts (ovo, frango, carne, feijão, leite, whey...) per meal to add grams, and sees the day total and weekly average (days ≥ 112 g) in neutral colors with no calorie counting; if average weight has not risen in 2 weeks the app suggests adding 1 carb portion per day.
   2. User sets a weekly workout goal (default 3) and sees a weekly streak that tolerates 1 grace week, sees a no-guilt "há N dias sem treinar" notice on Today when applicable, sets a body-weight goal with a suggested healthy pace, and sets per-exercise load goals (available only after calibration) with a progress bar.
   3. The app walks the user through creating a recurring morning alarm in the Android Clock and/or downloads a calendar (.ics) file for it.
   4. User takes front/side/back progress photos that stay only on the phone (downsized), compares two photos side by side, and exports the photos separately from the main backup.
   5. User taps "Gerar relatório para IA" and gets a copyable text summary (loads, frequency, average weight, sleep/energy, protein) with a ready question; user can also save their own Gemini key, ask for an analysis inside the app and read the answer in pt-BR; when the in-app call fails (offline, bad key, retired model) a clear message appears with the paste-in report as the alternative, and the model name can be changed in Settings without touching code.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 4: Identity, Publish & Handoff
+
 **Goal:** As the only user, who will soon lose access to Claude, I want the app published at its permanent URL with its own name, logo and a maintenance guide, so that it keeps working and I can maintain it without AI.
 **Mode:** mvp
 **Depends on**: Phase 3
 **Requirements**: LANC-01, LANC-02, LANC-03
 **Success Criteria** (what must be TRUE):
+
   1. The app shows its own name and logo/icon on the Android home screen after installation.
   2. The app is reachable at its permanent free GitHub Pages URL, installs from there on the user's real phone and runs a full workout end to end in airplane mode.
   3. A pt-BR guide in the repository explains, step by step and without assuming programming knowledge, how to publish a change, add an exercise and restore a backup.
+
 **Plans**: TBD
 
 ## Progress
@@ -107,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Today's Workout (Core Value) | 0/6 | Planned | - |
+| 1. Today's Workout (Core Value) | 1/6 | In Progress|  |
 | 2. Backup, History & Check-in | 0/TBD | Not started | - |
 | 3. Food, Goals, Photos & AI | 0/TBD | Not started | - |
 | 4. Identity, Publish & Handoff | 0/TBD | Not started | - |

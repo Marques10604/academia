@@ -1,11 +1,18 @@
 ---
-gsd_state_version: '1.0'
-status: planning
+gsd_state_version: "1.0"
+current_phase: 1
+current_phase_name: Today's Workout (Core Value)
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-11-18T15:18:10.053Z"
+last_activity: 2026-11-18
+last_activity_desc: Phase 1 execution started
+state_head: 57d3e5fd2a6dfd225232f2e273238a7d54cca81d
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 6
+  completed_plans: 1
   percent: 0
 ---
 
@@ -16,22 +23,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-18)
 
 **Core value:** In the gym, open the app and know exactly which workout to do today, how to do each exercise and with what weight, log each set in seconds, and have the next load suggested automatically, offline.
-**Current focus:** Phase 1 - Today's Workout (Core Value)
+**Current focus:** Phase 1 — Today's Workout (Core Value)
 
 **Hard deadline:** whole app finished in 5 days, target finish 2026-11-23 (started 2026-11-18). First gym session is in December 2026. Keep every implementation as simple as works for one person.
 
 ## Current Position
 
-Phase: 1 of 4 (Today's Workout - Core Value)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-11-18 - Roadmap created (4 phases, 53/53 v1 requirements mapped)
+Phase: 1 (Today's Workout (Core Value)) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-11-18 — Phase 1 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: - min
 - Total execution time: 0.0 hours
@@ -43,10 +51,16 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: -
 - Trend: -
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01 | ~35min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -59,6 +73,7 @@ Recent decisions affecting current work:
 - [Roadmap]: EVOL-03 (personal record detection) mapped to Phase 1, not Phase 2, because the Phase 1 workout summary (TREINO-09) shows records.
 - [Roadmap]: BKP-04 (photo export) mapped to Phase 3 with the photos it exports, not to Phase 2 with the rest of backup.
 - [Lean]: single `schemaVersion`, SW cache-version constant without `skipWaiting`, backup import = one-line summary + confirm, Gemini key stored plainly in local settings, rest-timer end alert only while the app is visible (TREINO-05, see Blockers/Concerns). Data saved on every set and working export/import stay as core.
+- [Phase 01]: [01-01] Hash router matches parameterised routes by prefix; draft actions all go through queue()/mutate()
 
 ### Pending Todos
 
@@ -83,6 +98,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18
-Stopped at: Roadmap and STATE created; REQUIREMENTS.md traceability filled
+Last session: 2026-11-18T15:18:09.959Z
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
