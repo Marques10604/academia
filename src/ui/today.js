@@ -1,5 +1,5 @@
 import { h } from './dom.js';
-import { listSessions } from '../data/db.js';
+import { listSessions, getActive } from '../data/db.js';
 import { PROGRAM, ROTATION } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import { nextTemplate } from '../domain/history.js';
@@ -12,13 +12,18 @@ function planned(item) {
 }
 
 export async function renderToday() {
+  const draft = await getActive();
   const sessions = await listSessions();
-  const templateId = nextTemplate(sessions, ROTATION);
+  // With an open workout, Today shows that workout instead of the rotation's next one.
+  const templateId = draft ? draft.templateId : nextTemplate(sessions, ROTATION);
   const tpl = PROGRAM[templateId];
 
   const onStart = async (e) => {
     e.currentTarget.disabled = true;
     await startWorkout(templateId, Date.now());
+    location.hash = '#/treino';
+  };
+  const onResume = () => {
     location.hash = '#/treino';
   };
 
@@ -30,5 +35,7 @@ export async function renderToday() {
           h('span', null, EXERCISES[item.exerciseId].name),
           h('span', { class: 'muted small' }, planned(item))))),
     h('div', { class: 'bottom-bar' },
-      h('button', { class: 'btn btn-big btn-primary', 'data-action': 'start', onclick: onStart }, 'Iniciar treino')));
+      draft
+        ? h('button', { class: 'btn btn-big btn-primary', 'data-action': 'resume', onclick: onResume }, 'Continuar treino')
+        : h('button', { class: 'btn btn-big btn-primary', 'data-action': 'start', onclick: onStart }, 'Iniciar treino')));
 }

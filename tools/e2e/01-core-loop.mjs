@@ -24,4 +24,25 @@ export default async function (page) {
   await page.waitFor("!!document.querySelector('[data-screen=treino]')");
   await page.waitFor("document.querySelectorAll('[data-set-kind=work]').length === 1");
   assert.equal(await page.eval(draftSetCount), 1, 'o rascunho no IndexedDB deve ter 1 série');
+
+  // (a) double tap: two clicks in one tick must save two sets
+  await page.eval(`(() => { const b = document.querySelector('[data-action=log-set]'); b.click(); b.click(); return true; })()`);
+  await page.waitFor(`(async () => (await ${draftSetCount.trim()}) === 3)()`);
+  await new Promise((r) => setTimeout(r, 300));
+  assert.equal(await page.eval(draftSetCount), 3, 'duplo toque deve manter exatamente 3 séries');
+  await page.waitFor("document.querySelectorAll('[data-set-kind=work]').length === 3");
+  assert.equal(await page.eval("document.querySelectorAll('[data-set-kind=work]').length"), 3);
+
+  // (b) move between exercises
+  await page.click('[data-action=next-exercise]');
+  await page.waitFor("document.body.innerText.includes('Exercício 2 de 8')");
+  await page.click('[data-action=prev-exercise]');
+  await page.waitFor("document.body.innerText.includes('Exercício 1 de 8')");
+
+  // (c) Today offers to continue the open workout
+  await page.goto('#/hoje');
+  await page.waitFor("!!document.querySelector('[data-action=resume]')");
+  assert.ok((await page.text()).includes('Continuar treino'));
+  await page.click('[data-action=resume]');
+  await page.waitFor("!!document.querySelector('[data-screen=treino]')");
 }
