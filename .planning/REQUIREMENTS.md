@@ -17,11 +17,11 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Programa e Exercícios (PROG)
 
-- [ ] **PROG-01**: App vem com programa full body A/B pronto — todo treino trabalha pernas, empurrar, puxar e core (A: Leg press 45°, Supino reto com halteres, Puxada frontal, Mesa flexora, Elevação lateral, Rosca direta, Panturrilha em pé, Prancha; B: Agachamento goblet, Desenvolvimento com halteres, Remada baixa, Stiff com halteres, Voador, Tríceps na polia, Abdominal)
+- [x] **PROG-01**: App vem com programa full body A/B pronto — todo treino trabalha pernas, empurrar, puxar e core (A: Leg press 45°, Supino reto com halteres, Puxada frontal, Mesa flexora, Elevação lateral, Rosca direta, Panturrilha em pé, Prancha; B: Agachamento goblet, Desenvolvimento com halteres, Remada baixa, Stiff com halteres, Voador, Tríceps na polia, Abdominal)
 - [x] **PROG-02**: Tela "Hoje" mostra o próximo treino (A ou B) pela rotação, sem depender do dia da semana — faltar não "quebra" o plano
-- [ ] **PROG-03**: Cada exercício tem nome de academia brasileira, passo a passo de execução em pt-BR, erros comuns, músculos trabalhados e ajuste do aparelho
-- [ ] **PROG-04**: Cada exercício tem botão que abre busca do YouTube em português para ver a demonstração
-- [ ] **PROG-05**: Cada exercício mostra séries × repetições alvo, descanso e esforço esperado ("quantas repetições devem sobrar") conforme a fase (calibração / adaptação / base)
+- [x] **PROG-03**: Cada exercício tem nome de academia brasileira, passo a passo de execução em pt-BR, erros comuns, músculos trabalhados e ajuste do aparelho
+- [x] **PROG-04**: Cada exercício tem botão que abre busca do YouTube em português para ver a demonstração
+- [x] **PROG-05**: Cada exercício mostra séries × repetições alvo, descanso e esforço esperado ("quantas repetições devem sobrar") conforme a fase (calibração / adaptação / base)
 - [ ] **PROG-06**: Aquecimento guiado: app sugere 5 min leves + séries de aquecimento no primeiro exercício, marcadas como aquecimento (não contam para recorde)
 
 ### Treino ao Vivo (TREINO)
@@ -39,10 +39,10 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 ### Progressão de Carga (CARGA)
 
 - [ ] **CARGA-01**: Nas 2 primeiras sessões de cada exercício (calibração), o app guia a descoberta da carga inicial com séries de rampa e a pergunta "quantas repetições ainda sobravam?"
-- [ ] **CARGA-02**: Depois da calibração, o app aplica dupla progressão: quando todas as séries chegam ao topo da faixa (ex: 3×12 numa faixa 8–12), sugere subir a carga no próximo treino
-- [ ] **CARGA-03**: App mostra uma linha explicando a sugestão (ex: "Você fez 3×12 — suba para 22 kg")
-- [ ] **CARGA-04**: Se o usuário falhar a faixa mínima em 2 sessões seguidas ou estagnar 3 sessões, o app reduz a carga automaticamente
-- [ ] **CARGA-05**: Após 10+ dias sem treinar, o app sugere retomar com 90% da carga (80% após 28+ dias)
+- [x] **CARGA-02**: Depois da calibração, o app aplica dupla progressão: quando todas as séries chegam ao topo da faixa (ex: 3×12 numa faixa 8–12), sugere subir a carga no próximo treino
+- [x] **CARGA-03**: App mostra uma linha explicando a sugestão (ex: "Você fez 3×12 — suba para 22 kg")
+- [x] **CARGA-04**: Se o usuário falhar a faixa mínima em 2 sessões seguidas ou estagnar 3 sessões, o app reduz a carga automaticamente
+- [x] **CARGA-05**: Após 10+ dias sem treinar, o app sugere retomar com 90% da carga (80% após 28+ dias)
 - [ ] **CARGA-06**: Usuário pode ajustar o incremento de cada exercício (ex: +1 pino, +2 kg, próximo halter) e sobrescrever a carga sugerida a qualquer momento
 
 ### Progresso (EVOL)
@@ -141,11 +141,11 @@ Adiado. Rastreado, fora do roadmap atual.
 | FUND-03 | Phase 1 | Complete |
 | FUND-04 | Phase 1 | Complete |
 | FUND-05 | Phase 1 | Complete |
-| PROG-01 | Phase 1 | Pending |
+| PROG-01 | Phase 1 | Complete |
 | PROG-02 | Phase 1 | Complete |
-| PROG-03 | Phase 1 | Pending |
-| PROG-04 | Phase 1 | Pending |
-| PROG-05 | Phase 1 | Pending |
+| PROG-03 | Phase 1 | Complete |
+| PROG-04 | Phase 1 | Complete |
+| PROG-05 | Phase 1 | Complete |
 | PROG-06 | Phase 1 | Pending |
 | TREINO-01 | Phase 1 | Complete |
 | TREINO-02 | Phase 1 | Pending |
@@ -157,10 +157,10 @@ Adiado. Rastreado, fora do roadmap atual.
 | TREINO-08 | Phase 1 | Pending |
 | TREINO-09 | Phase 1 | Pending |
 | CARGA-01 | Phase 1 | Pending |
-| CARGA-02 | Phase 1 | Pending |
-| CARGA-03 | Phase 1 | Pending |
-| CARGA-04 | Phase 1 | Pending |
-| CARGA-05 | Phase 1 | Pending |
+| CARGA-02 | Phase 1 | Complete |
+| CARGA-03 | Phase 1 | Complete |
+| CARGA-04 | Phase 1 | Complete |
+| CARGA-05 | Phase 1 | Complete |
 | CARGA-06 | Phase 1 | Pending |
 | EVOL-01 | Phase 2 | Pending |
 | EVOL-02 | Phase 2 | Pending |

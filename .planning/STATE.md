@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Today's Workout (Core Value)
 status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-11-18T15:33:05.787Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-11-18T15:44:07.515Z"
 last_activity: 2026-11-18
 last_activity_desc: Phase 1 execution started
-state_head: f58cd9af9b8512e50f2226be11651631e57e3904
+state_head: 5d18a809a93956d586a13d451d0c90f4ea14e2fb
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-11-18)
 ## Current Position
 
 Phase: 1 (Today's Workout (Core Value)) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-11-18 — Phase 1 execution started
 
@@ -63,6 +63,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P01 | ~35min | 2 tasks | 14 files |
 | Phase 1 P02 | 15min | 3 tasks | 11 files |
 | Phase 01 P03 | 30min | 3 tasks | 11 files |
+| Phase 01 P04 | 25min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,7 @@ Recent decisions affecting current work:
 - [Phase 01]: [01-01] Hash router matches parameterised routes by prefix; draft actions all go through queue()/mutate()
 - [Phase 1]: stamp-sw normalizes CRLF so --check is stable on Windows; sw.js ASSETS generated from tree
 - [Phase 01]: 01-03: workout counts as complete at >=70% exercises with a work set; Pages enabled from main root; version 0.1.0 published
+- [Phase 01]: 01-04: YouTube button uses a search URL; layoff/stall deloads never return the same load; calibration/adaptation plan min(2, sets) sets
 
 ### Pending Todos
 
@@ -102,6 +104,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T15:32:54.609Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-11-18T15:44:07.430Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
