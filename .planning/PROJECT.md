@@ -34,6 +34,8 @@ Se todo o resto falhar, isso precisa funcionar: treino do dia + registro de sér
 - [ ] Backup: exportar/importar arquivo (.json) para salvar no Drive/WhatsApp
 - [ ] Nome e logo/ícone do app (criados pelo Claude)
 - [ ] Funciona 100% offline, instalável na tela inicial do Android
+- [ ] Análise dos dados por IA: relatório copiável para qualquer IA grátis + IA dentro do app (Gemini, chave própria do usuário, sem servidor)
+- [ ] Meta padrão: 3 treinos por semana
 
 ### Out of Scope
 
@@ -75,6 +77,10 @@ Se todo o resto falhar, isso precisa funcionar: treino do dia + registro de sér
 | Exercícios: texto + link YouTube (sem GIF) | Offline e leve | — Pending |
 | Alimentação com foco em proteína em modo leve | Dúvida "dieta da selva" vs contagem; decidir com pesquisa | — Pending |
 | Metas de carga só após fase de descoberta de carga | Usuário não sabe cargas iniciais | — Pending |
+| Dupla progressão (ex: 3×8–12) como padrão | Pesquisa + pedido do usuário; autocorrige carga inicial errada | — Pending |
+| IA sem servidor: relatório copiável + Gemini direto do celular | Usuário quer análise por IA; servidor reconsiderado e rejeitado (celular + backup) | — Pending |
+| Lembrete via alarme do Relógio/.ics, não push | Notification Triggers abandonado pelo Chrome | — Pending |
+| Construção em MVP vertical | Treino usável primeiro, resto em fatias | — Pending |
 
 ## Evolution
 
