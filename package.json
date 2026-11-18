@@ -1,0 +1,15 @@
+{
+  "name": "academia",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "smoke": "node tools/smoke.mjs",
+    "serve": "node tools/smoke.mjs --serve",
+    "icons": "node tools/make-icons.mjs",
+    "stamp": "node tools/stamp-sw.mjs"
+  }
+}
