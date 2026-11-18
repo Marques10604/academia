@@ -9,9 +9,9 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Fundação (FUND)
 
-- [ ] **FUND-01**: Usuário instala o app na tela inicial do Android (PWA standalone) e ele abre sem internet
+- [x] **FUND-01**: Usuário instala o app na tela inicial do Android (PWA standalone) e ele abre sem internet
 - [ ] **FUND-02**: Dados ficam salvos no celular (IndexedDB) com armazenamento persistente solicitado e status visível em Configurações
-- [ ] **FUND-03**: App mostra a versão atual e só aplica atualização entre treinos (nunca no meio de um treino)
+- [x] **FUND-03**: App mostra a versão atual e só aplica atualização entre treinos (nunca no meio de um treino)
 - [ ] **FUND-04**: Usuário digita pesos com vírgula ou ponto (ex: 72,5) e o app entende corretamente
 - [ ] **FUND-05**: Na primeira abertura, o usuário vê aviso de check-up médico / "não é aconselhamento médico" e informa peso e altura
 
@@ -136,9 +136,9 @@ Adiado. Rastreado, fora do roadmap atual.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FUND-01 | Phase 1 | Pending |
+| FUND-01 | Phase 1 | Complete |
 | FUND-02 | Phase 1 | Pending |
-| FUND-03 | Phase 1 | Pending |
+| FUND-03 | Phase 1 | Complete |
 | FUND-04 | Phase 1 | Pending |
 | FUND-05 | Phase 1 | Pending |
 | PROG-01 | Phase 1 | Pending |
