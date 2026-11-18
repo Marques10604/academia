@@ -1,12 +1,12 @@
 // Serialized write-through workout actions. IndexedDB is the only source of truth:
 // nothing here keeps a draft copy in memory between calls.
 import { getActive, putActive, listSessions, getAll, del, finishActive, SCHEMA_VERSION } from '../data/db.js';
-import { PROGRAM } from '../data/program.js';
+import { workoutItems } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import { exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
-import { undoLast } from '../domain/draft.js';
+import { undoLast, isComplete } from '../domain/draft.js';
 
 let chain = Promise.resolve();
 
@@ -28,13 +28,13 @@ export function mutate(fn) {
   });
 }
 
-export function startWorkout(templateId, now) {
+export function startWorkout(templateId, now, short = false) {
   return queue(async () => {
     const sessions = await listSessions();
     const prefs = await getAll('exercisePrefs');
     const incrementById = new Map(prefs.map((p) => [p.exerciseId, p.incrementKg]));
     const today = localDate(now);
-    const entries = PROGRAM[templateId].items.map((item) => {
+    const entries = workoutItems(templateId, short).map((item) => {
       const exercise = EXERCISES[item.exerciseId];
       const plan = planExercise({
         item,
@@ -60,6 +60,7 @@ export function startWorkout(templateId, now) {
     const draft = {
       id: 'current',
       templateId,
+      short: short === true,
       startedAt: now,
       localDate: today,
       currentIdx: 0,
@@ -154,14 +155,12 @@ export function setCurrent(idx) {
   });
 }
 
-// A workout counts as complete when at least 70% of its exercises have a work set
-// (TRAINING-SCIENCE 2.1). Runs in the queue so a set logged just before "Finalizar" is included.
+// Completion rule lives in domain/draft.js (isComplete). Runs in the queue so a set logged just before "Finalizar" is included.
 export function finishWorkout(now) {
   return queue(async () => {
     const draft = await getActive();
     if (!draft) return null;
-    const done = draft.entries.filter((e) => e.sets.some((s) => s.kind === 'work')).length;
-    const complete = draft.entries.length > 0 && done / draft.entries.length >= 0.7;
+    const complete = isComplete(draft.entries, draft.short === true);
     const session = {
       ...draft,
       id: crypto.randomUUID(),

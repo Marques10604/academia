@@ -1,6 +1,6 @@
 import { h } from './dom.js';
 import { listSessions, getActive, getAll } from '../data/db.js';
-import { PROGRAM, ROTATION } from '../data/program.js';
+import { PROGRAM, ROTATION, workoutItems } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
 import { nextTemplate, exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
@@ -59,7 +59,7 @@ export async function renderToday() {
   const tpl = PROGRAM[templateId];
   const today = localDate(Date.now()); // the clock is read here in the UI layer, never in src/domain
 
-  const rows = tpl.items.map((item) => {
+  const rows = workoutItems(templateId, draft ? draft.short === true : false).map((item) => {
     const plan = planExercise({
       item,
       exercise: EXERCISES[item.exerciseId],
@@ -70,9 +70,9 @@ export async function renderToday() {
     return exerciseRow(item, plan);
   });
 
-  const onStart = async (e) => {
+  const onStart = (short) => async (e) => {
     e.currentTarget.disabled = true;
-    await startWorkout(templateId, Date.now());
+    await startWorkout(templateId, Date.now(), short);
     location.hash = '#/treino';
   };
   const onResume = () => {
@@ -91,5 +91,8 @@ export async function renderToday() {
     h('div', { class: 'bottom-bar' },
       draft
         ? h('button', { class: 'btn btn-big btn-primary', 'data-action': 'resume', onclick: onResume }, 'Continuar treino')
-        : h('button', { class: 'btn btn-big btn-primary', 'data-action': 'start', onclick: onStart }, 'Iniciar treino')));
+        : [
+          h('button', { class: 'btn btn-big btn-primary', 'data-action': 'start', onclick: onStart(false) }, 'Iniciar treino'),
+          h('button', { class: 'btn', 'data-action': 'start-short', onclick: onStart(true) }, 'Treino curto (dia corrido, ~25 min)'),
+        ]));
 }

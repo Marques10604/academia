@@ -169,7 +169,7 @@ export async function renderWorkout() {
   const screen = h('div', { class: 'screen', 'data-screen': 'treino' },
     h('div', { class: 'topbar' },
       h('div', null,
-        h('h1', { class: 'title' }, tpl.name),
+        h('h1', { class: 'title' }, draft.short ? `${tpl.name} (curto)` : tpl.name),
         h('p', { class: 'subtitle muted' }, `Exercício ${idx + 1} de ${total}`))),
     h('div', { class: 'chips', 'data-role': 'overview' },
       draft.entries.map((e, i) => h('button', {

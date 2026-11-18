@@ -36,3 +36,11 @@ export const PROGRAM = Object.freeze({
     ]),
   }),
 });
+
+// "Treino curto (dia corrido)": the same template, only its first SHORT_ITEMS exercises (~25 min).
+export const SHORT_ITEMS = 4;
+
+export function workoutItems(templateId, short) {
+  const items = PROGRAM[templateId].items;
+  return short ? items.slice(0, SHORT_ITEMS) : items;
+}

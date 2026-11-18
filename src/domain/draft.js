@@ -37,3 +37,12 @@ export function warmupSets(load, step) {
   ];
   return out.filter((s) => s.load > 0);
 }
+
+// A workout is complete when at least 70% of its exercises have a work set (TRAINING-SCIENCE 2.1).
+// A short workout ("treino curto") always counts once at least one exercise was done: its entries are
+// already only the short list, so nothing is measured against the exercises that were left out.
+export function isComplete(entries, short) {
+  const done = entries.filter((e) => e.sets.some((s) => s.kind === 'work')).length;
+  if (entries.length === 0) return false;
+  return short ? done > 0 : done / entries.length >= 0.7;
+}

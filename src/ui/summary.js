@@ -39,7 +39,7 @@ export async function renderSummary(hash) {
 
   return h('div', { class: 'screen', 'data-screen': 'resumo' },
     h('div', { class: 'topbar' },
-      h('h1', { class: 'title' }, session.complete ? `${tpl.name} concluído` : 'Treino registrado (incompleto)')),
+      h('h1', { class: 'title' }, session.complete ? (session.short ? `Treino curto: ${tpl.name} concluído` : `${tpl.name} concluído`) : 'Treino registrado (incompleto)')),
     h('p', { class: 'muted small', 'data-role': 'date' }, dayText(session.startedAt)),
     h('div', { class: 'card' },
       h('p', null, `Duração: ${minutes} min`),
