@@ -52,10 +52,21 @@ export async function main() {
     await browser.send('Runtime.enable');
     await browser.send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 2, mobile: true });
     const page = makePage(browser.send, url);
-    const capture = (params) => Promise.race([
-      browser.send('Page.captureScreenshot', { format: 'png', ...params }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('captura demorou demais')), 20000)),
-    ]);
+    // "Unable to capture screenshot" shows up now and then on a busy machine: bring the tab to the front and retry.
+    const capture = async (params) => {
+      for (let attempt = 1; ; attempt++) {
+        try {
+          await browser.send('Page.bringToFront');
+          return await Promise.race([
+            browser.send('Page.captureScreenshot', { format: 'png', ...params }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('captura demorou demais')), 20000)),
+          ]);
+        } catch (err) {
+          if (attempt >= 6) throw err;
+          await new Promise((r) => setTimeout(r, 600));
+        }
+      }
+    };
     const shot = async (name, { full = false } = {}) => {
       await new Promise((r) => setTimeout(r, 300)); // let fonts/layout settle
       const save = async (file, params = {}) => {
