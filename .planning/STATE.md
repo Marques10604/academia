@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Backup, History & Check-in
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-11-18T17:35:48.184Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-11-18T20:02:30.628Z"
 last_activity: 2026-11-18
 last_activity_desc: Phase 1 execution started
-state_head: 365b2519270991136a6e9bdff95726eb6d903c76
+state_head: bea1cb255cf459d6002a62ea3297d07285163a31
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 0
 ---
 
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-18)
 
 **Core value:** In the gym, open the app and know exactly which workout to do today, how to do each exercise and with what weight, log each set in seconds, and have the next load suggested automatically, offline.
-**Current focus:** Phase 2 — Backup, History & Check-in (02-01 and 02-02 done; next 02-03)
+**Current focus:** Phase 2 — Backup, History & Check-in (all 3 plans done, 0.3.0 live; phone checks pending)
 
 **Hard deadline:** whole app finished in 5 days, target finish 2026-11-23 (started 2026-11-18). First gym session is in December 2026. Keep every implementation as simple as works for one person.
 
 ## Current Position
 
 Phase: 2 (Backup, History & Check-in) — EXECUTING
-Plan: 2 of 3 complete (next: 02-03)
-Status: Executing Phase 2
-Last activity: 2026-11-18 — Completed 02-02 (history and SVG chart)
+Plan: 3 of 3 complete (phase 2 plans done; verification and UAT pending)
+Status: Phase 2 plans complete (0.3.0 published)
+Last activity: 2026-11-18 — Completed 02-03 (check-in, 7-day average, waist, 0.3.0 published)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -68,6 +68,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 1 P06 | 20 min | 2 tasks | 8 files |
 | Phase 02 P01 | 1h | 3 tasks | 11 files |
 | Phase 02 P02 | 45 min | 2 tasks | 14 files |
+| Phase 02 P03 | 40min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,7 @@ Recent decisions affecting current work:
 - [Phase 1]: 01-06: Ramp sets are kind 'ramp' and logSet ends calibration; increment chips come from fixed lists and apply to the next workout started
 - [Phase 02]: Backup envelope {app, format, schemaVersion, appVersion, exportedAt, counts, stores}; share as text/plain .txt; restore in one transaction; lastBackupAt = exportedAt after restore
 - [Phase 02]: 02-02: chart plots best set per workout (time for plank, reps when loads are 0, load in most recent unit); older workouts compute records against earlier workouts only
+- [Phase 02]: 02-03: only body weight from the scale is recorded; saving the waist rebuilds only the waist card so an unsaved check-in is never lost
 
 ### Pending Todos
 
@@ -113,6 +115,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T17:35:47.369Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-11-18T20:02:29.753Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None

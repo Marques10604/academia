@@ -54,10 +54,10 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 ### Corpo e Check-in (CORPO)
 
-- [ ] **CORPO-01**: Check-in matinal em poucos segundos: peso, sono (1–5) e energia (1–5) — todos opcionais
-- [ ] **CORPO-02**: Gráfico de peso corporal com média móvel de 7 dias
+- [x] **CORPO-01**: Check-in matinal em poucos segundos: peso, sono (1–5) e energia (1–5) — todos opcionais
+- [x] **CORPO-02**: Gráfico de peso corporal com média móvel de 7 dias
 - [ ] **CORPO-03**: App lembra a cada 4 semanas de tirar fotos de progresso (frente/lado/costas) num álbum "Academia" da galeria do celular (fotos fora do app — decisão 2026-11-18)
-- [ ] **CORPO-05**: Usuário registra a medida da cintura com fita (na altura do umbigo) a cada 4 semanas e vê a evolução junto com o peso
+- [x] **CORPO-05**: Usuário registra a medida da cintura com fita (na altura do umbigo) a cada 4 semanas e vê a evolução junto com o peso
 
 ### Alimentação (ALIM)
 
@@ -166,10 +166,10 @@ Adiado. Rastreado, fora do roadmap atual.
 | EVOL-02 | Phase 2 | Complete |
 | EVOL-03 | Phase 1 | Complete |
 | EVOL-04 | Phase 2 | Complete |
-| CORPO-01 | Phase 2 | Pending |
-| CORPO-02 | Phase 2 | Pending |
+| CORPO-01 | Phase 2 | Complete |
+| CORPO-02 | Phase 2 | Complete |
 | CORPO-03 | Phase 3 | Pending |
-| CORPO-05 | Phase 2 | Pending |
+| CORPO-05 | Phase 2 | Complete |
 | ALIM-01 | Phase 3 | Pending |
 | ALIM-02 | Phase 3 | Pending |
 | ALIM-03 | Phase 3 | Pending |
