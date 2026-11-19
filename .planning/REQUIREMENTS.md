@@ -70,12 +70,12 @@ Escopo da primeira versão (pronta antes de começar a academia em dezembro/2026
 
 - [x] **META-01**: Usuário define meta de treinos por semana (padrão: 3) e vê sequência de semanas cumpridas, com 1 semana de folga permitida sem zerar
 - [x] **META-02**: Usuário define meta de peso corporal e vê progresso com ritmo saudável sugerido (~0,25–0,4% do peso/semana)
-- [ ] **META-04**: App guia o usuário a criar alarme matinal recorrente no Relógio do Android (e/ou arquivo de calendário .ics)
+- [x] **META-04**: App guia o usuário a criar alarme matinal recorrente no Relógio do Android (e/ou arquivo de calendário .ics)
 - [x] **META-05**: Tela Hoje mostra aviso "há N dias sem treinar" quando aplicável, sem linguagem de culpa
 
 ### Análise por IA (IA)
 
-- [ ] **IA-01**: Usuário toca em "Gerar relatório para IA" e o app monta um texto com resumo do histórico (cargas por exercício, frequência, peso médio, sono/energia, proteína) + pergunta pronta, copiável para colar em qualquer IA gratuita (ChatGPT, Gemini, Claude)
+- [x] **IA-01**: Usuário toca em "Gerar relatório para IA" e o app monta um texto com resumo do histórico (cargas por exercício, frequência, peso médio, sono/energia, proteína) + pergunta pronta, copiável para colar em qualquer IA gratuita (ChatGPT, Gemini, Claude)
 
 ### Backup (BKP)
 
@@ -176,9 +176,9 @@ Adiado. Rastreado, fora do roadmap atual.
 | ALIM-04 | Phase 3 | Complete |
 | META-01 | Phase 3 | Complete |
 | META-02 | Phase 3 | Complete |
-| META-04 | Phase 3 | Pending |
+| META-04 | Phase 3 | Complete |
 | META-05 | Phase 3 | Complete |
-| IA-01 | Phase 3 | Pending |
+| IA-01 | Phase 3 | Complete |
 | BKP-01 | Phase 2 | Complete |
 | BKP-02 | Phase 2 | Complete |
 | BKP-03 | Phase 2 | Complete |

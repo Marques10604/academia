@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 4
 current_phase_name: Identity, Publish & Handoff
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-11-18T23:46:33.218Z"
+stopped_at: Completed 03-03-PLAN.md (0.5.0 live)
+last_updated: "2026-11-19T00:55:52.918Z"
 last_activity: 2026-11-18
-last_activity_desc: Completed 03-02 (weekly goal and streak, gap note, weight goal, carb nudge, photo reminder)
-state_head: 7e3983202ef17c9cc7e401f038df7f546fb14461
+last_activity_desc: Completed 03-03 (AI report, morning-alarm guide and .ics, kit file map, 0.5.0 published)
+state_head: 9a3243c37d3608257ea0f6bb065845ec53dbc3f8
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
   percent: 0
 ---
 
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-18)
 
 **Core value:** In the gym, open the app and know exactly which workout to do today, how to do each exercise and with what weight, log each set in seconds, and have the next load suggested automatically, offline.
-**Current focus:** Phase 4 — Identity, Publish & Handoff complete and live as 0.4.0 (phone checks pending); next: verify the phase, then Phase 3
+**Current focus:** All 4 phases have their plans executed; 0.5.0 (Phase 3) is live. Next: verify/close Phase 3 and run the phone checks (03-03-SUMMARY "Teste no celular")
 
 **Hard deadline:** whole app finished in 5 days, target finish 2026-11-23 (started 2026-11-18). First gym session is in December 2026. Keep every implementation as simple as works for one person.
 
 ## Current Position
 
-Phase: 4 (Identity, Publish & Handoff) — EXECUTING
-Plan: 2 of 2 complete (04-02: version 0.4.0, publish, maintenance guide, rescue kit)
-Status: Phase 4 plans complete; 0.4.0 live at https://marques10604.github.io/academia/ (phone checks pending, see 04-02-SUMMARY)
-Last activity: 2026-11-18 — Completed 03-02 (Meta de treinos + sequência, aviso "Faz N dias", Meta de peso, sugestão de carboidrato, lembrete de fotos); Phase 3 next: 03-03 (AI report, alarm guide, 0.5.0)
+Phase: 3 (Food, Goals, Photos & AI) — plans 3 of 3 complete (03-03: AI report, alarm guide + .ics, kit file map, release 0.5.0)
+Plan: last plan of the project executed
+Status: 0.5.0 live at https://marques10604.github.io/academia/ (main fast-forwarded to 9a3243c); phone checks pending, see 03-03-SUMMARY
+Last activity: 2026-11-18 — Completed 03-03 (Relatório para IA, Lembrete matinal, 0.5.0 published)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -73,6 +73,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P02 | 45min | 3 tasks | 9 files |
 | Phase 03 P01 | 35min | 3 tasks | 11 files |
 | Phase 03 P02 | 45min | 3 tasks | 11 files |
+| Phase 03 P03 | 40min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-18T23:46:32.502Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-11-19T00:55:52.732Z
+Stopped at: Completed 03-03-PLAN.md (0.5.0 live)
 Resume file: None
