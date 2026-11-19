@@ -1,4 +1,4 @@
-const VERSION = '0.4.0';
+const VERSION = '0.5.0';
 const CACHE = 'academia-' + VERSION;
 const ASSETS = [
   // ASSETS-START
@@ -30,6 +30,8 @@ const ASSETS = [
   './src/domain/progression.js',
   './src/domain/protein.js',
   './src/domain/records.js',
+  './src/domain/reminder.js',
+  './src/domain/report.js',
   './src/domain/timer.js',
   './src/domain/units.js',
   './src/domain/week.js',
@@ -45,6 +47,8 @@ const ASSETS = [
   './src/ui/onboarding.js',
   './src/ui/protein.js',
   './src/ui/reasons.js',
+  './src/ui/reminder.js',
+  './src/ui/report.js',
   './src/ui/settings.js',
   './src/ui/summary.js',
   './src/ui/tabs.js',

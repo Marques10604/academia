@@ -41,6 +41,9 @@ MAPA DOS ARQUIVOS
 - src/ui/exercise.js: tela Exercício (como fazer, carga, regulagem)
 - src/ui/history.js: tela Histórico
 - src/ui/body.js: tela Corpo (check-in, peso, cintura)
+- src/ui/protein.js: tela Proteína (porções do dia e meta)
+- src/ui/report.js: tela Relatório para IA
+- src/ui/reminder.js: tela Lembrete matinal (alarme e arquivo de agenda)
 - src/ui/backup.js: tela Backup (baixar, enviar, restaurar)
 - src/ui/settings.js: tela Config
 - src/ui/onboarding.js: primeira tela (boas-vindas)
@@ -51,8 +54,12 @@ MAPA DOS ARQUIVOS
 - src/domain/progression.js e src/domain/plan.js: regra da próxima carga (dupla progressão)
 - src/domain/records.js: recordes pessoais
 - src/domain/timer.js: cronômetro de descanso
-- src/domain/week.js: semana de treinos
+- src/domain/week.js: semana de treinos, meta semanal e sequência
 - src/domain/body.js: peso médio e medidas
+- src/domain/protein.js: meta e porções de proteína
+- src/domain/goals.js: meta de peso, ritmo, sugestão de carboidrato e fotos a cada 4 semanas
+- src/domain/report.js: texto do relatório para IA
+- src/domain/reminder.js: arquivo .ics do lembrete
 - src/domain/backup.js: formato do arquivo de backup (BACKUP_APP, BACKUP_STORES)
 - src/domain/numbers.js: parseDecimal (aceita vírgula)
 - src/domain/dates.js: datas locais
@@ -116,6 +123,10 @@ Descreva **um problema por conversa**. Se a correção não funcionar, continue 
 | Histórico | `src/ui/history.js` |
 | Corpo | `src/ui/body.js` |
 | Backup | `src/ui/backup.js` |
+| Proteína | `src/ui/protein.js` |
+| Relatório para IA | `src/ui/report.js` e `src/domain/report.js` |
+| Lembrete matinal | `src/ui/reminder.js` |
+| Metas, sequência e fotos | `src/domain/week.js` e `src/domain/goals.js` |
 | Config | `src/ui/settings.js` |
 | Checklist do 1º dia | `src/ui/firstday.js` |
 | Carga sugerida errada | `src/domain/progression.js` e `src/domain/plan.js` |
