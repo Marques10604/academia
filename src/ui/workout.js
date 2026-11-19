@@ -2,6 +2,7 @@ import { h } from './dom.js';
 import { getActive, listSessions } from '../data/db.js';
 import { PROGRAM } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
+import { videoLink } from './video.js';
 import {
   logSet, setCurrent, finishWorkout, discardWorkout,
   adjustLoad, setLoad, adjustReps, setFeel, undoLastSet, logWarmup, skipRest, logRampSet, answerRamp,
@@ -232,8 +233,10 @@ export async function renderWorkout() {
     wakeNode,
     warmupCard,
     h('div', { class: 'card current' },
-      h('h2', { class: 'title' },
-        h('a', { href: '#/exercicio/' + entry.exerciseId }, ex.name)),
+      h('div', { class: 'ex-head' },
+        h('h2', { class: 'title' },
+          h('a', { href: '#/exercicio/' + entry.exerciseId }, ex.name)),
+        videoLink(ex)),
       noteOf(pref) ? h('p', { class: 'small setup-note', 'data-role': 'setup-note' }, h('strong', null, 'Minha regulagem: '), noteOf(pref)) : null,
       entry.phase ? h('p', null, h('span', { class: `badge badge-${entry.phase}`, 'data-role': 'phase' }, phaseLabel(entry.phase))) : null, // drafts from 0.1.0 have no phase
       entry.phase ? h('p', { class: 'muted small', 'data-role': 'effort' }, effortText(entry.phase, ex)) : null,

@@ -614,6 +614,21 @@ body.has-tabs .bottom-bar {
   text-decoration: none;
 }
 
+.video-link {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
 .ex-name::after {
   content: " ›";
   margin-left: 4px;

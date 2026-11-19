@@ -3,6 +3,7 @@ import { listSessions, getActive, getSetting } from '../data/db.js';
 import { loadPrefs } from '../data/prefs.js';
 import { PROGRAM, ROTATION, workoutItems } from '../data/program.js';
 import { EXERCISES } from '../data/exercises.js';
+import { videoLink } from './video.js';
 import { nextTemplate, exerciseHistory } from '../domain/history.js';
 import { planExercise } from '../domain/plan.js';
 import { localDate } from '../domain/dates.js';
@@ -43,7 +44,8 @@ function exerciseCard(item, plan, note) {
   return h('div', { class: 'card ex-card', 'data-exercise': item.exerciseId },
     h('div', { class: 'ex-head' },
       h('a', { class: 'ex-name', href: '#/exercicio/' + item.exerciseId }, exercise.name),
-      h('span', { class: 'badge badge-' + plan.phase, 'data-role': 'phase' }, phaseLabel(plan.phase))),
+      h('span', { class: 'badge badge-' + plan.phase, 'data-role': 'phase' }, phaseLabel(plan.phase)),
+      videoLink(exercise)),
     isTime ? null : h('strong', { class: 'ex-load', 'data-role': 'load' }, loadText(plan.load, exercise, plan.unit)),
     h('span', { class: 'muted small', 'data-role': 'prescription' }, plannedText(item, plan, exercise)),
     // user text: h() only ever adds it as a text node

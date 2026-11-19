@@ -1,4 +1,4 @@
-const VERSION = '0.5.0';
+const VERSION = '0.5.1';
 const CACHE = 'academia-' + VERSION;
 const ASSETS = [
   // ASSETS-START
@@ -53,6 +53,7 @@ const ASSETS = [
   './src/ui/summary.js',
   './src/ui/tabs.js',
   './src/ui/today.js',
+  './src/ui/video.js',
   './src/ui/workout.js',
   './src/version.js',
   './styles.css',
